@@ -17,4 +17,14 @@ public class DefaultStructuredTextListener extends StructuredTextBaseListener {
 		System.out.println(ctx);
 	}
 
+	@Override
+	public void enterData_type_declaration(StructuredTextParser.Data_type_declarationContext ctx) {
+		System.out.println(ctx);
+	}
+
+	@Override
+	public void enterStructure_type_name(StructuredTextParser.Structure_type_nameContext ctx) {
+		System.out.println(ctx.IDENTIFIER());
+	}
+
 }

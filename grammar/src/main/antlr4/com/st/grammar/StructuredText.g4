@@ -84,6 +84,7 @@ function_block_declaration:
 //function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
 	
 	
+
 	
 	
 program_delcaration:
@@ -258,6 +259,87 @@ unsigned_integer_type_name :
 	;
 	
 	
+
+
+
+//data_type_declaration ::= ’TYPE’ type_declaration ’;’ {type_declaration ’;’} ’END_TYPE’
+data_type_declaration:
+	TYPE 
+	(type_declaration SEMICOLON)+
+	END_TYPE
+	;
+
+// type_declaration ::= single_element_type_declaration | array_type_declaration | structure_type_declaration | string_type_declaration
+type_declaration:
+	//single_element_type_declaration 
+	//| 
+	//array_type_declaration 
+	//| 
+	structure_type_declaration 
+	//| 
+	//string_type_declaration
+	;
+
+structure_type_declaration:
+	structure_type_name COLON structure_specification
+	;
+	
+structure_specification :
+	 structure_declaration 
+//	 | 
+//	 initialized_structure
+	 ;
+	 
+structure_declaration : 
+	STRUCT 
+	(structure_element_declaration SEMICOLON)+
+	END_STRUCT
+	;
+	
+
+
+structure_type_name:
+	IDENTIFIER
+	;
+	
+// structure_element_declaration ::= structure_element_name ’:’(simple_spec_init |subrange_spec_init | enumerated_spec_init | array_spec_init | initialized_structure)
+structure_element_declaration : 
+	structure_element_name COLON 
+	(
+		simple_spec_init 
+//		| 
+//		subrange_spec_init 
+//		| 
+//		enumerated_spec_init 
+//		| 
+//		array_spec_init 
+//		| 
+//		initialized_structure
+	)
+	;
+	
+structure_element_name :
+	IDENTIFIER
+	;
+
+structure_initialization :
+	 '(' structure_element_initialization (COMMA structure_element_initialization)? ')'
+	 ;
+
+structure_element_initialization :
+	structure_element_name ':=' 
+//	(constant | enumerated_value | array_initialization | structure_initialization)
+	;
+
+string_type_name : 
+	IDENTIFIER
+	;
+
+string_type_declaration : 
+	string_type_name COLON ('STRING' | 'WSTRING') 
+	('[' INTEGER ']')? 
+	(':=' STRING_LITERAL)?
+	;
 	
 // function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
 function_block_body:
@@ -482,6 +564,8 @@ DOUBLE_QUOTES: '"';
 END_FUNCTION_BLOCK: 'END_FUNCTION_BLOCK';
 END_PROGRAM : 'END_PROGRAM';
 END_VAR : 'END_VAR';
+END_TYPE : 'END_TYPE';
+END_STRUCT: 'END_STRUCT';
 
 // F
 FUNCTION_BLOCK : 'FUNCTION_BLOCK';
@@ -506,9 +590,11 @@ RETAIN: 'RETAIN';
 
 // S
 SEMICOLON : ';';
+STRUCT : 'STRUCT';
 
 // T
 TICK : '\'';
+TYPE : 'TYPE';
 
 // U
 UNDERSCORE: '_';

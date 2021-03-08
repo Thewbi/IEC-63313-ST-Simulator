@@ -10,18 +10,50 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import com.st.grammar.DefaultStructuredTextListener;
 import com.st.grammar.StructuredTextLexer;
 import com.st.grammar.StructuredTextParser;
+import com.st.grammar.StructuredTextParser.Data_type_declarationContext;
 import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
 import com.st.grammar.StructuredTextParser.Program_delcarationContext;
+import com.st.grammar.StructuredTextParser.Type_declarationContext;
 
 public class Main {
 
 	public static void main(final String[] args) throws IOException {
-
 		functionProgram();
 		functionInterface();
 		functionBlock();
+		type();
+	}
+	
+	private static void type() throws IOException {
+		
+		System.out.println("Test Type");
+		
+		final CharStream charStream = CharStreams
+				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+				//.fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
+				.fromFileName("src/test/resources/iec61131_structuredtext/type.st");
 
+		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+		// create a buffer of tokens pulled from the lexer
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+		// parse a type declaration
+        Data_type_declarationContext root = parser.data_type_declaration();
+
+//		// Create a generic parse tree walker that can trigger callbacks
+		final ParseTreeWalker walker = new ParseTreeWalker();
+		// Walk the tree created during the parse, trigger callbacks
+		walker.walk(new DefaultStructuredTextListener(), root);
+		System.out.println(); // print a \n after translation
+
+		// Walk the tree again to translate to java
+		// walker.walk(new MyLangTranslator(), tree);
 	}
 	
 	private static void functionProgram() throws IOException {
