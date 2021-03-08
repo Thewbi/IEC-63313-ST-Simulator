@@ -12,4 +12,9 @@ public class DefaultStructuredTextListener extends StructuredTextBaseListener {
 		System.out.println(ctx);
 	}
 
+	@Override
+	public void enterInterface_declaration(StructuredTextParser.Interface_declarationContext ctx) {
+		System.out.println(ctx);
+	}
+
 }

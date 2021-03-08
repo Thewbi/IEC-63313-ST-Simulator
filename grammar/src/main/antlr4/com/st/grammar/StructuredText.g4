@@ -17,11 +17,80 @@ BlockComment:
 	| ('(*' .*? '*)'))
 	-> skip
     ;
+    
+//INTERFACE I_Subject
+interface_declaration:
+	INTERFACE IDENTIFIER
+//	(interface_method_declaration)*
+	(method_declaration)*
+	;
+	
+//interface_method_declaration:
+method_declaration:
+	METHOD PUBLIC? IDENTIFIER COLON elementary_type_name
+	(
+		other_var_declarations
+		|
+		io_var_declarations
+	)?
+	;
+	
+
+	
+	
+	
+//function_block_type_name ::= standard_function_block_name | derived_function_block_name
+function_block_type_name :
+	//standard_function_block_name | 
+	derived_function_block_name
+	;
+
+//standard_function_block_name ::= <as defined in clause 2.5.2.3 of the standard>
+
+derived_function_block_name : 
+	IDENTIFIER
+	;
+
+//function_block_declaration ::=
+//â€™FUNCTION_BLOCKâ€™ derived_function_block_name
+//{ io_var_declarations | other_var_declarations }
+//function_block_body
+//â€™END_FUNCTION_BLOCKâ€™
+function_block_declaration:
+	FUNCTION_BLOCK PUBLIC IDENTIFIER
+	(
+	//io_var_declarations |
+	other_var_declarations
+	)
+	method_declaration+
+	function_block_body
+	END_FUNCTION_BLOCK
+	;
+
+
+
+//temp_var_decls ::=
+//â€™VAR_TEMPâ€™
+//temp_var_decl â€™;â€™
+//{temp_var_decl â€™;â€™}
+//â€™END_VARâ€™
+
+//non_retentive_var_decls ::=
+//â€™VARâ€™ â€™NON_RETAINâ€™
+//var_init_decl â€™;â€™
+//{var_init_decl â€™;â€™}
+//â€™END_VARâ€™
+
+//function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
+	
+	
+	
 	
 program_delcaration:
 	PROGRAM program_type_name
 	(
-//	io_var_declarations |
+	io_var_declarations 
+	|
 	other_var_declarations 
 //	| located_var_declarations 
 //	| program_access_decls
@@ -41,7 +110,25 @@ other_var_declarations :
 	//| non_retentive_var_declarations
     //| temp_var_decls 
     //| incompl_located_var_declarations
-    ;    
+    ;
+    
+//io_var_declarations ::= input_declarations | output_declarations | input_output_declarations 
+io_var_declarations :
+	input_declarations
+	;
+	
+// input_declarations ::= â€™VAR_INPUTâ€™ [â€™RETAINâ€™ | â€™NON_RETAINâ€™] input_declaration â€™;â€™ {input_declaration â€™;â€™} â€™END_VARâ€™
+input_declarations:
+	VAR_INPUT (RETAIN | NON_RETAIN)?
+	(input_declaration SEMICOLON)+
+	END_VAR
+	;
+	
+//input_declaration ::= var_init_decl | edge_declaration
+input_declaration :
+	var_init_decl 
+	//| edge_declaration
+	;
 
 var_declarations : 
 	VAR 
@@ -78,11 +165,15 @@ simple_spec_init :
 	
 simple_specification : 
 	elementary_type_name 
-	//| 
-	//simple_type_name
+	| 
+	simple_type_name
 	;
 	
-// elementary_type_name ::= numeric_type_name | date_type_name | bit_string_type_name | ’STRING’ | ’WSTRING’ | ’TIME’
+simple_type_name :
+	IDENTIFIER
+	;
+	
+// elementary_type_name ::= numeric_type_name | date_type_name | bit_string_type_name | ï¿½STRINGï¿½ | ï¿½WSTRINGï¿½ | ï¿½TIMEï¿½
 elementary_type_name:
 	numeric_type_name | 
 	//date_type_name | 
@@ -174,7 +265,7 @@ function_block_body:
 	;
 	
 // statement_list aka. structured_text
-// statement_list ::= statement ’;’ {statement ’;’} 
+// statement_list ::= statement ï¿½;ï¿½ {statement ï¿½;ï¿½} 
 statement_list:
 	(statement SEMICOLON)+
 	;
@@ -213,22 +304,22 @@ variable_name:
 	IDENTIFIER
 	;
 	
-// expression ::= xor_expression {’OR’ xor_expression}
+// expression ::= xor_expression {ï¿½ORï¿½ xor_expression}
 expression:
 	xor_expression ('OR' xor_expression)?
 	;
 	
-// xor_expression ::= and_expression {’XOR’ and_expression}
+// xor_expression ::= and_expression {ï¿½XORï¿½ and_expression}
 xor_expression:
 	and_expression ('OR' and_expression)?
 	;
 	
-// and_expression ::= comparison {(’&’ | ’AND’) comparison}
+// and_expression ::= comparison {(ï¿½&ï¿½ | ï¿½ANDï¿½) comparison}
 and_expression:
 	comparison (('&' | 'AND') comparison)?
 	;
 	
-// comparison ::= equ_expression { (’=’ | ’<>’) equ_expression}
+// comparison ::= equ_expression { (ï¿½=ï¿½ | ï¿½<>ï¿½) equ_expression}
 comparison:
 	equ_expression (('=' | '<>') equ_expression)?
 	;
@@ -238,7 +329,7 @@ equ_expression:
 	add_expression (comparison_operator add_expression)?
 	;
 	
-// comparison_operator ::= ’<’ | ’>’ | ’<=’ | ’>=’
+// comparison_operator ::= ï¿½<ï¿½ | ï¿½>ï¿½ | ï¿½<=ï¿½ | ï¿½>=ï¿½
 comparison_operator:
 	'<' | '>' | '<=' | '>='
 	;
@@ -248,7 +339,7 @@ add_expression:
 	term (add_operator term)?
 	;
 
-//add_operator ::= ’+’ | ’-’
+//add_operator ::= ï¿½+ï¿½ | ï¿½-ï¿½
 add_operator:
 	'+' | '-'
 	;
@@ -258,12 +349,12 @@ term:
 	power_expression (multiply_operator power_expression)?
 	;
 	
-// multiply_operator ::= ’*’ | ’/’ | ’MOD’
+// multiply_operator ::= ï¿½*ï¿½ | ï¿½/ï¿½ | ï¿½MODï¿½
 multiply_operator:
 	'*' | '/' | 'MOD'
 	;
 	
-// power_expression ::= unary_expression {’**’ unary_expression}
+// power_expression ::= unary_expression {ï¿½**ï¿½ unary_expression}
 power_expression:
 	unary_expression ('*''*' unary_expression)?
 	;
@@ -273,20 +364,20 @@ unary_expression:
 	unary_operator? primary_expression
 	;
 
-// unary_operator ::= ’-’ | ’NOT’	
+// unary_operator ::= ï¿½-ï¿½ | ï¿½NOTï¿½	
 unary_operator:
 	'-' | 'NOT'
 	;
 	
-//primary_expression ::= constant | enumerated_value | variable | ’(’ expression ’)’ | function_name ’(’ param_assignment {’,’ param_assignment} ’)’
+//primary_expression ::= constant | enumerated_value | variable | ï¿½(ï¿½ expression ï¿½)ï¿½ | function_name ï¿½(ï¿½ param_assignment {ï¿½,ï¿½ param_assignment} ï¿½)ï¿½
 primary_expression:
 	constant
 	//| 
 	//enumerated_value 
 	| 
 	variable 
-	// | ’(’ expression ’)’ 
-	// | function_name ’(’ param_assignment {’,’ param_assignment} ’)’
+	// | ï¿½(ï¿½ expression ï¿½)ï¿½ 
+	// | function_name ï¿½(ï¿½ param_assignment {ï¿½,ï¿½ param_assignment} ï¿½)ï¿½
 	;
 	
 	
@@ -301,7 +392,7 @@ iteration_statement:
 	//exit_statement
 	;
 	
-// for_statement ::= ’FOR’ control_variable ’:=’ for_list ’DO’ statement_list ’END_FOR’
+// for_statement ::= ï¿½FORï¿½ control_variable ï¿½:=ï¿½ for_list ï¿½DOï¿½ statement_list ï¿½END_FORï¿½
 for_statement:
 	'FOR' control_variable ':=' for_list 'DO' statement_list 'END_FOR'
 	;
@@ -311,7 +402,7 @@ control_variable:
 	IDENTIFIER
 	;
 
-// for_list ::= expression ’TO’ expression [’BY’ expression]	
+// for_list ::= expression ï¿½TOï¿½ expression [ï¿½BYï¿½ expression]	
 for_list:
 	expression 'TO' expression ('BY' expression)?
 	;
@@ -328,10 +419,10 @@ selection_statement:
 	;
 
 //if_statement ::=
-//’IF’ expression ’THEN’ statement_list
-//{’ELSIF’ expression ’THEN’ statement_list}
-//[’ELSE’ statement_list]
-//’END_IF’
+//ï¿½IFï¿½ expression ï¿½THENï¿½ statement_list
+//{ï¿½ELSIFï¿½ expression ï¿½THENï¿½ statement_list}
+//[ï¿½ELSEï¿½ statement_list]
+//ï¿½END_IFï¿½
 if_statement:
 	'IF' expression 'THEN' statement_list
 	(
@@ -344,11 +435,11 @@ if_statement:
 	;
 
 //case_statement ::=
-//’CASE’ expression ’OF’
+//ï¿½CASEï¿½ expression ï¿½OFï¿½
 //case_element
 //{case_element}
-//[’ELSE’ statement_list]
-//’END_CASE’
+//[ï¿½ELSEï¿½ statement_list]
+//ï¿½END_CASEï¿½
 case_statement:
 	'CASE' expression 'OF' 
 	(case_element)+
@@ -356,12 +447,12 @@ case_statement:
 	'END_CASE'
 	;
 
-//case_element ::= case_list ’:’ statement_list
+//case_element ::= case_list ï¿½:ï¿½ statement_list
 case_element:
 	case_list COLON statement_list
 	;
 
-//case_list ::= case_list_element {’,’ case_list_element}
+//case_list ::= case_list_element {ï¿½,ï¿½ case_list_element}
 case_list:
 	case_list_element (',' case_list_element)?
 	;
@@ -388,15 +479,30 @@ CONSTANT: 'CONSTANT';
 DOUBLE_QUOTES: '"';
 
 // E
+END_FUNCTION_BLOCK: 'END_FUNCTION_BLOCK';
 END_PROGRAM : 'END_PROGRAM';
 END_VAR : 'END_VAR';
 
+// F
+FUNCTION_BLOCK : 'FUNCTION_BLOCK';
+
+// I
+INTERFACE: 'INTERFACE';
+
 // M
 MINUS: '-';
+METHOD: 'METHOD';
+
+// N
+NON_RETAIN: 'NON_RETAIN';
 
 // P
 PLUS: '+';
 PROGRAM : 'PROGRAM';
+PUBLIC: 'PUBLIC';
+
+// R
+RETAIN: 'RETAIN';
 
 // S
 SEMICOLON : ';';
@@ -409,6 +515,7 @@ UNDERSCORE: '_';
 
 // V
 VAR: 'VAR';
+VAR_INPUT: 'VAR_INPUT';
 
 
 
@@ -418,16 +525,16 @@ VAR: 'VAR';
 // fragment lexer rules can only be used by other lexer rules: 
 // these will never become a token on their own. Therefor, you cannot use fragment rules in parser rules.
 
-// letter ::= ’A’ | ’B’ | <...> | ’Z’ | ’a’ | ’b’ | <...> | ’z’
+// letter ::= ï¿½Aï¿½ | ï¿½Bï¿½ | <...> | ï¿½Zï¿½ | ï¿½aï¿½ | ï¿½bï¿½ | <...> | ï¿½zï¿½
 fragment LETTER : [a-zA-Z];
 
-// digit ::= ’0’ | ’1’ | ’2’ | ’3’ | ’4’ | ’5’ | ’6’ | ’7’ | ’8’ |’9’
+// digit ::= ï¿½0ï¿½ | ï¿½1ï¿½ | ï¿½2ï¿½ | ï¿½3ï¿½ | ï¿½4ï¿½ | ï¿½5ï¿½ | ï¿½6ï¿½ | ï¿½7ï¿½ | ï¿½8ï¿½ |ï¿½9ï¿½
 fragment DIGIT : [0-9];
 
-// octal_digit ::= ’0’ | ’1’ | ’2’ | ’3’ | ’4’ | ’5’ | ’6’ | ’7’
+// octal_digit ::= ï¿½0ï¿½ | ï¿½1ï¿½ | ï¿½2ï¿½ | ï¿½3ï¿½ | ï¿½4ï¿½ | ï¿½5ï¿½ | ï¿½6ï¿½ | ï¿½7ï¿½
 //OCTAL_DIGIT
 
-// hex_digit ::= digit | ’A’ | ’B’ | ’C’ | ’D’ | ’E’ | ’F’
+// hex_digit ::= digit | ï¿½Aï¿½ | ï¿½Bï¿½ | ï¿½Cï¿½ | ï¿½Dï¿½ | ï¿½Eï¿½ | ï¿½Fï¿½
 
 
 
@@ -438,7 +545,7 @@ INTEGER:
 	;
 	
 
-// identifier ::= (letter | (’_’ (letter | digit))) {[’_’] (letter | digit)}
+// identifier ::= (letter | (ï¿½_ï¿½ (letter | digit))) {[ï¿½_ï¿½] (letter | digit)}
 IDENTIFIER:
 	(LETTER | (UNDERSCORE (LETTER | DIGIT))) (UNDERSCORE | LETTER | DIGIT)*
 	;
