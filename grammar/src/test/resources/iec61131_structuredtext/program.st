@@ -1,20 +1,29 @@
 PROGRAM M_AIN_2
+
+VAR
+END_VAR
+
 //PROGRAM main
-/*VAR
+/*
+VAR
 	test: BOOL := TRUE;
 	test2: INT := 10;
 END_VAR
 
 test := TRUE;
-test2 := 14;*/
+test2 := 14;
+*/
 
-(*VAR
+(*
+VAR
 	test: BOOL := TRUE;
 	test2: INT := 10;
 END_VAR
 
 test := TRUE;
-test2 := 14;*)
+test2 := 14;
+*)
+
 
 VAR
 	test: BOOL := FALSE;

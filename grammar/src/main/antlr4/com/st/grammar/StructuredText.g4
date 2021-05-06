@@ -21,18 +21,26 @@ BlockComment:
 //INTERFACE I_Subject
 interface_declaration:
 	INTERFACE IDENTIFIER
-//	(interface_method_declaration)*
-	(method_declaration)*
+	// interface method declarations have no body
+	(interface_method_declaration)*
+//	(method_declaration)*
 	;
 	
-//interface_method_declaration:
-method_declaration:
+interface_method_declaration:
 	METHOD PUBLIC? IDENTIFIER COLON elementary_type_name
+	// optional variable declarations
 	(
 		other_var_declarations
 		|
 		io_var_declarations
 	)?
+	// no body required
+	;
+
+method_declaration:
+	interface_method_declaration
+	// mandatory body
+	function_block_body
 	;
 	
 
@@ -57,13 +65,18 @@ derived_function_block_name :
 //function_block_body
 //’END_FUNCTION_BLOCK’
 function_block_declaration:
-	FUNCTION_BLOCK PUBLIC IDENTIFIER
+	FUNCTION_BLOCK PUBLIC? IDENTIFIER
 	(
-	//io_var_declarations |
-	other_var_declarations
+		io_var_declarations 
+		|
+		other_var_declarations
 	)
-	method_declaration+
-	function_block_body
+	// either methods or a single function block body
+	(
+		(method_declaration*)
+		|
+		function_block_body
+	)
 	END_FUNCTION_BLOCK
 	;
 
@@ -86,7 +99,7 @@ function_block_declaration:
 	
 
 	
-	
+// several VAR-END_VAR are allowd in this grammar!
 program_delcaration:
 	PROGRAM program_type_name
 	(
@@ -95,7 +108,7 @@ program_delcaration:
 	other_var_declarations 
 //	| located_var_declarations 
 //	| program_access_decls
-	)?
+	)+
 	function_block_body
 	END_PROGRAM
 	;
@@ -121,7 +134,7 @@ io_var_declarations :
 // input_declarations ::= ’VAR_INPUT’ [’RETAIN’ | ’NON_RETAIN’] input_declaration ’;’ {input_declaration ’;’} ’END_VAR’
 input_declarations:
 	VAR_INPUT (RETAIN | NON_RETAIN)?
-	(input_declaration SEMICOLON)+
+	(input_declaration SEMICOLON)?
 	END_VAR
 	;
 	
