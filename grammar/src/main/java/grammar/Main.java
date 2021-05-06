@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
+import com.st.grammar.ASTListener;
 import com.st.grammar.DefaultStructuredTextListener;
 import com.st.grammar.StructuredTextLexer;
 import com.st.grammar.StructuredTextParser;
@@ -14,6 +15,8 @@ import com.st.grammar.StructuredTextParser.Data_type_declarationContext;
 import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
 import com.st.grammar.StructuredTextParser.Program_delcarationContext;
+
+import common.Node;
 
 public class Main {
 
@@ -23,6 +26,7 @@ public class Main {
 		functionBlock();
 		functionBlock2();
 		type();
+		expressions();
 	}
 	
 	private static void type() throws IOException {
@@ -50,10 +54,9 @@ public class Main {
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		// Walk the tree created during the parse, trigger callbacks
 		walker.walk(new DefaultStructuredTextListener(), root);
-		System.out.println(); // print a \n after translation
-
-		// Walk the tree again to translate to java
-		// walker.walk(new MyLangTranslator(), tree);
+		
+		// print a \n after translation
+		System.out.println(); 
 	}
 	
 	private static void functionProgram() throws IOException {
@@ -86,10 +89,9 @@ public class Main {
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		// Walk the tree created during the parse, trigger callbacks
 		walker.walk(new DefaultStructuredTextListener(), root);
-		System.out.println(); // print a \n after translation
-
-		// Walk the tree again to translate to java
-		// walker.walk(new MyLangTranslator(), tree);
+		
+		// print a \n after translation
+		System.out.println();
 	}
 	
 	private static void functionInterface() throws IOException {
@@ -122,10 +124,9 @@ public class Main {
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		// Walk the tree created during the parse, trigger callbacks
 		walker.walk(new DefaultStructuredTextListener(), root);
-		System.out.println(); // print a \n after translation
-
-		// Walk the tree again to translate to java
-		// walker.walk(new MyLangTranslator(), tree);
+		
+		// print a \n after translation
+		System.out.println();
 	}
 
 	private static void functionBlock() throws IOException {
@@ -153,15 +154,16 @@ public class Main {
 		
 		// function block
 		Function_block_declarationContext root = parser.function_block_declaration();
+		
+//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+		ASTListener listener = new ASTListener();
 
 //		// Create a generic parse tree walker that can trigger callbacks
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(new DefaultStructuredTextListener(), root);
-		System.out.println(); // print a \n after translation
-
-		// Walk the tree again to translate to java
-		// walker.walk(new MyLangTranslator(), tree);
+		walker.walk(listener, root);
+		 // print a \n after translation
+		System.out.println();
 	}
 	
 	private static void functionBlock2() throws IOException {
@@ -190,14 +192,54 @@ public class Main {
 		// function block
 		Function_block_declarationContext root = parser.function_block_declaration();
 
+//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+		ASTListener listener = new ASTListener();
+
 //		// Create a generic parse tree walker that can trigger callbacks
 		final ParseTreeWalker walker = new ParseTreeWalker();
 		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(new DefaultStructuredTextListener(), root);
-		System.out.println(); // print a \n after translation
+		walker.walk(listener, root);
+		// print a \n after translation
+		System.out.println();
+		
+//		Node rootNode = listener.getRootNode();
+//		rootNode.print(0);
 
-		// Walk the tree again to translate to java
-		// walker.walk(new MyLangTranslator(), tree);
+	}
+	
+	private static void expressions() throws IOException {
+		
+		System.out.println("expressions()");
+		
+		final CharStream charStream = CharStreams
+				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+				.fromFileName("src/test/resources/iec61131_structuredtext/expressions.st");
+
+		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+		// create a buffer of tokens pulled from the lexer
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+		// parse a program
+		Program_delcarationContext root = parser.program_delcaration();
+
+//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+		ASTListener listener = new ASTListener();
+
+		// Create a generic parse tree walker that can trigger callbacks
+		final ParseTreeWalker walker = new ParseTreeWalker();
+		// Walk the tree created during the parse, trigger callbacks
+		walker.walk(listener, root);
+		// print a \n after translation
+		System.out.println();
+		
+		Node rootNode = listener.getRootNode();
+		rootNode.print(0);
+
 	}
 
 }
