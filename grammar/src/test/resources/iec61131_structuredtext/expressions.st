@@ -7,7 +7,7 @@ test := TRUE;
 
 // IF (Tc2_Standard.LEN(STR := MsgFmtString) + LEN(STR := StringArg)) <= MSG_FMT_STRING_MAX_NUMBER_OF_CHARACTERS THEN
 
-IF ((1 + LEN(STR := StringArg)) <= MSG_FMT_STRING_MAX_NUMBER_OF_CHARACTERS) THEN
+IF ((Tc2_Standard.LEN(STR := MsgFmtString) + LEN(STR := StringArg)) <= MSG_FMT_STRING_MAX_NUMBER_OF_CHARACTERS) THEN
 	SEL := 1;
 END_IF;
 

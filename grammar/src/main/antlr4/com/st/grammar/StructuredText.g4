@@ -97,7 +97,34 @@ function_block_declaration:
 
 //function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
 	
-	
+
+
+// function_name ::= standard_function_name | derived_function_name
+function_name:
+	standard_function_name
+//	| 
+//	derived_function_name
+	;
+
+// standard_function_name ::= <as defined in clause 2.5.1.5 of the standard>
+standard_function_name:
+	IDENTIFIER (DOT IDENTIFIER)*
+	;
+
+// derived_function_name ::= identifier
+derived_function_name:
+	IDENTIFIER
+	;
+
+
+// param_assignment ::= ([variable_name ’:=’] expression) | ([’NOT’] variable_name ’=>’ variable)
+param_assignment:
+	variable_name ':=' expression
+	| 
+	(('NOT')? variable_name '=>' variable)
+	;
+
+
 
 	
 // several VAR-END_VAR are allowd in this grammar!
@@ -489,9 +516,10 @@ primary_expression:
 	//enumerated_value 
 	| 
 	variable 
-	 | 
-	 '(' expression ')' 
-	// | function_name '(' param_assignment {',' param_assignment} ')'
+	| 
+	'(' expression ')' 
+	| 
+	function_name '(' param_assignment (',' param_assignment)* ')'
 	;
 	
 // iteration_statement ::= for_statement | while_statement | repeat_statement | exit_statement
