@@ -19,8 +19,10 @@ public class ASTListener extends StructuredTextBaseListener {
 	 */
 	@Override 
 	public void enterEveryRule(ParserRuleContext ctx) {
+		
+		// TO DEBUG UNCOMMENT THIS:
 //		descend();
-//		//currentNode.setLabel(ctx.getText());
+//		currentNode.setLabel(ctx.getText());
 //		currentNode.setLabel(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
 	}
 	
@@ -31,13 +33,14 @@ public class ASTListener extends StructuredTextBaseListener {
 	 */
 	@Override 
 	public void exitEveryRule(ParserRuleContext ctx) {
+		// TO DEBUG UNCOMMENT THIS
 //		ascend();
 	}
 	
 	@Override 
 	public void visitTerminal(TerminalNode node) { 
 		descend();
-		currentNode.setLabel(node.getText());
+		currentNode.setLabel("TERMINAL: " + node.getText());
 		ascend();
 	}
 	

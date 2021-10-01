@@ -28,9 +28,13 @@ END_VAR
 // -------------------------------------------------------------------------
 
 /**/
+IMPLEMENTATION
+
 IF A = 0 THEN
 	SEL := 1;
 END_IF;
+
+
 
 
 // Check if any of the two strings are too long (or the combination of them)
@@ -63,5 +67,7 @@ ELSE
     StringArgProcessed := '';
     
 END_IF;
+
+END_IMPLEMENTATION
 
 END_FUNCTION_BLOCK

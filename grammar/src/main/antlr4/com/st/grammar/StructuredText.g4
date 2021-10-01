@@ -18,6 +18,46 @@ BlockComment:
 	-> skip
     ;
     
+    
+    
+    
+    
+compilation_unit:
+	(library_element_declaration)*
+	EOF
+	;
+	
+// library_element_name ::= data_type_name | function_name | function_block_type_name | program_type_name | resource_type_name | configuration_name
+    
+library_element_name:
+//	data_type_name 
+//	| 
+	function_name 
+	| 
+	function_block_type_name 
+	| 
+	program_type_name 
+	| 
+//	resource_type_name 
+//	| 
+//	configuration_name
+	;
+	
+//library_element_declaration ::= data_type_declaration | function_declaration | function_block_declaration | program_declaration | configuration_declaration
+library_element_declaration:
+	data_type_declaration 
+//	| 
+//	function_declaration 
+	| 
+	function_block_declaration 
+//	| 
+//	program_declaration 
+//	| 
+//	configuration_declaration
+	;
+    
+    
+    
 //INTERFACE I_Subject
 interface_declaration:
 	INTERFACE IDENTIFIER
@@ -36,11 +76,18 @@ interface_method_declaration:
 	)*
 	// no body required
 	;
+	
+	
+	
+	
+action_declaration:
+	ACTION IDENTIFIER function_block_body END_ACTION
+	;
+	
+	
 
 method_declaration:
-	interface_method_declaration
-	// mandatory body
-	function_block_body
+	interface_method_declaration function_block_body
 	;
 	
 
@@ -48,14 +95,15 @@ method_declaration:
 	
 	
 //function_block_type_name ::= standard_function_block_name | derived_function_block_name
-function_block_type_name :
-	//standard_function_block_name | 
+function_block_type_name:
+	//standard_function_block_name 
+	//| 
 	derived_function_block_name
 	;
 
 //standard_function_block_name ::= <as defined in clause 2.5.2.3 of the standard>
 
-derived_function_block_name : 
+derived_function_block_name: 
 	IDENTIFIER
 	;
 
@@ -74,10 +122,22 @@ function_block_declaration:
 	)+
 	// either methods or a single function block body
 	(
-		(method_declaration*)
-		|
-		function_block_body
+
+// custom grammar change - the function_block_body is moved to it's own dedicated slot
+		(
+			method_declaration
+			|
+			action_declaration
+		)*		
+// original grammar
+//		(method_declaration*)
+//		|
+//		function_block_body
 	)
+// custom grammar change, add function block implementation wrapper token
+	(
+		IMPLEMENTATION function_block_body END_IMPLEMENTATION
+	)?
 	END_FUNCTION_BLOCK
 	;
 
@@ -117,17 +177,12 @@ derived_function_name:
 	;
 
 
-// param_assignment ::= ([variable_name ’:=’] expression) | ([’NOT’] variable_name ’=>’ variable)
-param_assignment:
-	variable_name ':=' expression
-	| 
-	(('NOT')? variable_name '=>' variable)
-	;
+
 
 
 
 	
-// several VAR-END_VAR are allowd in this grammar!
+// several VAR-END_VAR are allowed in this grammar!
 program_delcaration:
 	PROGRAM program_type_name
 	(
@@ -145,7 +200,7 @@ program_type_name:
 	IDENTIFIER
 	;
 	
-other_var_declarations :
+other_var_declarations:
 	//external_var_declarations |
 	var_declarations 
 	//| retentive_var_declarations 
@@ -155,7 +210,7 @@ other_var_declarations :
     ;
     
 //io_var_declarations ::= input_declarations | output_declarations | input_output_declarations 
-io_var_declarations :
+io_var_declarations:
 	input_declarations
 	|
 	output_declarations
@@ -169,9 +224,10 @@ input_declarations:
 	;
 	
 //input_declaration ::= var_init_decl | edge_declaration
-input_declaration :
+input_declaration:
 	var_init_decl 
-	//| edge_declaration
+	//| 
+	//edge_declaration
 	;
 	
 // output_declarations ::= 'VAR_OUTPUT' ['RETAIN' | 'NON_RETAIN'] var_init_decl ';' {var_init_decl ';'} 'END_VAR'
@@ -181,69 +237,83 @@ output_declarations:
 	END_VAR
 	;
 	
-output_declaration :
+output_declaration:
 	var_init_decl 
-	//| edge_declaration
+	//| 
+	//edge_declaration
 	;
 
-var_declarations : 
+var_declarations: 
 	VAR 
-	( CONSTANT? (var_init_decl SEMICOLON)+ )?
+	( (CONSTANT | PERSISTENT)* (var_init_decl SEMICOLON)+ )?
 	END_VAR
 	;
 	
-var_init_decl :
+var_init_decl:
 	var1_init_decl 
+	| 
+	array_var_init_decl 
 	//| 
-	//array_var_init_decl | 
-	//structured_var_init_decl | 
-	//fb_name_decl | 
+	//structured_var_init_decl 
+	// | 
+	//fb_name_decl 
+	// | 
 	//string_var_declaration
 	;
 	
-var1_init_decl : 
+var1_init_decl: 
 	var1_list COLON 
 	(
 		simple_spec_init 
 		//| 
-		//subrange_spec_init |
+		//subrange_spec_init 
+		//|
 		//enumerated_spec_init
 	)
 	;
 	
-var1_list : 
+var1_list: 
 	variable_name (COMMA variable_name)*
 	;
 	
-simple_spec_init : 
+simple_spec_init: 
 	simple_specification (':=' constant)?
 	;
 	
-simple_specification : 
+simple_specification: 
 	elementary_type_name 
 	| 
 	simple_type_name
 	;
 	
-simple_type_name :
+simple_type_name:
 	IDENTIFIER (DOT IDENTIFIER)*
 	;
 	
 // elementary_type_name ::= numeric_type_name | date_type_name | bit_string_type_name | 'STRING' | 'WSTRING' | 'TIME'
 elementary_type_name:
-	numeric_type_name | 
-	//date_type_name | 
-	bit_string_type_name | 
-	'STRING' | 
-	'WSTRING' | 
+	numeric_type_name 
+	| 
+	//date_type_name 
+	//| 
+	bit_string_type_name 
+	| 
+	'STRING' ('(' integer ')')? 
+	| 
+	'WSTRING' ('(' integer ')')? 
+	| 
 	'TIME'
 	;
 	
 bit_string_type_name: 
-	'BOOL' | 
-	'BYTE' | 
-	'WORD' | 
-	'DWORD' | 
+	'BOOL' 
+	| 
+	'BYTE' 
+	| 
+	'WORD' 
+	| 
+	'DWORD' 
+	| 
 	'LWORD'
 	;
 
@@ -253,29 +323,130 @@ numeric_type_name:
 	//|
 	//real_type_name
 	;
-	
-//constant :
-//	'TRUE' | 'FALSE'
-//	;
 
-constant : 
+constant: 
 	numeric_literal 
 	| 
 	character_string 
 	| 
-	//time_literal | 
-	//bit_string_literal |
+	time_literal 
+	| 
+	bit_string_literal 
+	|
 	boolean_literal
 	;
 	
-character_string :
+character_string:
 	STRING_LITERAL_SINGLE_QUOTE
 	;
 	
-boolean_literal :
-	 //( 'BOOL#'? ('1' | '0' ) ) | 
+// time_literal ::= duration | time_of_day
+time_literal:
+	duration 
+//	| 
+//	time_of_day
+	;
+
+// duration ::= (’T’ | ’TIME’) ’#’ [’-’] interval
+duration:
+	('T' | 'TIME') '#' '-'? interval
+	;
+
+// interval ::= days | hours | minutes | seconds | milliseconds
+interval: 
+	days 
+	| 
+	hours 
+	| 
+	minutes 
+	| 
+	seconds 
+	| 
+	milliseconds
+	;
+
+// days ::= fixed_point (’d’) | integer (’d’) [’_’] hours
+days: 
+	fixed_point ('d'|'D')
+	| 
+	integer ('d'|'D') '_'? hours
+	;
+
+// fixed_point ::= integer [ ’.’ integer]
+fixed_point:
+	integer ( '.' integer )?
+	;
+
+// hours ::= fixed_point (’h’) | integer (’h’)[’_’] minutes
+hours:
+	fixed_point ('h'|'H') 
+	| 
+	integer ('h'|'H') '_'? minutes
+	;
+
+// minutes ::= fixed_point (’m’) | integer (’m’) [’_’] seconds
+minutes:
+	fixed_point ('m'|'M') 
+	| 
+	integer ('m'|'M') '_'? seconds
+	;
+
+// seconds ::= fixed_point (’s’) | integer (’s’) [’_’]milliseconds
+seconds:
+	fixed_point ('s'|'S') 
+	| 
+	integer ('s'|'S') '_'? milliseconds
+	;
+
+// milliseconds ::= fixed_point (’ms’)
+milliseconds:
+	 fixed_point ('ms'|'MS')
+	 ;
+	 
+// bit_string_literal ::= [ (’BYTE’ | ’WORD’ | ’DWORD’ | ’LWORD’) ’#’ ]( unsigned_integer | binary_integer | octal_integer | hex_integer)
+bit_string_literal:
+ 	(('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#')?
+ 	( 
+ 		//unsigned_integer
+ 		integer
+ 		| 
+ 		binary_integer 
+ 		//BINARY_INTEGER
+ 		//| 
+ 		//octal_integer 
+ 		//| 
+ 		//hex_integer
+ 	)
+	;
+	
+
+	
+// binary_integer ::= ’2#’ bit {[’_’] bit}
+//binary_integer:
+//	'2#' bit ( ('_')? bit )+
+//	'2#' DIGIT ( ('_')? DIGIT )+
+//'2#' (ONE | ZERO)*
+//'2#'
+//    '2#' ('1' | '0') ('1' | '0') ('1' | '0')
+//	;
+
+binary_integer:
+	BINARY_INTEGER
+	;
+	
+// bit ::= ’1’ | ’0’
+//bit:
+//	'1'
+//	|
+//	'0'
+//	;
+
+boolean_literal:
+	 BOOLEAN_EXPLICIT_LITERAL
+	 | 
 	 'TRUE' 
-	 | 'FALSE'
+	 | 
+	 'FALSE'
 	 ;
 	 
 numeric_literal:
@@ -284,37 +455,57 @@ numeric_literal:
 	//real_literal
 	;
 	
-integer_literal : 
+// integer_literal ::= [ integer_type_name ’#’ ]( signed_integer | binary_integer | octal_integer | hex_integer)
+integer_literal: 
 	( integer_type_name '#' )?
 	( 
 		signed_integer 
+		| 
+		binary_integer 
+		//BINARY_INTEGER
+		//|
+		//octal_integer 
 		//| 
-		//binary_integer |
-		//octal_integer | 
 		//hex_integer
 	)
 	;
 	
-signed_integer : 
-	(PLUS | MINUS)? INTEGER
+integer:
+	INTEGER
+	;	
+	
+signed_integer: 
+//	(PLUS | MINUS)? integer
+    (PLUS | MINUS) integer
 	;
+	
+//unsigned_integer:
+//	INTEGER
+//	;
 
-integer_type_name : 
-	signed_integer_type_name | 
+integer_type_name: 
+	signed_integer_type_name 
+	| 
 	unsigned_integer_type_name
 	;
 	
-signed_integer_type_name : 
-	'SINT' | 
-	'INT' | 
-	'DINT' | 
+signed_integer_type_name: 
+	'SINT' 
+	| 
+	'INT' 
+	| 
+	'DINT' 
+	| 
 	'LINT'
 	;
 	
-unsigned_integer_type_name : 
-	'USINT' | 
-	'UINT' | 
-	'UDINT' | 
+unsigned_integer_type_name: 
+	'USINT' 
+	| 
+	'UINT' 
+	| 
+	'UDINT' 
+	| 
 	'ULINT'
 	;
 	
@@ -333,18 +524,129 @@ data_type_declaration:
 type_declaration:
 	//single_element_type_declaration 
 	//| 
-	//array_type_declaration 
-	//| 
+	array_type_declaration 
+	| 
 	structure_type_declaration 
 	//| 
 	//string_type_declaration
 	;
 
+
+
+
+// array_var_init_decl ::= var1_list ’:’ array_spec_init
+array_var_init_decl:
+	var1_list COLON array_spec_init
+	;
+
+
+// array_type_declaration ::= array_type_name ’:’ array_spec_init
+array_type_declaration:
+	array_type_name COLON array_spec_init
+	;
+	
+// array_type_name ::= identifier
+array_type_name:
+	IDENTIFIER
+	;
+	
+// array_spec_init ::= array_specification [’:=’ array_initialization]
+array_spec_init:
+	array_specification (':=' array_initialization)?
+	;
+	
+// array_specification ::= array_type_name | ’ARRAY’ ’[’ subrange {’,’ subrange} ’]’ ’OF’ non_generic_type_name
+array_specification:
+	array_type_name
+	|
+	ARRAY '[' subrange (COMMA subrange)* ']' OF non_generic_type_name
+	;
+	
+
+	
+// non_generic_type_name ::= elementary_type_name | derived_type_name
+non_generic_type_name:
+	elementary_type_name
+	|
+	derived_type_name
+	;
+	
+// derived_type_name ::= single_element_type_name | array_type_name | structure_type_name | string_type_name
+derived_type_name:
+	single_element_type_name 
+	| 
+	array_type_name 
+	| 
+	structure_type_name 
+	| 
+	string_type_name
+	;
+	
+// single_element_type_name ::= simple_type_name | subrange_type_name | enumerated_type_name
+single_element_type_name:
+	simple_type_name
+	|
+	subrange_type_name
+	|
+	enumerated_type_name
+	;
+	
+//simple_type_name:
+//	IDENTIFIER
+//	;
+	
+subrange_type_name:
+	IDENTIFIER
+	;
+	
+//enumerated_type_name:
+//	IDENTIFIER
+//	;
+	
+//array_type_name:
+//	IDENTIFIER
+//	;
+	
+//structure_type_name:
+//	IDENTIFIER
+//	;
+	
+// array_initialization ::= ’[’ array_initial_elements {’,’ array_initial_elements} ’]’
+array_initialization:
+	'[' array_initial_elements (COMMA array_initial_elements)* ']'
+	;
+	
+// array_initial_elements ::= array_initial_element | integer ’(’[array_initial_element] ’)’
+array_initial_elements:
+	array_initial_element 
+	| 
+	integer '(' (array_initial_element)? ')'
+//	INTEGER '(' (array_initial_element)? ')'
+	;
+	
+// array_initial_element ::= constant | enumerated_value | structure_initialization | array_initialization
+array_initial_element:
+	constant
+	|
+	enumerated_value 
+	| 
+	structure_initialization 
+	| 
+	array_initialization
+	;
+
+
+
+
+
+	
+
+
 structure_type_declaration:
 	structure_type_name COLON structure_specification
 	;
 	
-structure_specification :
+structure_specification:
 	 structure_declaration 
 //	 | 
 //	 initialized_structure
@@ -361,41 +663,41 @@ structure_type_name:
 	;
 	
 // structure_element_declaration ::= structure_element_name ':'(simple_spec_init |subrange_spec_init | enumerated_spec_init | array_spec_init | initialized_structure)
-structure_element_declaration : 
+structure_element_declaration: 
 	structure_element_name COLON 
 	(
 		simple_spec_init 
-//		| 
+		| 
 //		subrange_spec_init 
 //		| 
 //		enumerated_spec_init 
 //		| 
-//		array_spec_init 
+		array_spec_init 
 //		| 
 //		initialized_structure
 	)
 	;
 	
-structure_element_name :
+structure_element_name:
 	IDENTIFIER
 	;
 
-structure_initialization :
+structure_initialization:
 	 '(' structure_element_initialization (COMMA structure_element_initialization)? ')'
 	 ;
 
-structure_element_initialization :
+structure_element_initialization:
 	structure_element_name ':=' 
 //	(constant | enumerated_value | array_initialization | structure_initialization)
 	;
 
-string_type_name : 
+string_type_name: 
 	IDENTIFIER
 	;
 
-string_type_declaration : 
+string_type_declaration: 
 	string_type_name COLON ('STRING' | 'WSTRING') 
-	('[' INTEGER ']')? 
+	('[' integer ']')? 
 	(':=' STRING_LITERAL)?
 	;
 	
@@ -406,21 +708,54 @@ function_block_body:
 	
 // statement_list aka. structured_text
 // statement_list ::= statement ';' {statement ';'} 
-statement_list:
-	(statement SEMICOLON)+
+statement_list :
+	statement+
 	;
 	
 // statement ::= NIL | assignment_statement | subprogram_control_statement | selection_statement | iteration_statement
-statement:
+statement :
 	//NIL |
-	assignment_statement
-	//|
-	//subprogram_control_statement 
+	assignment_statement SEMICOLON
 	|
-	selection_statement 
+	subprogram_control_statement SEMICOLON
 	|
-	iteration_statement
+	selection_statement SEMICOLON?
+	|
+	iteration_statement SEMICOLON
 	;
+	
+
+
+
+
+// subprogram_control_statement ::= fb_invocation | ’RETURN’
+subprogram_control_statement:
+	fb_invocation
+	|
+	RETURN
+	;
+
+// fb_invocation ::= fb_name ’(’ [param_assignment {’,’ param_assignment}]’)’
+fb_invocation:
+	fb_name ( DOT fb_name )* '(' ( param_assignment (COMMA param_assignment)* )? ')'
+	;	
+	
+// param_assignment ::= ([variable_name ’:=’] expression) | ([’NOT’] variable_name ’=>’ variable)	
+param_assignment:
+//	( variable_name ':=' )? expression
+	variable_name ':=' expression?
+	|
+	expression
+	|
+	'NOT'? variable_name '=>' variable?
+	;
+	
+
+fb_name:
+	IDENTIFIER
+	;
+
+
 	
 assignment_statement:
 	variable ':=' expression
@@ -431,17 +766,46 @@ assignment_statement:
 variable:
 	//direct_variable
 	//|
-	symbolic_variable
+	symbolic_variable (DOT variable)*
 	;
 	
 symbolic_variable:
 	variable_name 
-	//| 
-	//multi_element_variable
+	| 
+	multi_element_variable
 	;
 	
 variable_name:
-	IDENTIFIER (DOT IDENTIFIER)*
+//	IDENTIFIER (DOT IDENTIFIER)*
+	IDENTIFIER
+	;
+	
+// multi_element_variable ::= array_variable | structured_variable
+multi_element_variable:
+	array_variable
+//	|
+//	structured_variable
+	;
+	
+// array_variable ::= subscripted_variable subscript_list
+array_variable:
+	//subscripted_variable subscript_list
+	IDENTIFIER subscript_list
+	;
+	
+// subscripted_variable ::= symbolic_variable
+subscripted_variable:
+	symbolic_variable
+	;
+	
+// subscript_list ::= ’[’ subscript {’,’ subscript} ’]’
+subscript_list:
+	'[' subscript (COMMA subscript)* ']'
+	;
+	
+subscript:
+	expression
+	//INTEGER
 	;
 	
 // expression ::= xor_expression {'OR' xor_expression}
@@ -519,6 +883,7 @@ primary_expression:
 	| 
 	'(' expression ')' 
 	| 
+	// param_assignment also allows the use of a simple variable instead of only assignments. The name is misleading.
 	function_name '(' param_assignment (',' param_assignment)* ')'
 	;
 	
@@ -580,7 +945,7 @@ if_statement:
 //['ELSE' statement_list]
 //'END_CASE'
 case_statement:
-	'CASE' expression 'OF' 
+	CASE expression OF 
 	(case_element)+
 	('ELSE' statement_list)?
 	'END_CASE'
@@ -598,53 +963,82 @@ case_list:
 
 //case_list_element ::= subrange | signed_integer | enumerated_value
 case_list_element:
-	//subrange 
-	//| 
-	signed_integer 
-	//| 
-	//enumerated_value
+	subrange 
+	|
+	integer
+	|
+	signed_integer
+	|
+	binary_integer
+	| 
+	enumerated_value
 	;
 
+// subrange ::= signed_integer ’..’ signed_integer
+subrange:
+	(signed_integer | integer | IDENTIFIER) '..' (signed_integer | integer | IDENTIFIER)
+	;
 
-
-
+// enumerated_value ::= [enumerated_type_name ’#’] identifier
+enumerated_value:
+	(enumerated_type_name ('#' | '.')) IDENTIFIER
+	;
+	
+// enumerated_type_name ::= identifier
+enumerated_type_name:
+	IDENTIFIER
+	;
+	
+// A
+ARRAY : 'ARRAY';
+ACTION : 'ACTION';
 
 // C
-COLON: ':';
-COMMA: ',';
-CONSTANT: 'CONSTANT';
+CASE : 'CASE';
+COLON : ':';
+COMMA : ',';
+CONSTANT : 'CONSTANT';
 
 // D
-DOT: '.';
-DOUBLE_QUOTES: '"';
+DOT : '.';
+DOUBLE_QUOTES : '"';
 
 // E
-END_FUNCTION_BLOCK: 'END_FUNCTION_BLOCK';
+END_ACTION : 'END_ACTION';
+END_FUNCTION_BLOCK : 'END_FUNCTION_BLOCK';
+END_IMPLEMENTATION : 'END_IMPLEMENTATION'; // custom token!
 END_PROGRAM : 'END_PROGRAM';
 END_VAR : 'END_VAR';
 END_TYPE : 'END_TYPE';
-END_STRUCT: 'END_STRUCT';
+END_STRUCT : 'END_STRUCT';
 
 // F
 FUNCTION_BLOCK : 'FUNCTION_BLOCK';
 
 // I
-INTERFACE: 'INTERFACE';
+INTERFACE : 'INTERFACE';
+IMPLEMENTATION : 'IMPLEMENTATION'; // custom token!
 
 // M
-MINUS: '-';
-METHOD: 'METHOD';
+MINUS : '-';
+METHOD : 'METHOD';
 
 // N
-NON_RETAIN: 'NON_RETAIN';
+NON_RETAIN : 'NON_RETAIN';
+
+// O
+OF : 'OF';
+//ONE : '1';
 
 // P
-PLUS: '+';
+PERSISTENT : 'PERSISTENT';
+PLUS : '+';
 PROGRAM : 'PROGRAM';
-PUBLIC: 'PUBLIC';
+PUBLIC : 'PUBLIC';
 
 // R
-RETAIN: 'RETAIN';
+RETAIN : 'RETAIN';
+RETURN : 'RETURN';
 
 // S
 SEMICOLON : ';';
@@ -655,26 +1049,41 @@ TICK : '\'';
 TYPE : 'TYPE';
 
 // U
-UNDERSCORE: '_';
+UNDERSCORE : '_';
 
 // V
-VAR: 'VAR';
-VAR_INPUT: 'VAR_INPUT';
-VAR_OUTPUT: 'VAR_OUTPUT';
+VAR : 'VAR';
+VAR_INPUT : 'VAR_INPUT';
+VAR_OUTPUT : 'VAR_OUTPUT';
+
+// ZERO
+//ZERO: '0';
 
 
-
+BINARY_INTEGER:
+//	'2#''11'
+	'2#' ('1' | '0')+
+	;
+	
+BOOLEAN_EXPLICIT_LITERAL:
+	'BOOL#' ('1' | '0')
+	;
 
 
 // Fragments
 // fragment lexer rules can only be used by other lexer rules: 
-// these will never become a token on their own. Therefore, you cannot use fragment rules in parser rules.
+// these will never become a token on their own. 
+// Therefore, you cannot use fragment rules in parser rules.
 
 // letter ::= 'A' | 'B' | <...> | 'Z' | 'a' | 'b' | <...> | 'z'
-fragment LETTER : [a-zA-Z];
+fragment LETTER: 
+	[a-zA-Z]
+	;
 
-// digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' |'9'
-fragment DIGIT : [0-9];
+// digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9'
+fragment DIGIT:
+	[0-9]
+	;
 
 // octal_digit ::= '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7'
 //OCTAL_DIGIT
@@ -683,9 +1092,12 @@ fragment DIGIT : [0-9];
 
 
 
+
+
+
 INTEGER: 
-	//DIGIT ('_' DIGIT)*
-	//'1'
+	DIGIT ('_' DIGIT)+
+	|
 	DIGIT+
 	;
 	
@@ -695,7 +1107,7 @@ IDENTIFIER:
 	(LETTER | (UNDERSCORE (LETTER | DIGIT))) (UNDERSCORE | LETTER | DIGIT)*
 	;
 	
-STRING_LITERAL_SINGLE_QUOTE : 
+STRING_LITERAL_SINGLE_QUOTE: 
 	UNTERMINATED_STRING_LITERAL_SINGLE_QUOTE TICK
   	;
 
@@ -703,7 +1115,7 @@ UNTERMINATED_STRING_LITERAL_SINGLE_QUOTE:
 	TICK (~['\\\r\n] | '\\' (. | EOF))*
   	;
 	
-STRING_LITERAL : 
+STRING_LITERAL: 
 	UNTERMINATED_STRING_LITERAL DOUBLE_QUOTES
   	;
 
