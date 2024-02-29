@@ -1,5 +1,16 @@
 # IEC-63313-ST-Simulator
+
 IEC-63313 Structured Text simulator.
+
+## VSCode
+
+settings.json
+
+```
+"java.jdt.ls.java.home": "C:\\Program Files\\Java\\jdk-20",
+"java.configuration.updateBuildConfiguration": "interactive",
+"maven.executable.options": "-s C:/Users/U5353/.m2/settings.xml -D\"maven.wagon.http.ssl.insecure\"=\"true\" -D\"maven.wagon.http.ssl.allowall\"=\"true\" -D\"maven.wagon.http.ssl.ignore.validity.dates\"=\"true\" -D\"maven.resolver.transport\"=\"wagon\"",
+```
 
 ## Grammar
 

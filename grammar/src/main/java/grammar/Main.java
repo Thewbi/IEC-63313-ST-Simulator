@@ -19,24 +19,29 @@ import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
 import com.st.grammar.StructuredTextParser.Program_delcarationContext;
 
-import common.Node;
+//import common.Node;
 
 public class Main {
 
-	public static void main(final String[] args) throws IOException {
+	public static void main(String[] args) throws IOException {
+
+        System.out.println("Start");
+
 		assignment();
 		binaryInteger();
 		functionProgram();
 		functionInterface();
 		functionBlock();
-		functionBlock2();
-		functionBlock3();
-		functionBlock4();
+		//functionBlock2();
+		//functionBlock3();
+		//functionBlock4();
 		case_test();
 		tcunit();
 		type();
 		expressions();
-		eventLog();
+		//eventLog();
+
+        System.out.println("End");
 	}
 	
 	private static void assignment() throws IOException {
