@@ -46,17 +46,49 @@ library_element_name:
 //library_element_declaration ::= data_type_declaration | function_declaration | function_block_declaration | program_declaration | configuration_declaration
 library_element_declaration:
 	data_type_declaration 
-//	| 
-//	function_declaration 
+	| 
+	function_declaration 
 	| 
 	function_block_declaration 
-//	| 
-//	program_declaration 
-//	| 
-//	configuration_declaration
+	| 
+	program_declaration 
+	| 
+	configuration_declaration
 	;
+
+
+// function_declaration ::= ’FUNCTION’ derived_function_name ’:’
+// (elementary_type_name | derived_type_name)
+// { io_var_declarations | function_var_decls } function_body
+// ’END_FUNCTION’
+function_declaration:
+    FUNCTION derived_function_name ':' 
+    ( elementary_type_name | derived_type_name )? // return value
+    ( io_var_declarations | function_var_decls )*
+        function_body
+    END_FUNCTION
+    ;
+
+// function_var_decls ::= ’VAR’ [’CONSTANT’]
+//  var2_init_decl ’;’ {var2_init_decl ’;’} ’END_VAR’
+function_var_decls:
+    VAR CONSTANT?
+    ( var2_init_decl ';' )*
+    END_VAR
+    ;
     
-    
+//var2_init_decl ::= var1_init_decl | array_var_init_decl |
+//    structured_var_init_decl | string_var_declaration
+
+var2_init_decl:
+    var1_init_decl
+    ;
+
+//function_body ::= ladder_diagram | function_block_diagram |
+//instruction_list | statement_list | <other languages>
+function_body:
+    statement_list
+    ;
     
 //INTERFACE I_Subject
 interface_declaration:
@@ -181,35 +213,201 @@ derived_function_name:
 
 
 
+//configuration_declaration ::=
+//    ’CONFIGURATION’ configuration_name
+//    [global_var_declarations]
+//    (single_resource_declaration
+//    | (resource_declaration {resource_declaration}))
+//    [access_declarations]
+//    [instance_specific_initializations]
+//    ’END_CONFIGURATION’
+configuration_declaration: 
+    CONFIGURATION configuration_name
+    (global_var_declarations)?
+    (single_resource_declaration
+//    | (resource_declaration {resource_declaration})
+    )
+//    [access_declarations]
+//    [instance_specific_initializations]
+    END_CONFIGURATION
+    ;
 
 
+//single_resource_declaration ::=
+//{task_configuration ’;’}
+//program_configuration ’;’
+//{program_configuration ’;’}
+
+single_resource_declaration:
+    ( task_configuration SEMICOLON )*
+    ( program_configuration SEMICOLON )*
+    ;
+
+
+//program_configuration ::=
+//’PROGRAM’ [RETAIN | NON_RETAIN]
+//program_name [’WITH’ task_name] ’:’ program_type_name
+//[’(’ prog_conf_elements ’)’]
+
+program_configuration:
+    PROGRAM ( RETAIN | NON_RETAIN )?
+    program_name ( 'WITH' task_name )? COLON program_type_name
+    ( '(' prog_conf_elements ')' )?
+    ;
+
+program_name:
+    IDENTIFIER
+    ;
+
+program_type_name:
+    IDENTIFIER
+    ;
+
+// prog_conf_elements ::= prog_conf_element {’,’ prog_conf_element}
+prog_conf_elements:
+    prog_conf_element ( COMMA prog_conf_element )*
+    ;
+
+// prog_conf_element ::= fb_task | prog_cnxn
+prog_conf_element:
+    fb_task | prog_cnxn
+    ;
+
+//fb_task ::= fb_name ’WITH’ task_name
+fb_task:
+    fb_name 'WITH' task_name
+    ;
+
+//prog_cnxn ::= symbolic_variable ’:=’ prog_data_source
+//| symbolic_variable ’=>’ data_sink
+prog_cnxn:
+    symbolic_variable ':=' prog_data_source
+    | 
+    symbolic_variable '=>' data_sink
+    ;
+
+//prog_data_source ::= constant | enumerated_value | global_var_reference | direct_variable
+prog_data_source:
+    constant 
+    | 
+    enumerated_value 
+    //| 
+    //global_var_reference 
+    //| 
+    //direct_variable
+    ;
+
+//data_sink ::= global_var_reference | direct_variable
+data_sink:
+    //global_var_reference
+    //|
+    //direct_variable
+    ;
+
+
+//task_configuration ::= ’TASK’ task_name task_initialization
+task_configuration:
+    TASK task_name task_initialization
+    ;
+
+task_name:
+    IDENTIFIER
+    ;
+
+
+
+//task_initialization ::=
+//’(’ [’SINGLE’ ’:=’ data_source ’,’]
+//[’INTERVAL’ ’:=’ data_source ’,’]
+//’PRIORITY’ ’:=’ integer ’)’
+task_initialization:
+    '('
+        ( 'SINGLE' ':=' data_source COMMA )?
+        ( 'INTERVAL' ':=' data_source COMMA )?
+        'PRIORITY' ':=' integer
+    ')'
+    ;
+
+//data_source ::= constant | global_var_reference
+//| program_output_reference | direct_variable
+data_source:
+    ;
+
+//global_var_declarations ::= ’VAR_GLOBAL’ [’CONSTANT’ | ’RETAIN’]
+//global_var_decl ’;’ {global_var_decl ’;’} ’END_VAR’
+global_var_declarations:
+    VAR_GLOBAL
+    ( CONSTANT | RETAIN )?
+    ( global_var_decl SEMICOLON )+
+    END_VAR
+    ;
+
+global_var_decl:
+    var_init_decl
+    ;
+
+//configuration_name ::= identifier
+configuration_name:
+    IDENTIFIER
+    ;
 
 	
 // several VAR-END_VAR are allowed in this grammar!
-program_delcaration:
+program_declaration:
 	PROGRAM program_type_name
 	(
-	io_var_declarations 
-	|
-	other_var_declarations 
-//	| located_var_declarations 
-//	| program_access_decls
+        io_var_declarations 
+        |
+        other_var_declarations 
+    //	| located_var_declarations 
+    //	| program_access_decls
 	)+
 	function_block_body
 	END_PROGRAM
 	;
 	
-program_type_name:
-	IDENTIFIER
-	;
+
 	
 other_var_declarations:
-	//external_var_declarations |
+	external_var_declarations 
+    |
 	var_declarations 
 	//| retentive_var_declarations 
 	//| non_retentive_var_declarations
     //| temp_var_decls 
     //| incompl_located_var_declarations
+    ;
+
+//external_var_declarations ::= ’VAR_EXTERNAL’ [’CONSTANT’]
+//  external_declaration ’;’ {external_declaration ’;’} ’END_VAR’
+external_var_declarations:
+    VAR_EXTERNAL ( 'CONSTANT' )?
+        ( external_declaration SEMICOLON )+
+    END_VAR
+    ;
+
+//external_declaration ::= global_var_name ’:’ (simple_specification |
+//subrange_specification | enumerated_specification | array_specification |
+//structure_type_name | function_block_type_name)
+external_declaration :
+    global_var_name COLON
+    (
+        simple_specification 
+        //|
+        //subrange_specification 
+        //| 
+        //enumerated_specification 
+        | 
+        array_specification 
+        |
+        structure_type_name 
+        | 
+        function_block_type_name
+    )
+    ;
+
+global_var_name:
+    IDENTIFIER
     ;
     
 //io_var_declarations ::= input_declarations | output_declarations | input_output_declarations 
@@ -1002,6 +1200,7 @@ ACTION : 'ACTION';
 CASE : 'CASE';
 COLON : ':';
 COMMA : ',';
+CONFIGURATION : 'CONFIGURATION';
 CONSTANT : 'CONSTANT';
 
 // D
@@ -1010,6 +1209,8 @@ DOUBLE_QUOTES : '"';
 
 // E
 END_ACTION : 'END_ACTION';
+END_CONFIGURATION : 'END_CONFIGURATION';
+END_FUNCTION : 'END_FUNCTION';
 END_FUNCTION_BLOCK : 'END_FUNCTION_BLOCK';
 END_IMPLEMENTATION : 'END_IMPLEMENTATION'; // custom token!
 END_PROGRAM : 'END_PROGRAM';
@@ -1018,6 +1219,7 @@ END_TYPE : 'END_TYPE';
 END_STRUCT : 'END_STRUCT';
 
 // F
+FUNCTION : 'FUNCTION';
 FUNCTION_BLOCK : 'FUNCTION_BLOCK';
 
 // I
@@ -1052,14 +1254,17 @@ STRUCT : 'STRUCT';
 // T
 TICK : '\'';
 TYPE : 'TYPE';
+TASK : 'TASK';
 
 // U
 UNDERSCORE : '_';
 
 // V
 VAR : 'VAR';
+VAR_EXTERNAL : 'VAR_EXTERNAL';
 VAR_INPUT : 'VAR_INPUT';
 VAR_OUTPUT : 'VAR_OUTPUT';
+VAR_GLOBAL : 'VAR_GLOBAL';
 
 // ZERO
 //ZERO: '0';

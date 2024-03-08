@@ -17,9 +17,7 @@ import com.st.grammar.StructuredTextParser.Compilation_unitContext;
 import com.st.grammar.StructuredTextParser.Data_type_declarationContext;
 import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
-import com.st.grammar.StructuredTextParser.Program_delcarationContext;
-
-//import common.Node;
+import com.st.grammar.StructuredTextParser.Program_declarationContext;
 
 public class Main {
 
@@ -263,7 +261,7 @@ public class Main {
 		final StructuredTextParser parser = new StructuredTextParser(tokens);
 
 		// parse a program
-		final Program_delcarationContext root = parser.program_delcaration();
+		final Program_declarationContext root = parser.program_declaration();
 		
 		// parse an interface
 //		final Interface_declarationContext root = parser.interface_declaration();
@@ -532,7 +530,7 @@ public class Main {
 		final StructuredTextParser parser = new StructuredTextParser(tokens);
 
 		// parse a program
-		Program_delcarationContext root = parser.program_delcaration();
+		Program_declarationContext root = parser.program_declaration();
 
 //		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
 		ASTListener listener = new ASTListener();
