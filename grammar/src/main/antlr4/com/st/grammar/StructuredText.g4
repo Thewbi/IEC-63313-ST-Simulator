@@ -160,21 +160,167 @@ function_block_declaration:
 			method_declaration
 			|
 			action_declaration
+            //|
+            //initial_step
+            //|
+            //transition
+            |
+            sequential_function_chart
 		)*		
 // original grammar
 //		(method_declaration*)
 //		|
 //		function_block_body
 	)
+
 // custom grammar change, add function block implementation wrapper token
 	(
 		IMPLEMENTATION function_block_body END_IMPLEMENTATION
 	)?
+
+// function_block_body
     (
         function_block_body
-    )
+    )?
 	END_FUNCTION_BLOCK
 	;
+
+
+
+
+
+
+//sequential_function_chart ::= sfc_network {sfc_network}
+sequential_function_chart:
+    sfc_network
+    ;
+
+//sfc_network ::= initial_step {step | transition | action}
+sfc_network:
+    initial_step
+    (
+        step 
+        | 
+        transition 
+        | 
+        action
+    )+
+    ;
+
+//initial_step ::= 'INITIAL_STEP' step_name ':' {action_association ';'} 'END_STEP'
+initial_step:
+    'INITIAL_STEP'
+    step_name
+    COLON
+    (
+        action_association SEMICOLON
+    )*
+    'END_STEP'
+    ;
+
+//step ::= 'STEP' step_name ':' {action_association ';'} 'END_STEP'
+step:
+    'STEP' step_name COLON
+    (
+        action_association SEMICOLON
+    )*
+    'END_STEP'
+    ;
+
+//step_name ::= identifier
+step_name:
+    IDENTIFIER
+    ;
+
+//action_association ::= action_name '(' [action_qualifier] {',' indicator_name} ')'
+action_association:
+    action_name
+    '(' 
+    ( action_qualifier )?
+    (
+        COMMA indicator_name
+    )*
+    ')'
+    ;
+
+//action_name ::= identifier
+action_name:
+    IDENTIFIER
+    ;
+
+//action_qualifier ::= 'N' | 'R' | 'S' | 'P' | timed_qualifier ',' action_time
+action_qualifier:
+    'N'
+    |
+    'R'
+    |
+    'S'
+    |
+    'P'
+    | 
+    timed_qualifier COMMA action_time
+    ;
+
+//timed_qualifier ::= 'L' | 'D' | 'SD' | 'DS' | 'SL'
+timed_qualifier:
+    'L' | 'D' | 'SD' | 'DS' | 'SL'
+    ;
+
+//action_time ::= duration | variable_name
+action_time:
+    duration
+    |
+    variable_name
+    ;
+
+//indicator_name ::= variable_name
+indicator_name:
+    variable_name
+    ;
+
+//transition ::= ‘TRANSITION’ [transition_name] ['(' 'PRIORITY' ':=' integer ')']
+//'FROM' steps 'TO' steps
+//transition_condition
+//'END_TRANSITION'
+transition:
+    'TRANSITION'
+    ( transition_name )?
+    ( '(' 'PRIORITY' ':=' integer ')' )?
+    'FROM' steps 'TO' steps
+    transition_condition
+    'END_TRANSITION'
+    ;
+
+//transition_name ::= identifier
+transition_name:
+    IDENTIFIER
+    ;
+
+//steps ::= step_name | '(' step_name ',' step_name {',' step_name} ')'
+steps:
+    step_name
+    |
+    '(' step_name ',' step_name (',' step_name)* ')'
+    ;
+
+//transition_condition ::= ':' simple_instruction_list | ':=' expression ';' | ':' (fbd_network | rung)
+transition_condition:
+    COLON statement_list
+    |
+    ':=' expression SEMICOLON
+    //|
+    //COLON ( fbd_network | rung )
+    ;
+
+//action ::= 'ACTION' action_name ':'
+// function_block_body
+// 'END_ACTION'
+action: 
+    'ACTION' action_name COLON
+    function_block_body
+    'END_ACTION'
+    ;
+
 
 
 
@@ -224,12 +370,36 @@ derived_function_name:
 configuration_declaration: 
     CONFIGURATION configuration_name
     (global_var_declarations)?
-    (single_resource_declaration
-//    | (resource_declaration {resource_declaration})
+    (
+        single_resource_declaration
+        | 
+        ( resource_declaration+ )
     )
 //    [access_declarations]
 //    [instance_specific_initializations]
     END_CONFIGURATION
+    ;
+
+//resource_declaration ::=
+//’RESOURCE’ resource_name ’ON’ resource_type_name
+//[global_var_declarations]
+//single_resource_declaration
+//’END_RESOURCE’
+
+resource_declaration:
+    'RESOURCE' resource_name 'ON' resource_type_name
+    (global_var_declarations)?
+    single_resource_declaration
+    'END_RESOURCE'
+    ;
+
+// resource_name ::= identifier
+resource_name:
+    IDENTIFIER
+    ;
+
+resource_type_name:
+    IDENTIFIER
     ;
 
 
@@ -331,6 +501,13 @@ task_initialization:
 //data_source ::= constant | global_var_reference
 //| program_output_reference | direct_variable
 data_source:
+    constant 
+    //| 
+    //global_var_reference
+    //| 
+    //program_output_reference 
+    //| 
+    //direct_variable
     ;
 
 //global_var_declarations ::= ’VAR_GLOBAL’ [’CONSTANT’ | ’RETAIN’]
