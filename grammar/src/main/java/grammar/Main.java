@@ -27,6 +27,9 @@ public class Main {
 
         System.out.println("Start");
 
+        application();
+
+        /* 
 		assignment();
 		binaryInteger();
 		functionProgram();
@@ -40,8 +43,42 @@ public class Main {
 		type();
 		expressions();
 		//eventLog();
+        */
 
         System.out.println("End");
+	}
+
+    private static void application() throws IOException {
+		System.out.println("application");
+		
+		final CharStream charStream = CharStreams
+				.fromFileName("C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st");
+		
+		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+		// create a buffer of tokens pulled from the lexer
+		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+		final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+		// parse
+//        Function_block_declarationContext root = parser.function_block_declaration();
+//		 Assignment_statementContext root = parser.assignment_statement();
+         Compilation_unitContext root = parser.compilation_unit();
+         
+         ASTListener listener = new ASTListener();
+//       DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+//		// Create a generic parse tree walker that can trigger callbacks
+		final ParseTreeWalker walker = new ParseTreeWalker();
+		// Walk the tree created during the parse, trigger callbacks
+		walker.walk(listener, root);
+		
+//		// dump output
+//		Node rootNode = listener.getRootNode();
+//		rootNode.print(0);
+		
+		System.out.println();
 	}
 	
 	private static void assignment() throws IOException {

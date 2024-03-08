@@ -138,6 +138,9 @@ function_block_declaration:
 	(
 		IMPLEMENTATION function_block_body END_IMPLEMENTATION
 	)?
+    (
+        function_block_body
+    )
 	END_FUNCTION_BLOCK
 	;
 
@@ -821,6 +824,8 @@ xor_expression:
 // and_expression ::= comparison {('&' | 'AND') comparison}
 and_expression:
 	comparison (('&' | 'AND') comparison)?
+    |
+    'AND' '(' comparison ',' comparison ')'
 	;
 	
 // comparison ::= equ_expression { ('=' | '<>') equ_expression}

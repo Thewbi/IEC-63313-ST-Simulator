@@ -19,6 +19,8 @@ public class ASTListener extends StructuredTextBaseListener {
 	 */
 	@Override 
 	public void enterEveryRule(ParserRuleContext ctx) {
+
+        System.out.println(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
 		
 		// TO DEBUG UNCOMMENT THIS:
 //		descend();
