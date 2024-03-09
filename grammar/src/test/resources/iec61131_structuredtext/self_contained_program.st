@@ -1,18 +1,20 @@
 PROGRAM stexample
 
   VAR
-    x : BOOL;
+    x3 : BOOL;
   END_VAR
 
-  x := TRUE;
-  //x := 1 + 2 + 3;
+  x4 := TRUE;
+  x := 1 + 2 + 3;
 
-/*
+/**/
   REPEAT
-    x := FALSE;
-  UNTIL x = FALSE
+    x1 := FALSE;
+    x2 := FALSE;
+  UNTIL x2 = FALSE
+  //UNTIL TRUE
   END_REPEAT;
-*/
+
 
 END_PROGRAM
 

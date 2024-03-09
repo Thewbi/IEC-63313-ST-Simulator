@@ -6,6 +6,13 @@ public class AssignmentStatement extends Statement {
 
     private Expression expression;
 
+    /**
+     * ctor
+     */
+    public AssignmentStatement() {
+        setStatementType(StatementType.ASSIGNMENT);
+    }
+
     public String getVariableQualifier() {
         return variableQualifier;
     }

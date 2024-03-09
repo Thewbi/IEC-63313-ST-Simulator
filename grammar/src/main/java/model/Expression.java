@@ -1,6 +1,9 @@
 package model;
 
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 
 public class Expression {
@@ -11,10 +14,36 @@ public class Expression {
 
     private Boolean booleanValue;
 
+    private String variableNameValue;
+
     @Override
     public String toString() {
-        return "Expression [expressionType=" + expressionType + ", integerValue=" + integerValue + ", booleanValue="
-                + booleanValue + ", expressionList=" + expressionList + "]";
+        // return "Expression [expressionType=" + expressionType + ", integerValue=" +
+        // integerValue + ", booleanValue="
+        // + booleanValue + ", expressionList=" + expressionList + "]";
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Expression [ ");
+        stringBuffer.append(" expressionType=" + expressionType + " ");
+
+        if (integerValue != null) {
+            stringBuffer.append(" integerValue=" + integerValue + " ");
+        }
+
+        if (booleanValue != null) {
+            stringBuffer.append(" booleanValue=" + booleanValue + " ");
+        }
+
+        if (variableNameValue != null) {
+            stringBuffer.append(" variableNameValue=" + variableNameValue + " ");
+        }
+
+        if (CollectionUtils.isNotEmpty(expressionList)) {
+            stringBuffer.append("\n expressionList=" + expressionList + " ");
+        }
+
+        stringBuffer.append(" ]");
+        return stringBuffer.toString();
     }
 
     private List<Expression> expressionList = new ArrayList<>();
@@ -46,5 +75,13 @@ public class Expression {
     public void setBooleanValue(Boolean booleanValue) {
         this.booleanValue = booleanValue;
     }
-    
+
+    public String getVariableNameValue() {
+        return variableNameValue;
+    }
+
+    public void setVariableNameValue(String variableNameValue) {
+        this.variableNameValue = variableNameValue;
+    }
+
 }

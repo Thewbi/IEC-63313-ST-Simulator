@@ -4,6 +4,8 @@ public enum StatementType {
 
     UNKNOWN,
 
-    ASSIGNMENT
+    ASSIGNMENT,
+
+    REPEAT
     
 }
