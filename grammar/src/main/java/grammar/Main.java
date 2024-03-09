@@ -21,530 +21,534 @@ import com.st.grammar.StructuredTextParser.Program_declarationContext;
 
 public class Main {
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         System.out.println("Start");
 
         application();
 
-        /* 
-		assignment();
-		binaryInteger();
-		functionProgram();
-		functionInterface();
-		functionBlock();
-		//functionBlock2();
-		//functionBlock3();
-		//functionBlock4();
-		case_test();
-		tcunit();
-		type();
-		expressions();
-		//eventLog();
-        */
+        /*
+         * assignment();
+         * binaryInteger();
+         * functionProgram();
+         * functionInterface();
+         * functionBlock();
+         * //functionBlock2();
+         * //functionBlock3();
+         * //functionBlock4();
+         * case_test();
+         * tcunit();
+         * type();
+         * expressions();
+         * //eventLog();
+         */
 
         System.out.println("End");
-	}
+    }
 
     private static void application() throws IOException {
-		System.out.println("application");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st");
-		
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        System.out.println("application");
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        //String pathAsString = "C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st";
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\self_contained_program.st";
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        final CharStream charStream = CharStreams
+                .fromFileName(pathAsString);
 
-		// parse
-//        Function_block_declarationContext root = parser.function_block_declaration();
-//		 Assignment_statementContext root = parser.assignment_statement();
-         Compilation_unitContext root = parser.compilation_unit();
-         
-         ASTListener listener = new ASTListener();
-//       DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void assignment() throws IOException {
-		System.out.println("assignment");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/assignment.st");
-		
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        // parse
+        // Function_block_declarationContext root = parser.function_block_declaration();
+        // Assignment_statementContext root = parser.assignment_statement();
+        Compilation_unitContext root = parser.compilation_unit();
 
-		// parse
-//        Function_block_declarationContext root = parser.function_block_declaration();
-		 Assignment_statementContext root = parser.assignment_statement();
-         
-         ASTListener listener = new ASTListener();
-//       DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-
-	private static void binaryInteger() throws IOException {
-		System.out.println("binaryInteger");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/binary_integer.st");
-		
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
-
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
-
-		// parse
-//        Function_block_declarationContext root = parser.function_block_declaration();
-		 Assignment_statementContext root = parser.assignment_statement();
-         
-         ASTListener listener = new ASTListener();
-//       DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-
-	private static void eventLog() throws IOException {
-		
-		System.out.println("EventLog");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/event_log.st");
-		
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
-
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
-
-		// parse
-//        Function_block_declarationContext root = parser.function_block_declaration();
-		Compilation_unitContext root = parser.compilation_unit();
-         
-         ASTListener listener = new ASTListener();
-//       DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void type() throws IOException {
-		
-		System.out.println("Test Type");
-		
-		final CharStream charStream = CharStreams
-				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
-				.fromFileName("src/test/resources/iec61131_structuredtext/type.st");
-
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
-
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
-
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
-
-		// parse a type declaration
-        Data_type_declarationContext root = parser.data_type_declaration();
-        
         ASTListener listener = new ASTListener();
-//        DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void case_test() throws IOException {
-		
-		System.out.println("case_test");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/case.st");
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        System.out.println();
+    }
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+    private static void assignment() throws IOException {
+        System.out.println("assignment");
 
-		// parse a case declaration
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/assignment.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse
+        // Function_block_declarationContext root = parser.function_block_declaration();
+        Assignment_statementContext root = parser.assignment_statement();
+
+        ASTListener listener = new ASTListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void binaryInteger() throws IOException {
+        System.out.println("binaryInteger");
+
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/binary_integer.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse
+        // Function_block_declarationContext root = parser.function_block_declaration();
+        Assignment_statementContext root = parser.assignment_statement();
+
+        ASTListener listener = new ASTListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void eventLog() throws IOException {
+
+        System.out.println("EventLog");
+
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/event_log.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse
+        // Function_block_declarationContext root = parser.function_block_declaration();
+        Compilation_unitContext root = parser.compilation_unit();
+
+        ASTListener listener = new ASTListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void type() throws IOException {
+
+        System.out.println("Test Type");
+
+        final CharStream charStream = CharStreams
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
+                .fromFileName("src/test/resources/iec61131_structuredtext/type.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a type declaration
+        Data_type_declarationContext root = parser.data_type_declaration();
+
+        ASTListener listener = new ASTListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void case_test() throws IOException {
+
+        System.out.println("case_test");
+
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/case.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a case declaration
         Case_statementContext root = parser.case_statement();
 
         ASTListener listener = new ASTListener();
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void functionProgram() throws IOException {
-		
-		System.out.println("Test Program");
-		
-		final CharStream charStream = CharStreams
-				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
-				.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        System.out.println();
+    }
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+    private static void functionProgram() throws IOException {
 
-		// parse a program
-		final Program_declarationContext root = parser.program_declaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-//		Function_block_declarationContext root = parser.function_block_declaration();
+        System.out.println("Test Program");
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(new DefaultStructuredTextListener(), root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void functionInterface() throws IOException {
-		
-		System.out.println("Test Interface");
-		
-		final CharStream charStream = CharStreams
-				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
-				.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
+        final CharStream charStream = CharStreams
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+                .fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+        // .fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+        // .fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-//		Function_block_declarationContext root = parser.function_block_declaration();
+        // parse a program
+        final Program_declarationContext root = parser.program_declaration();
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(new DefaultStructuredTextListener(), root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
 
-	private static void functionBlock() throws IOException {
-		
-		System.out.println("functionBlock()");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
+        // function block
+        // Function_block_declarationContext root = parser.function_block_declaration();
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(new DefaultStructuredTextListener(), root);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        System.out.println();
+    }
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-		Function_block_declarationContext root = parser.function_block_declaration();
-		
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+    private static void functionInterface() throws IOException {
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void functionBlock2() throws IOException {
-		
-		System.out.println("functionBlock2()");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/function_block_2.st");
+        System.out.println("Test Interface");
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        final CharStream charStream = CharStreams
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+                .fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+        // .fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-		Function_block_declarationContext root = parser.function_block_declaration();
-		
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void functionBlock3() throws IOException {
-		
-		System.out.println("functionBlock3()");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/function_block_3.st");
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // parse an interface
+        final Interface_declarationContext root = parser.interface_declaration();
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        // function block
+        // Function_block_declarationContext root = parser.function_block_declaration();
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(new DefaultStructuredTextListener(), root);
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-		Function_block_declarationContext root = parser.function_block_declaration();
-		
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);	
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void functionBlock4() throws IOException {
-		
-		System.out.println("functionBlock4()");
-		
-		final CharStream charStream = CharStreams
-				.fromFileName("src/test/resources/iec61131_structuredtext/function_block_4.st");
+        System.out.println();
+    }
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+    private static void functionBlock() throws IOException {
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        System.out.println("functionBlock()");
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/function_block.st");
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-		Function_block_declarationContext root = parser.function_block_declaration();
-		
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);	
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void tcunit() throws IOException {
-		
-		System.out.println("tcunit()");
-		
-		final CharStream charStream = CharStreams
-				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
-				.fromFileName("src/test/resources/iec61131_structuredtext/tcunit/FB_AdjustAssertFailureMessageToMax253CharLength.TcPOU");
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
 
-		// parse a program
-//		final Program_delcarationContext root = parser.program_delcaration();
-		
-		// parse an interface
-//		final Interface_declarationContext root = parser.interface_declaration();
-		
-		// function block
-		Function_block_declarationContext root = parser.function_block_declaration();
+        // function block
+        Function_block_declarationContext root = parser.function_block_declaration();
 
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
 
-//		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
-	
-	private static void expressions() throws IOException {
-		
-		System.out.println("expressions()");
-		
-		final CharStream charStream = CharStreams
-				// .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/program.st");
-				//.fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
-				.fromFileName("src/test/resources/iec61131_structuredtext/expressions.st");
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
 
-		final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
 
-		// create a buffer of tokens pulled from the lexer
-		final CommonTokenStream tokens = new CommonTokenStream(lexer);
+        System.out.println();
+    }
 
-		final StructuredTextParser parser = new StructuredTextParser(tokens);
+    private static void functionBlock2() throws IOException {
 
-		// parse a program
-		Program_declarationContext root = parser.program_declaration();
+        System.out.println("functionBlock2()");
 
-//		DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-		ASTListener listener = new ASTListener();
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/function_block_2.st");
 
-		// Create a generic parse tree walker that can trigger callbacks
-		final ParseTreeWalker walker = new ParseTreeWalker();
-		// Walk the tree created during the parse, trigger callbacks
-		walker.walk(listener, root);
-		
-//		// dump output
-//		Node rootNode = listener.getRootNode();
-//		rootNode.print(0);
-		
-		System.out.println();
-	}
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
+
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
+
+        // function block
+        Function_block_declarationContext root = parser.function_block_declaration();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void functionBlock3() throws IOException {
+
+        System.out.println("functionBlock3()");
+
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/function_block_3.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
+
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
+
+        // function block
+        Function_block_declarationContext root = parser.function_block_declaration();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void functionBlock4() throws IOException {
+
+        System.out.println("functionBlock4()");
+
+        final CharStream charStream = CharStreams
+                .fromFileName("src/test/resources/iec61131_structuredtext/function_block_4.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
+
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
+
+        // function block
+        Function_block_declarationContext root = parser.function_block_declaration();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void tcunit() throws IOException {
+
+        System.out.println("tcunit()");
+
+        final CharStream charStream = CharStreams
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+                .fromFileName(
+                        "src/test/resources/iec61131_structuredtext/tcunit/FB_AdjustAssertFailureMessageToMax253CharLength.TcPOU");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a program
+        // final Program_delcarationContext root = parser.program_delcaration();
+
+        // parse an interface
+        // final Interface_declarationContext root = parser.interface_declaration();
+
+        // function block
+        Function_block_declarationContext root = parser.function_block_declaration();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+
+        // // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
+
+    private static void expressions() throws IOException {
+
+        System.out.println("expressions()");
+
+        final CharStream charStream = CharStreams
+                // .fromFileName("src/test/resources/iec61131_structuredtext/function_selection.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/program.st");
+                // .fromFileName("src/test/resources/iec61131_structuredtext/interface.st");
+                .fromFileName("src/test/resources/iec61131_structuredtext/expressions.st");
+
+        final StructuredTextLexer lexer = new StructuredTextLexer(charStream);
+
+        // create a buffer of tokens pulled from the lexer
+        final CommonTokenStream tokens = new CommonTokenStream(lexer);
+
+        final StructuredTextParser parser = new StructuredTextParser(tokens);
+
+        // parse a program
+        Program_declarationContext root = parser.program_declaration();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+
+        // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+
+        // // dump output
+        // Node rootNode = listener.getRootNode();
+        // rootNode.print(0);
+
+        System.out.println();
+    }
 
 }

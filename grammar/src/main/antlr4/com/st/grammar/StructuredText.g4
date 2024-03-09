@@ -8,28 +8,23 @@ grammar StructuredText;
 //}
 
 // https://stackoverflow.com/questions/23976617/parsing-single-line-comments
-LineComment: 
+LineComment : 
 	('--' | '//') ~[\r\n]* -> channel(HIDDEN)
 	;
 	
-BlockComment:
+BlockComment :
 	(('/*' .*? '*/')
 	| ('(*' .*? '*)'))
 	-> skip
     ;
     
-    
-    
-    
-    
-compilation_unit:
+compilation_unit :
 	(library_element_declaration)*
 	EOF
 	;
 	
 // library_element_name ::= data_type_name | function_name | function_block_type_name | program_type_name | resource_type_name | configuration_name
-    
-library_element_name:
+library_element_name :
 //	data_type_name 
 //	| 
 	function_name 
@@ -337,8 +332,6 @@ action:
 //'END_VAR'
 
 //function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
-	
-
 
 // function_name ::= standard_function_name | derived_function_name
 function_name:
@@ -402,7 +395,6 @@ resource_type_name:
     IDENTIFIER
     ;
 
-
 //single_resource_declaration ::=
 //{task_configuration ’;’}
 //program_configuration ’;’
@@ -413,12 +405,10 @@ single_resource_declaration:
     ( program_configuration SEMICOLON )*
     ;
 
-
 //program_configuration ::=
 //’PROGRAM’ [RETAIN | NON_RETAIN]
 //program_name [’WITH’ task_name] ’:’ program_type_name
 //[’(’ prog_conf_elements ’)’]
-
 program_configuration:
     PROGRAM ( RETAIN | NON_RETAIN )?
     program_name ( 'WITH' task_name )? COLON program_type_name
@@ -474,7 +464,6 @@ data_sink:
     //direct_variable
     ;
 
-
 //task_configuration ::= ’TASK’ task_name task_initialization
 task_configuration:
     TASK task_name task_initialization
@@ -483,8 +472,6 @@ task_configuration:
 task_name:
     IDENTIFIER
     ;
-
-
 
 //task_initialization ::=
 //’(’ [’SINGLE’ ’:=’ data_source ’,’]
@@ -527,7 +514,6 @@ global_var_decl:
 configuration_name:
     IDENTIFIER
     ;
-
 	
 // several VAR-END_VAR are allowed in this grammar!
 program_declaration:
@@ -542,8 +528,6 @@ program_declaration:
 	function_block_body
 	END_PROGRAM
 	;
-	
-
 	
 other_var_declarations:
 	external_var_declarations 
@@ -714,24 +698,24 @@ constant:
 	boolean_literal
 	;
 	
-character_string:
+character_string :
 	STRING_LITERAL_SINGLE_QUOTE
 	;
 	
 // time_literal ::= duration | time_of_day
-time_literal:
+time_literal :
 	duration 
 //	| 
 //	time_of_day
 	;
 
 // duration ::= (’T’ | ’TIME’) ’#’ [’-’] interval
-duration:
+duration :
 	('T' | 'TIME') '#' '-'? interval
 	;
 
 // interval ::= days | hours | minutes | seconds | milliseconds
-interval: 
+interval : 
 	days 
 	| 
 	hours 
@@ -751,38 +735,38 @@ days:
 	;
 
 // fixed_point ::= integer [ ’.’ integer]
-fixed_point:
+fixed_point :
 	integer ( '.' integer )?
 	;
 
 // hours ::= fixed_point (’h’) | integer (’h’)[’_’] minutes
-hours:
+hours :
 	fixed_point ('h'|'H') 
 	| 
 	integer ('h'|'H') '_'? minutes
 	;
 
 // minutes ::= fixed_point (’m’) | integer (’m’) [’_’] seconds
-minutes:
+minutes :
 	fixed_point ('m'|'M') 
 	| 
 	integer ('m'|'M') '_'? seconds
 	;
 
 // seconds ::= fixed_point (’s’) | integer (’s’) [’_’]milliseconds
-seconds:
+seconds :
 	fixed_point ('s'|'S') 
 	| 
 	integer ('s'|'S') '_'? milliseconds
 	;
 
 // milliseconds ::= fixed_point (’ms’)
-milliseconds:
+milliseconds :
 	 fixed_point ('ms'|'MS')
 	 ;
 	 
 // bit_string_literal ::= [ (’BYTE’ | ’WORD’ | ’DWORD’ | ’LWORD’) ’#’ ]( unsigned_integer | binary_integer | octal_integer | hex_integer)
-bit_string_literal:
+bit_string_literal :
  	(('BYTE' | 'WORD' | 'DWORD' | 'LWORD') '#')?
  	( 
  		//unsigned_integer
@@ -797,8 +781,6 @@ bit_string_literal:
  	)
 	;
 	
-
-	
 // binary_integer ::= ’2#’ bit {[’_’] bit}
 //binary_integer:
 //	'2#' bit ( ('_')? bit )+
@@ -808,7 +790,7 @@ bit_string_literal:
 //    '2#' ('1' | '0') ('1' | '0') ('1' | '0')
 //	;
 
-binary_integer:
+binary_integer :
 	BINARY_INTEGER
 	;
 	
@@ -819,7 +801,7 @@ binary_integer:
 //	'0'
 //	;
 
-boolean_literal:
+boolean_literal :
 	 BOOLEAN_EXPLICIT_LITERAL
 	 | 
 	 'TRUE' 
@@ -827,14 +809,14 @@ boolean_literal:
 	 'FALSE'
 	 ;
 	 
-numeric_literal:
+numeric_literal :
 	integer_literal 
 	//| 
 	//real_literal
 	;
 	
 // integer_literal ::= [ integer_type_name ’#’ ]( signed_integer | binary_integer | octal_integer | hex_integer)
-integer_literal: 
+integer_literal : 
 	( integer_type_name '#' )?
 	( 
 		signed_integer 
@@ -848,11 +830,11 @@ integer_literal:
 	)
 	;
 	
-integer:
+integer :
 	INTEGER
 	;	
 	
-signed_integer: 
+signed_integer : 
 //	(PLUS | MINUS)? integer
     (PLUS | MINUS) integer
 	;
@@ -861,13 +843,13 @@ signed_integer:
 //	INTEGER
 //	;
 
-integer_type_name: 
+integer_type_name : 
 	signed_integer_type_name 
 	| 
 	unsigned_integer_type_name
 	;
 	
-signed_integer_type_name: 
+signed_integer_type_name : 
 	'SINT' 
 	| 
 	'INT' 
@@ -877,7 +859,7 @@ signed_integer_type_name:
 	'LINT'
 	;
 	
-unsigned_integer_type_name: 
+unsigned_integer_type_name : 
 	'USINT' 
 	| 
 	'UINT' 
@@ -886,20 +868,16 @@ unsigned_integer_type_name:
 	| 
 	'ULINT'
 	;
-	
-	
-
-
 
 //data_type_declaration ::= 'TYPE' type_declaration ';' {type_declaration ';'} 'END_TYPE'
-data_type_declaration:
+data_type_declaration :
 	TYPE 
 	(type_declaration SEMICOLON)+
 	END_TYPE
 	;
 
 // type_declaration ::= single_element_type_declaration | array_type_declaration | structure_type_declaration | string_type_declaration
-type_declaration:
+type_declaration :
 	//single_element_type_declaration 
 	//| 
 	array_type_declaration 
@@ -909,48 +887,42 @@ type_declaration:
 	//string_type_declaration
 	;
 
-
-
-
 // array_var_init_decl ::= var1_list ’:’ array_spec_init
-array_var_init_decl:
+array_var_init_decl :
 	var1_list COLON array_spec_init
 	;
 
-
 // array_type_declaration ::= array_type_name ’:’ array_spec_init
-array_type_declaration:
+array_type_declaration :
 	array_type_name COLON array_spec_init
 	;
 	
 // array_type_name ::= identifier
-array_type_name:
+array_type_name :
 	IDENTIFIER
 	;
 	
 // array_spec_init ::= array_specification [’:=’ array_initialization]
-array_spec_init:
+array_spec_init :
 	array_specification (':=' array_initialization)?
 	;
 	
 // array_specification ::= array_type_name | ’ARRAY’ ’[’ subrange {’,’ subrange} ’]’ ’OF’ non_generic_type_name
-array_specification:
+array_specification :
 	array_type_name
 	|
 	ARRAY '[' subrange (COMMA subrange)* ']' OF non_generic_type_name
 	;
 	
-
-	
 // non_generic_type_name ::= elementary_type_name | derived_type_name
-non_generic_type_name:
+non_generic_type_name :
 	elementary_type_name
 	|
 	derived_type_name
 	;
 	
 // derived_type_name ::= single_element_type_name | array_type_name | structure_type_name | string_type_name
-derived_type_name:
+derived_type_name :
 	single_element_type_name 
 	| 
 	array_type_name 
@@ -961,7 +933,7 @@ derived_type_name:
 	;
 	
 // single_element_type_name ::= simple_type_name | subrange_type_name | enumerated_type_name
-single_element_type_name:
+single_element_type_name :
 	simple_type_name
 	|
 	subrange_type_name
@@ -973,7 +945,7 @@ single_element_type_name:
 //	IDENTIFIER
 //	;
 	
-subrange_type_name:
+subrange_type_name :
 	IDENTIFIER
 	;
 	
@@ -990,12 +962,12 @@ subrange_type_name:
 //	;
 	
 // array_initialization ::= ’[’ array_initial_elements {’,’ array_initial_elements} ’]’
-array_initialization:
+array_initialization :
 	'[' array_initial_elements (COMMA array_initial_elements)* ']'
 	;
 	
 // array_initial_elements ::= array_initial_element | integer ’(’[array_initial_element] ’)’
-array_initial_elements:
+array_initial_elements :
 	array_initial_element 
 	| 
 	integer '(' (array_initial_element)? ')'
@@ -1003,7 +975,7 @@ array_initial_elements:
 	;
 	
 // array_initial_element ::= constant | enumerated_value | structure_initialization | array_initialization
-array_initial_element:
+array_initial_element :
 	constant
 	|
 	enumerated_value 
@@ -1013,18 +985,11 @@ array_initial_element:
 	array_initialization
 	;
 
-
-
-
-
-	
-
-
-structure_type_declaration:
+structure_type_declaration :
 	structure_type_name COLON structure_specification
 	;
 	
-structure_specification:
+structure_specification :
 	 structure_declaration 
 //	 | 
 //	 initialized_structure
@@ -1036,12 +1001,12 @@ structure_declaration :
 	END_STRUCT
 	;
 	
-structure_type_name:
+structure_type_name :
 	IDENTIFIER
 	;
 	
 // structure_element_declaration ::= structure_element_name ':'(simple_spec_init |subrange_spec_init | enumerated_spec_init | array_spec_init | initialized_structure)
-structure_element_declaration: 
+structure_element_declaration : 
 	structure_element_name COLON 
 	(
 		simple_spec_init 
@@ -1056,38 +1021,38 @@ structure_element_declaration:
 	)
 	;
 	
-structure_element_name:
+structure_element_name :
 	IDENTIFIER
 	;
 
-structure_initialization:
+structure_initialization :
 	 '(' structure_element_initialization (COMMA structure_element_initialization)? ')'
 	 ;
 
-structure_element_initialization:
+structure_element_initialization :
 	structure_element_name ':=' 
 //	(constant | enumerated_value | array_initialization | structure_initialization)
 	;
 
-string_type_name: 
+string_type_name : 
 	IDENTIFIER
 	;
 
-string_type_declaration: 
+string_type_declaration : 
 	string_type_name COLON ('STRING' | 'WSTRING') 
 	('[' integer ']')? 
 	(':=' STRING_LITERAL)?
 	;
 	
 // function_block_body ::= ladder_diagram | function_block_diagram | instruction_list | statement_list | <other languages>
-function_block_body:
+function_block_body :
 	statement_list
 	;
 	
 // statement_list aka. structured_text
 // statement_list ::= statement ';' {statement ';'} 
 statement_list :
-	statement+
+	( statement )+
 	;
 	
 // statement ::= NIL | assignment_statement | subprogram_control_statement | selection_statement | iteration_statement
@@ -1101,25 +1066,21 @@ statement :
 	|
 	iteration_statement SEMICOLON
 	;
-	
-
-
-
 
 // subprogram_control_statement ::= fb_invocation | ’RETURN’
-subprogram_control_statement:
+subprogram_control_statement :
 	fb_invocation
 	|
 	RETURN
 	;
 
 // fb_invocation ::= fb_name ’(’ [param_assignment {’,’ param_assignment}]’)’
-fb_invocation:
+fb_invocation :
 	fb_name ( DOT fb_name )* '(' ( param_assignment (COMMA param_assignment)* )? ')'
 	;	
 	
 // param_assignment ::= ([variable_name ’:=’] expression) | ([’NOT’] variable_name ’=>’ variable)	
-param_assignment:
+param_assignment :
 //	( variable_name ':=' )? expression
 	variable_name ':=' expression?
 	|
@@ -1127,134 +1088,130 @@ param_assignment:
 	|
 	'NOT'? variable_name '=>' variable?
 	;
-	
 
-fb_name:
+fb_name :
 	IDENTIFIER
 	;
-
-
 	
-assignment_statement:
+assignment_statement :
 	variable ':=' expression
 	//variable ':=' numeric_literal
 	;
 	
 // variable ::= direct_variable | symbolic_variable
-variable:
+variable :
 	//direct_variable
 	//|
 	symbolic_variable (DOT variable)*
 	;
 	
-symbolic_variable:
+symbolic_variable :
 	variable_name 
 	| 
 	multi_element_variable
 	;
 	
-variable_name:
+variable_name :
 //	IDENTIFIER (DOT IDENTIFIER)*
 	IDENTIFIER
 	;
 	
 // multi_element_variable ::= array_variable | structured_variable
-multi_element_variable:
+multi_element_variable :
 	array_variable
 //	|
 //	structured_variable
 	;
 	
 // array_variable ::= subscripted_variable subscript_list
-array_variable:
+array_variable :
 	//subscripted_variable subscript_list
 	IDENTIFIER subscript_list
 	;
 	
 // subscripted_variable ::= symbolic_variable
-subscripted_variable:
+subscripted_variable :
 	symbolic_variable
 	;
 	
 // subscript_list ::= ’[’ subscript {’,’ subscript} ’]’
-subscript_list:
+subscript_list :
 	'[' subscript (COMMA subscript)* ']'
 	;
 	
-subscript:
+subscript : 
 	expression
-	//INTEGER
 	;
 	
 // expression ::= xor_expression {'OR' xor_expression}
-expression:
-	xor_expression ('OR' xor_expression)?
+expression :
+	xor_expression ( 'OR' xor_expression )?
 	;
 	
 // xor_expression ::= and_expression {'XOR' and_expression}
-xor_expression:
-	and_expression ('OR' and_expression)?
+xor_expression :
+	and_expression ( 'OR' and_expression )?
 	;
 	
 // and_expression ::= comparison {('&' | 'AND') comparison}
-and_expression:
+and_expression :
 	comparison (('&' | 'AND') comparison)?
     |
     'AND' '(' comparison ',' comparison ')'
 	;
 	
 // comparison ::= equ_expression { ('=' | '<>') equ_expression}
-comparison:
+comparison :
 	equ_expression (('=' | '<>') equ_expression)?
 	;
 	
 // equ_expression ::= add_expression {comparison_operator add_expression}
-equ_expression:
+equ_expression :
 	add_expression (comparison_operator add_expression)?
 	;
 	
 // comparison_operator ::= '<' | '>' | '<=' | '>='
-comparison_operator:
+comparison_operator :
 	'<' | '>' | '<=' | '>='
 	;
 
 // add_expression ::= term {add_operator term}
-add_expression:
+add_expression :
 	term (add_operator term)*
 	;
 
 //add_operator ::= '+' | '-'
-add_operator:
+add_operator :
 	'+' | '-'
 	;
 
 // term ::= power_expression {multiply_operator power_expression}	
-term:
+term :
 	power_expression (multiply_operator power_expression)?
 	;
 	
 // multiply_operator ::= '*' | '/' | 'MOD'
-multiply_operator:
+multiply_operator :
 	'*' | '/' | 'MOD'
 	;
 	
 // power_expression ::= unary_expression {'**' unary_expression}
-power_expression:
+power_expression :
 	unary_expression ('*''*' unary_expression)?
 	;
 	
 //unary_expression ::= [unary_operator] primary_expression
-unary_expression:
+unary_expression :
 	unary_operator? primary_expression
 	;
 
 // unary_operator ::= '-' | 'NOT'	
-unary_operator:
+unary_operator :
 	'-' | 'NOT'
 	;
 	
 //primary_expression ::= constant | enumerated_value | variable | '(' expression ')' | function_name '(' param_assignment {',' param_assignment} ')'
-primary_expression:
+primary_expression :
 	constant
 	//| 
 	//enumerated_value 
@@ -1268,35 +1225,39 @@ primary_expression:
 	;
 	
 // iteration_statement ::= for_statement | while_statement | repeat_statement | exit_statement
-iteration_statement:
+iteration_statement :
 	for_statement 
 	//|
-	//while_statement | 
-	//repeat_statement | 
+	//while_statement 
+    | 
+	repeat_statement 
+    //| 
 	//exit_statement
 	;
+
+//repeat_statement ::=
+//’REPEAT’ statement_list ’UNTIL’ expression ’END_REPEAT’
+repeat_statement :
+    'REPEAT' statement_list 'UNTIL' expression 'END_REPEAT'
+    ;
 	
 // for_statement ::= 'FOR' control_variable ':=' for_list 'DO' statement_list 'END_FOR'
-for_statement:
+for_statement :
 	'FOR' control_variable ':=' for_list 'DO' statement_list 'END_FOR'
 	;
 	
 // control_variable ::= identifier
-control_variable:
+control_variable :
 	IDENTIFIER
 	;
 
 // for_list ::= expression 'TO' expression ['BY' expression]	
-for_list:
+for_list :
 	expression 'TO' expression ('BY' expression)?
 	;
 	
-	
-	
-	
-	
 // selection_statement ::= if_statement | case_statement
-selection_statement:
+selection_statement :
 	if_statement
 	|
 	case_statement
@@ -1307,7 +1268,7 @@ selection_statement:
 //{'ELSIF' expression 'THEN' statement_list}
 //['ELSE' statement_list]
 //'END_IF'
-if_statement:
+if_statement :
 	'IF' expression 'THEN' statement_list
 	(
 		'ELSIF' expression 'THEN' statement_list
@@ -1324,7 +1285,7 @@ if_statement:
 //{case_element}
 //['ELSE' statement_list]
 //'END_CASE'
-case_statement:
+case_statement :
 	CASE expression OF 
 	(case_element)+
 	('ELSE' statement_list)?
@@ -1332,17 +1293,17 @@ case_statement:
 	;
 
 //case_element ::= case_list ':' statement_list
-case_element:
+case_element :
 	case_list COLON statement_list
 	;
 
 //case_list ::= case_list_element {',' case_list_element}
-case_list:
+case_list :
 	case_list_element (',' case_list_element)?
 	;
 
 //case_list_element ::= subrange | signed_integer | enumerated_value
-case_list_element:
+case_list_element :
 	subrange 
 	|
 	integer
@@ -1355,17 +1316,17 @@ case_list_element:
 	;
 
 // subrange ::= signed_integer ’..’ signed_integer
-subrange:
+subrange :
 	(signed_integer | integer | IDENTIFIER) '..' (signed_integer | integer | IDENTIFIER)
 	;
 
 // enumerated_value ::= [enumerated_type_name ’#’] identifier
-enumerated_value:
+enumerated_value :
 	(enumerated_type_name ('#' | '.')) IDENTIFIER
 	;
 	
 // enumerated_type_name ::= identifier
-enumerated_type_name:
+enumerated_type_name :
 	IDENTIFIER
 	;
 	
