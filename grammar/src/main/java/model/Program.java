@@ -9,9 +9,11 @@ public class Program {
 
     private List<Variable> variables = new ArrayList<>();
 
+    private List<Statement> statements = new ArrayList<>();
+
     @Override
     public String toString() {
-        return "Program [name=" + name + ", variables=" + variables + "]";
+        return "Program [name=" + name + ", variables=" + variables + ", statements=" + statements + "]";
     }
 
     public String getName() {
@@ -25,5 +27,8 @@ public class Program {
     public List<Variable> getVariables() {
         return variables;
     }
-    
+
+    public List<Statement> getStatements() {
+        return statements;
+    }
 }

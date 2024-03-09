@@ -7,6 +7,8 @@ import common.DefaultNode;
 import common.Node;
 
 public class ASTListener extends StructuredTextBaseListener {
+
+    private int indent;
 	
 	private Node rootNode;
 	
@@ -20,12 +22,18 @@ public class ASTListener extends StructuredTextBaseListener {
 	@Override 
 	public void enterEveryRule(ParserRuleContext ctx) {
 
-        System.out.println(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
+        for (int i = 0; i < indent; i++)
+        {
+            System.out.print("  ");
+        }
+
+        System.out.print(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
+        System.out.println("");
 		
 		// TO DEBUG UNCOMMENT THIS:
-//		descend();
-//		currentNode.setLabel(ctx.getText());
-//		currentNode.setLabel(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
+		descend();
+		// currentNode.setLabel(ctx.getText());
+		// currentNode.setLabel(ctx.getClass().getSimpleName() + " " + ctx.getStart().getText());
 	}
 	
 	/**
@@ -36,7 +44,7 @@ public class ASTListener extends StructuredTextBaseListener {
 	@Override 
 	public void exitEveryRule(ParserRuleContext ctx) {
 		// TO DEBUG UNCOMMENT THIS
-//		ascend();
+		ascend();
 	}
 	
 	@Override 
@@ -47,6 +55,8 @@ public class ASTListener extends StructuredTextBaseListener {
 	}
 	
 	private void descend() {
+        indent++;
+
 		Node parent = getCurrentNode();
 		
 		currentNode = createNode();
@@ -56,6 +66,8 @@ public class ASTListener extends StructuredTextBaseListener {
 	}
 
 	private void ascend() {
+        indent--;
+
 		if (currentNode != null) {
 			currentNode = currentNode.getParentNode();
 		}
