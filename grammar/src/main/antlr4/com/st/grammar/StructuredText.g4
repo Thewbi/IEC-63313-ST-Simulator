@@ -51,7 +51,6 @@ library_element_declaration:
 	configuration_declaration
 	;
 
-
 // function_declaration ::= ’FUNCTION’ derived_function_name ’:’
 // (elementary_type_name | derived_type_name)
 // { io_var_declarations | function_var_decls } function_body
@@ -129,7 +128,6 @@ function_block_type_name:
 	;
 
 //standard_function_block_name ::= <as defined in clause 2.5.2.3 of the standard>
-
 derived_function_block_name: 
 	IDENTIFIER
 	;
@@ -179,11 +177,6 @@ function_block_declaration:
     )?
 	END_FUNCTION_BLOCK
 	;
-
-
-
-
-
 
 //sequential_function_chart ::= sfc_network {sfc_network}
 sequential_function_chart:
@@ -253,12 +246,20 @@ action_qualifier:
     |
     'P'
     | 
-    timed_qualifier COMMA action_time
+    ( timed_qualifier COMMA action_time )
     ;
 
 //timed_qualifier ::= 'L' | 'D' | 'SD' | 'DS' | 'SL'
 timed_qualifier:
-    'L' | 'D' | 'SD' | 'DS' | 'SL'
+    'L' 
+    | 
+    'D' 
+    | 
+    'SD' 
+    | 
+    'DS' 
+    | 
+    'SL'
     ;
 
 //action_time ::= duration | variable_name
@@ -316,9 +317,6 @@ action:
     'END_ACTION'
     ;
 
-
-
-
 //temp_var_decls ::=
 //'VAR_TEMP'
 //temp_var_decl ';'
@@ -349,8 +347,6 @@ standard_function_name:
 derived_function_name:
 	IDENTIFIER
 	;
-
-
 
 //configuration_declaration ::=
 //    ’CONFIGURATION’ configuration_name
@@ -398,7 +394,6 @@ resource_type_name:
 //{task_configuration ’;’}
 //program_configuration ’;’
 //{program_configuration ’;’}
-
 single_resource_declaration:
     ( task_configuration SEMICOLON )*
     ( program_configuration SEMICOLON )*
@@ -1080,8 +1075,7 @@ fb_invocation :
 	
 // param_assignment ::= ([variable_name ’:=’] expression) | ([’NOT’] variable_name ’=>’ variable)	
 param_assignment :
-//	( variable_name ':=' )? expression
-	variable_name ':=' expression?
+	variable_name ':=' ( expression )?
 	|
 	expression
 	|
@@ -1113,6 +1107,11 @@ symbolic_variable :
 variable_name :
 //	IDENTIFIER (DOT IDENTIFIER)*
 	IDENTIFIER
+    // the next two options have been added since they look like valid IDENTIFIERS and the compiler will parse them before returning the IDENTIFIER token!
+    |
+    action_qualifier
+    |
+    timed_qualifier
 	;
 	
 // multi_element_variable ::= array_variable | structured_variable
@@ -1443,17 +1442,11 @@ fragment DIGIT:
 
 // hex_digit ::= digit | 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
 
-
-
-
-
-
 INTEGER: 
 	DIGIT ('_' DIGIT)+
 	|
 	DIGIT+
 	;
-	
 
 // identifier ::= (letter | ('_' (letter | digit))) {['_'] (letter | digit)}
 IDENTIFIER:

@@ -51,7 +51,8 @@ public class Main {
         //System.out.println("application");
 
         //String pathAsString = "C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st";
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\self_contained_program.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\self_contained_program.st";
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\small_program.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration_with_variables.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\type_bool_struct.st";
@@ -71,8 +72,8 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        ASTListener listener = new ASTListener();
-        //ModelCreatorASTListener listener = new ModelCreatorASTListener();
+        //ASTListener listener = new ASTListener();
+        ModelCreatorASTListener listener = new ModelCreatorASTListener();
         //DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
 
         // // Create a generic parse tree walker that can trigger callbacks
@@ -86,7 +87,13 @@ public class Main {
 
         //System.out.println();
 
+        System.out.println("\nTypes");
+        System.out.println(listener.globalTypeScope);
+
+        System.out.println("\nProgram");
         System.out.println(listener.program);
+
+        System.out.println("\nConfiguration");
         System.out.println(listener.configuration);
     }
 

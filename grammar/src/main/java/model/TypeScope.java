@@ -7,7 +7,22 @@ public class TypeScope {
 
     private Map<String, DataType> typeMap = new HashMap<>();
 
-    private TypeScope parentTypeScope;
+    // private TypeScope parentTypeScope;
+
+    @Override
+    public String toString() {
+        //return "TypeScope [typeMap=" + typeMap + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (Map.Entry<String, DataType> entry : typeMap.entrySet())
+        {
+            stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue());
+            stringBuilder.append("\n");
+        }
+
+        return stringBuilder.toString();
+    }
 
     public void addType(String typeName, DataType object) {
         if (typeMap.containsKey(typeName)) {
@@ -20,21 +35,22 @@ public class TypeScope {
 
         if (typeMap.containsKey(dataTypeAsString)) {
             return typeMap.get(dataTypeAsString);
-        } 
-
-        if (parentTypeScope == null) {
-            return null;
         }
 
-        return parentTypeScope.retrieveDataTypeByTypeName(dataTypeAsString);
+        return null;
+
+        // if (parentTypeScope == null) {
+        //     return null;
+        // }
+
+        // return parentTypeScope.retrieveDataTypeByTypeName(dataTypeAsString);
     }
 
-    public TypeScope getParentTypeScope() {
-        return parentTypeScope;
-    }
+    // public TypeScope getParentTypeScope() {
+    //     return parentTypeScope;
+    // }
 
-    public void setParentTypeScope(TypeScope parentTypeScope) {
-        this.parentTypeScope = parentTypeScope;
-    }
-    
+    // public void setParentTypeScope(TypeScope parentTypeScope) {
+    //     this.parentTypeScope = parentTypeScope;
+    // }
 }

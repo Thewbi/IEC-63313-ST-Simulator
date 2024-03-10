@@ -14,6 +14,7 @@ import model.AssignmentStatement;
 import model.DataType;
 import model.Expression;
 import model.ExpressionType;
+import model.FunctionBlock;
 import model.GlobalScope;
 import model.Program;
 import model.ProgramConfiguration;
@@ -52,6 +53,10 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     public Configuration configuration;
 
+    public RepeatStatement repeatStatement;
+
+    private FunctionBlock functionBlock;
+
     /**
      * ctor
      */
@@ -59,13 +64,59 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         scopeStack.push(globalVarScope);
 
+        // BOOL
         DataType dataType = new DataType();
         dataType.setName("BOOL");
+        globalTypeScope.addType(dataType.getName(), dataType);
 
+        // SR FlipFlop (reset precedence)
+        dataType = new DataType();
+        dataType.setName("SR");
+        globalTypeScope.addType(dataType.getName(), dataType);
+
+        // TON Timer to ON (TRUE) (delays it's output going to HIGH/ON/TRUE for a
+        // configurable amount of time adter the input goes high)
+        dataType = new DataType();
+        dataType.setName("TON");
+        globalTypeScope.addType(dataType.getName(), dataType);
+
+        // TIME
+        dataType = new DataType();
+        dataType.setName("TIME");
         globalTypeScope.addType(dataType.getName(), dataType);
 
         // typeScopeStack.push(globalTypeScope);
     }
+
+    @Override
+    public void enterFunction_block_declaration(StructuredTextParser.Function_block_declarationContext ctx) {
+
+        final String typeName = ctx.IDENTIFIER().getText();
+
+        // System.out.println(typeName);
+
+        functionBlock = new FunctionBlock();
+        functionBlock.setName(typeName);
+
+        scopeStack.push(functionBlock);
+
+    }
+
+    @Override
+    public void exitFunction_block_declaration(StructuredTextParser.Function_block_declarationContext ctx) {
+        // System.out.println(functionBlock);
+
+        globalTypeScope.addType(functionBlock.getName(), functionBlock);
+
+        functionBlock = null;
+    }
+
+    // @Override
+    // public void exitInput_declaration(StructuredTextParser.Input_declarationContext ctx) {
+
+    //     System.out.println("");
+
+    // }
 
     @Override
     public void enterStructure_type_declaration(StructuredTextParser.Structure_type_declarationContext ctx) {
@@ -195,7 +246,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // System.out.println(ctx.getClass().getSimpleName() + " " +
         // ctx.getStart().getText());
 
-        RepeatStatement repeatStatement = new RepeatStatement();
+        repeatStatement = new RepeatStatement();
 
         // repeat statement is the new scope
         scopeStack.push(repeatStatement);
@@ -204,12 +255,15 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitRepeat_statement(StructuredTextParser.Repeat_statementContext ctx) {
 
-        RepeatStatement repeatStatement = (RepeatStatement) scopeStack.pop();
+        // RepeatStatement repeatStatement = (RepeatStatement) scopeStack.pop();
 
         repeatStatement.setTerminationCondition(comparisonExpression);
         comparisonExpression = null;
 
+        scopeStack.pop();
         scopeStack.peek().addStatement(repeatStatement);
+
+        repeatStatement = null;
     }
 
     @Override
@@ -299,18 +353,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     }
 
     @Override
-    public void visitTerminal(TerminalNode node) {
-        // System.out.println("TERMINAL: " + node.getText());
-
-        if (StringUtils.equalsIgnoreCase("=", node.getText())) {
-            equalsDetected = true;
-        }
-        if (StringUtils.equalsIgnoreCase("<>", node.getText())) {
-            notEqualsDetected = true;
-        }
-    }
-
-    @Override
     public void enterConfiguration_declaration(StructuredTextParser.Configuration_declarationContext ctx) {
         configuration = new Configuration();
     }
@@ -365,7 +407,17 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         programConfiguration.setProgramType(ctx.program_type_name().getText());
 
         configuration.setProgramConfiguration(programConfiguration);
-
     }
 
+    @Override
+    public void visitTerminal(TerminalNode node) {
+        // System.out.println("TERMINAL: " + node.getText());
+
+        if (StringUtils.equalsIgnoreCase("=", node.getText())) {
+            equalsDetected = true;
+        }
+        if (StringUtils.equalsIgnoreCase("<>", node.getText())) {
+            notEqualsDetected = true;
+        }
+    }
 }

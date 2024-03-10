@@ -1,13 +1,48 @@
 package model;
 
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.ArrayList;
 
-public class VarScope {
+public class VarScope extends DataType {
 
     private List<Variable> variables = new ArrayList<>();
 
     private List<Statement> statements = new ArrayList<>();
+
+    @Override
+    public String toString() {
+        //return "Program [name=" + name + ", variables=" + getVariables() + ", statements=" + getStatements() + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + " ");
+
+        stringBuilder.append("\n\n");
+        stringBuilder.append("Variables:");
+        if (CollectionUtils.isEmpty(getVariables())) {
+            stringBuilder.append("No Variables");
+        } else {
+            for (Variable variable : getVariables()) {
+                stringBuilder.append("\n").append(variable);
+            }
+        }
+
+        stringBuilder.append("\n\n");
+        stringBuilder.append("Statements:");
+        if (CollectionUtils.isEmpty(getStatements())) {
+            stringBuilder.append("No Statements");
+        } else {
+            for (Statement statment : getStatements()) {
+                //stringBuilder.append("\n");
+                stringBuilder.append("\n").append(statment);
+            }
+        }
+
+        return stringBuilder.toString();
+    }
 
     public List<Variable> getVariables() {
         return variables;
