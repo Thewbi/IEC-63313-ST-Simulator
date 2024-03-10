@@ -11,24 +11,24 @@ public class Program extends Scope {
     public String toString() {
         //return "Program [name=" + name + ", variables=" + getVariables() + ", statements=" + getStatements() + "]";
 
-        StringBuffer stringBuffer = new StringBuffer();
+        StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuffer.append("Program [name=" + name + " ");
+        stringBuilder.append("Program [name=" + name + " ");
 
-        stringBuffer.append("\n\n");
-        stringBuffer.append("Variables:");
+        stringBuilder.append("\n\n");
+        stringBuilder.append("Variables:");
         for (Variable variable : getVariables()) {
-            stringBuffer.append("\n\n").append(variable);
+            stringBuilder.append("\n\n").append(variable);
         }
 
-        stringBuffer.append("\n\n");
-        stringBuffer.append("Statements:");
+        stringBuilder.append("\n\n");
+        stringBuilder.append("Statements:");
         for (Statement statment : getStatements()) {
-            stringBuffer.append("\n\n\n\n");
-            stringBuffer.append(statment);
+            stringBuilder.append("\n\n\n\n");
+            stringBuilder.append(statment);
         }
 
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
 
     public String getName() {

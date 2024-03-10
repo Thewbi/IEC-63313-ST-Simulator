@@ -1162,7 +1162,7 @@ and_expression :
 	
 // comparison ::= equ_expression { ('=' | '<>') equ_expression}
 comparison :
-	equ_expression (('=' | '<>') equ_expression)?
+	equ_expression ((EQUALS | '<>') equ_expression)?
 	;
 	
 // equ_expression ::= add_expression {comparison_operator add_expression}
@@ -1355,6 +1355,7 @@ END_PROGRAM : 'END_PROGRAM';
 END_VAR : 'END_VAR';
 END_TYPE : 'END_TYPE';
 END_STRUCT : 'END_STRUCT';
+EQUALS : '=';
 
 // F
 FUNCTION : 'FUNCTION';

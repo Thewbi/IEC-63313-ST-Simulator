@@ -68,9 +68,9 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        //ASTListener listener = new ASTListener();
-        ModelCreatorASTListener listener = new ModelCreatorASTListener();
-        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+        ASTListener listener = new ASTListener();
+        //ModelCreatorASTListener listener = new ModelCreatorASTListener();
+        //DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
 
         // // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();

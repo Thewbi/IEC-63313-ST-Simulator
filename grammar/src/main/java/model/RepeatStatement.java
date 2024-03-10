@@ -2,7 +2,7 @@ package model;
 
 public class RepeatStatement extends Statement {
 
-    private boolean untilDetected;
+    // private boolean untilDetected;
 
     private Expression terminationCondition;
 
@@ -15,8 +15,24 @@ public class RepeatStatement extends Statement {
 
     @Override
     public String toString() {
-        return "RepeatStatement [untilDetected=" + untilDetected + ", terminationCondition=" + terminationCondition
-                + ", statements=" + getStatements() + "]";
+        // return "RepeatStatement [untilDetected=" + untilDetected + ", terminationCondition=" + terminationCondition
+        //         + ", statements=" + getStatements() + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("RepeatStatement\n\n");
+
+        stringBuilder.append("terminationCondition:\n");
+        stringBuilder.append(terminationCondition);
+
+        stringBuilder.append("\n\nstatements:\n");
+        for (Statement statment : getStatements()) {
+            stringBuilder.append(statment);
+            stringBuilder.append("\n\n");
+        }
+
+        //System.out.println(stringBuilder.toString());
+
+        return stringBuilder.toString();
     }
 
     public void addStatement(Statement statement) {
@@ -28,13 +44,13 @@ public class RepeatStatement extends Statement {
         getStatements().add(statement);
     }
 
-    public boolean isUntilDetected() {
-        return untilDetected;
-    }
+    // public boolean isUntilDetected() {
+    //     return untilDetected;
+    // }
 
-    public void setUntilDetected(boolean untilDetected) {
-        this.untilDetected = untilDetected;
-    }
+    // public void setUntilDetected(boolean untilDetected) {
+    //     this.untilDetected = untilDetected;
+    // }
 
     public Expression getTerminationCondition() {
         return terminationCondition;

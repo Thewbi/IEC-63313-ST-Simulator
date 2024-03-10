@@ -4,8 +4,11 @@ PROGRAM stexample
     x3 : BOOL;
   END_VAR
 
+/**/
   x4 := TRUE;
   x := 1 + 2 + 3;
+  x5 := 4 + 5 - 6;
+
 
 /**/
   REPEAT

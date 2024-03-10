@@ -8,6 +8,10 @@ public enum ExpressionType {
 
     BOOLEAN_CONSTANT,
 
-    ADD, VARIABLE_NAME
+    ADD, VARIABLE_NAME, 
     
+    EQUALS_COMPARISON, 
+    
+    NOT_EQUALS_COMPARISON
+
 }

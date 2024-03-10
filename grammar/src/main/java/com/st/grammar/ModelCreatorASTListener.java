@@ -43,6 +43,10 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private boolean addOperatorFound;
 
+    private boolean equalsDetected;
+
+    private boolean notEqualsDetected;
+
     @Override
     public void enterProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
         // System.out.println(ctx.getClass().getSimpleName() + " " +
@@ -54,9 +58,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
-        
+
         System.out.println(program);
-        
+
         program = null;
         scopeStack.pop();
     }
@@ -105,7 +109,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // ctx.getStart().getText());
 
         dataType = DataType.valueOf(ctx.getStart().getText());
-        //variable.setDataType(dataType);
+        // variable.setDataType(dataType);
     }
 
     // @Override
@@ -131,19 +135,20 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void exitAssignment_statement(StructuredTextParser.Assignment_statementContext ctx) {
 
         AssignmentStatement assignmentStatement = new AssignmentStatement();
-        //statementList.add(assignmentStatement);
+        // statementList.add(assignmentStatement);
         // statement = assignmentStatement;
         scopeStack.peek().addStatement(assignmentStatement);
 
-        // insert variable name
-        System.out.println(ctx.variable());
-        VariableContext variableContext = ctx.variable();
-        final String varName = variableContext.getStart().getText();
-        assignmentStatement.setVariableQualifier(varName);
+        // // insert variable name
+        // System.out.println(ctx.variable());
+        // VariableContext variableContext = ctx.variable();
+        // final String varName = variableContext.getStart().getText();
+        // assignmentStatement.setVariableQualifier(varName);
 
         // the expression is added into the statement in exitStatement
         // use the parse expression and copy it into the statement
-        assignmentStatement.setExpression(comparisonExpression);
+        //assignmentStatement.setExpression(comparisonExpression);
+        assignmentStatement.getExpressionList().addAll(expressionList);
 
         expressionList.clear();
     }
@@ -230,28 +235,27 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         repeatStatement.setTerminationCondition(comparisonExpression);
         comparisonExpression = null;
 
-
         scopeStack.peek().addStatement(repeatStatement);
 
     }
 
-    @Override
-    public void exitExpression(StructuredTextParser.ExpressionContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
+    // @Override
+    // public void exitExpression(StructuredTextParser.ExpressionContext ctx) {
+    //     // System.out.println(ctx.getClass().getSimpleName() + " " +
+    //     // ctx.getStart().getText());
 
-        // System.out.println(expressionList);
-        // expressionList.clear();
+    //     // System.out.println(expressionList);
+    //     // expressionList.clear();
 
-        // AssignmentStatement assignmentStatement = (AssignmentStatement) statement;
+    //     // AssignmentStatement assignmentStatement = (AssignmentStatement) statement;
 
-        // assignmentExpression = expressionList.get(0);
+    //     // assignmentExpression = expressionList.get(0);
 
-        // System.out.println(assignmentExpression);
-        // assignmentStatement.setExpression(expression);
+    //     // System.out.println(assignmentExpression);
+    //     // assignmentStatement.setExpression(expression);
 
-        // expressionList.clear();
-    }
+    //     // expressionList.clear();
+    // }
 
     @Override
     public void exitComparison(StructuredTextParser.ComparisonContext ctx) {
@@ -260,11 +264,25 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // // if the is only a single operand, no comparison node is required
         // if (expressionList.size() <= 1) {
-        //     return;
+        // return;
         // }
 
-        comparisonExpression = expressionList.get(0);
+        if ((!equalsDetected) && (!notEqualsDetected)) {
+            return;
+        }
+
+        comparisonExpression = new Expression();
+        if (equalsDetected) {
+            comparisonExpression.setExpressionType(ExpressionType.EQUALS_COMPARISON);
+        }
+        if (notEqualsDetected) {
+            comparisonExpression.setExpressionType(ExpressionType.NOT_EQUALS_COMPARISON);
+        }
+        comparisonExpression.getExpressionList().addAll(expressionList);
+
         expressionList.clear();
+
+        //expressionList.add(expression);
 
         // Scope topScope = scopeStack.peek();
         // System.out.println(topScope);
@@ -288,6 +306,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterBoolean_literal(StructuredTextParser.Boolean_literalContext ctx) {
+
+        System.out.println("BooleanLiteral: " + ctx.getStart().getText() + " Line: " + ctx.start.getLine() + " pos: "
+                + ctx.start.getCharPositionInLine());
 
         Expression expression = new Expression();
         expressionList.add(expression);
@@ -331,7 +352,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         addOperatorFound = false;
     }
 
-    @Override public void exitAdd_operator(StructuredTextParser.Add_operatorContext ctx) { 
+    @Override
+    public void exitAdd_operator(StructuredTextParser.Add_operatorContext ctx) {
         addOperatorFound = true;
     }
 
@@ -339,12 +361,19 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void visitTerminal(TerminalNode node) {
         // System.out.println("TERMINAL: " + node.getText());
 
-        if (StringUtils.equalsIgnoreCase("UNTIL", node.getText())) {
-            Scope scope = scopeStack.peek();
-            if (scope instanceof RepeatStatement) {
-                RepeatStatement repeatStatement = (RepeatStatement) scope;
-                repeatStatement.setUntilDetected(true);
-            }
+        // if (StringUtils.equalsIgnoreCase("UNTIL", node.getText())) {
+        // Scope scope = scopeStack.peek();
+        // if (scope instanceof RepeatStatement) {
+        // RepeatStatement repeatStatement = (RepeatStatement) scope;
+        // repeatStatement.setUntilDetected(true);
+        // }
+        // }
+
+        if (StringUtils.equalsIgnoreCase("=", node.getText())) {
+            equalsDetected = true;
+        }
+        if (StringUtils.equalsIgnoreCase("<>", node.getText())) {
+            notEqualsDetected = true;
         }
     }
 
