@@ -7,9 +7,6 @@ import java.util.Stack;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 
-import com.st.grammar.StructuredTextParser.VariableContext;
-
-import model.ArithmeticStatement;
 import model.AssignmentStatement;
 import model.DataType;
 import model.Expression;
@@ -17,8 +14,6 @@ import model.ExpressionType;
 import model.Program;
 import model.RepeatStatement;
 import model.Scope;
-import model.Statement;
-import model.StatementType;
 import model.Variable;
 
 public class ModelCreatorASTListener extends StructuredTextBaseListener {
@@ -30,10 +25,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     private DataType dataType = DataType.UNKNOWN;
 
     private List<Expression> expressionList = new ArrayList<>();
-
-    private Expression variableExpression;
-
-    private Expression assignmentExpression;
 
     private Expression comparisonExpression;
 
@@ -126,8 +117,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // System.out.println(ctx.getClass().getSimpleName() + " " +
         // ctx.getStart().getText());
 
-        Scope topScope = scopeStack.peek();
-
         RepeatStatement repeatStatement = new RepeatStatement();
 
         // repeat statement is the new scope
@@ -205,8 +194,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitAdd_expression(StructuredTextParser.Add_expressionContext ctx) {
-        System.out.println(ctx.getClass().getSimpleName() + " " +
-                ctx.getStart().getText());
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        //         ctx.getStart().getText());
 
         if (ctx.add_operator() == null) {
             return;
