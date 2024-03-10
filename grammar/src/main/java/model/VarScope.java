@@ -14,7 +14,6 @@ public class VarScope extends DataType {
 
     @Override
     public String toString() {
-        //return "Program [name=" + name + ", variables=" + getVariables() + ", statements=" + getStatements() + "]";
 
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -26,7 +25,12 @@ public class VarScope extends DataType {
             stringBuilder.append("No Variables");
         } else {
             for (Variable variable : getVariables()) {
-                stringBuilder.append("\n").append(variable);
+
+                if (variable.getDataType() instanceof FunctionBlock) {
+                    stringBuilder.append("\n").append(variable.toShortString());
+                } else {
+                    stringBuilder.append("\n").append(variable);
+                }
             }
         }
 
@@ -36,7 +40,6 @@ public class VarScope extends DataType {
             stringBuilder.append("No Statements");
         } else {
             for (Statement statment : getStatements()) {
-                //stringBuilder.append("\n");
                 stringBuilder.append("\n").append(statment);
             }
         }

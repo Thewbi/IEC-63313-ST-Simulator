@@ -1,4 +1,4 @@
-/*
+/**/
 TYPE
   S_FA_STATUS : STRUCT
     BART_Hand : BOOL := TRUE;
@@ -50,6 +50,7 @@ FUNCTION_BLOCK AKT_5_2_MV
   DebugBoolean := TON0.Q;
 END_FUNCTION_BLOCK
 
+/* We cannot parse functions yet!
 FUNCTION FA_SERV : BOOL
   VAR_INPUT
     status : S_FA_STATUS;
@@ -68,6 +69,7 @@ FUNCTION FA_SERV : BOOL
 
   FA_SERV := status.BART_Hand;
 END_FUNCTION
+*/
 
 PROGRAM program0_POU
   VAR
@@ -110,8 +112,9 @@ FUNCTION_BLOCK FA
 
   Status.Stoerung := TRUE;
 END_FUNCTION_BLOCK
-*/
 
+
+/*
 FUNCTION_BLOCK SequenctialFunctionChart
   VAR
     RedLight : BOOL;
@@ -160,6 +163,7 @@ FUNCTION_BLOCK SequenctialFunctionChart
   END_TRANSITION
 
 END_FUNCTION_BLOCK
+*/
 
 
 CONFIGURATION Config0

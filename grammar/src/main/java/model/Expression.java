@@ -16,6 +16,8 @@ public class Expression {
 
     private String variableNameValue;
 
+    // private String subprogramName;
+
     // @Override
     // public String toString() {
     //     // return "Expression [expressionType=" + expressionType + ", integerValue=" +
@@ -93,6 +95,11 @@ public class Expression {
         if (variableNameValue != null) {
             stringBuilder.append(" variableNameValue=" + variableNameValue + " ");
         }
+
+        // if (subprogramName != null) {
+        //     stringBuilder.append(" subprogramName=" + subprogramName + " ");
+        // }
+
         stringBuilder.append(" ]\n");
     }
 
@@ -133,5 +140,13 @@ public class Expression {
     public void setVariableNameValue(String variableNameValue) {
         this.variableNameValue = variableNameValue;
     }
+
+    // public String getSubprogramName() {
+    //     return subprogramName;
+    // }
+
+    // public void setSubprogramName(String subprogramName) {
+    //     this.subprogramName = subprogramName;
+    // }
 
 }

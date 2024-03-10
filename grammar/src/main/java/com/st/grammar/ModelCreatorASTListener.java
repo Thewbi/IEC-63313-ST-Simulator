@@ -7,8 +7,12 @@ import java.util.Stack;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 
+import com.st.grammar.StructuredTextParser.ComparisonContext;
 import com.st.grammar.StructuredTextParser.Data_sourceContext;
+import com.st.grammar.StructuredTextParser.Fixed_pointContext;
 import com.st.grammar.StructuredTextParser.IntegerContext;
+import com.st.grammar.StructuredTextParser.MillisecondsContext;
+import com.st.grammar.StructuredTextParser.Param_assignmentContext;
 
 import model.AssignmentStatement;
 import model.DataType;
@@ -19,6 +23,7 @@ import model.GlobalScope;
 import model.Program;
 import model.ProgramConfiguration;
 import model.RepeatStatement;
+import model.SubprogrammControlStatement;
 import model.Task;
 import model.TypeScope;
 import model.VarScope;
@@ -56,6 +61,10 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public RepeatStatement repeatStatement;
 
     private FunctionBlock functionBlock;
+
+    private String initialValue;
+
+    private SubprogrammControlStatement subprogrammControlStatement;
 
     /**
      * ctor
@@ -111,12 +120,35 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         functionBlock = null;
     }
 
-    // @Override
-    // public void exitInput_declaration(StructuredTextParser.Input_declarationContext ctx) {
+    @Override
+    public void exitBoolean_literal(StructuredTextParser.Boolean_literalContext ctx) {
+        // System.out.println(ctx.getText());
 
-    //     System.out.println("");
+        initialValue = ctx.getText();
+    }
 
-    // }
+    @Override
+    public void exitSeconds(StructuredTextParser.SecondsContext ctx) {
+        // System.out.println(ctx);
+
+        Fixed_pointContext fixedPointContext = ctx.fixed_point();
+        if (fixedPointContext != null) {
+            // System.out.println(fixedPointContext.getText());
+            initialValue = fixedPointContext.getText() + " Seconds";
+        }
+
+        IntegerContext integerContext = ctx.integer();
+        if (integerContext != null) {
+            // System.out.println(integerContext.getText());
+            initialValue = fixedPointContext.getText() + " Seconds";
+        }
+
+        MillisecondsContext millisecondsContext = ctx.milliseconds();
+        if (millisecondsContext != null) {
+            // System.out.println(millisecondsContext.getText());
+            initialValue = fixedPointContext.getText() + " Milliseconds";
+        }
+    }
 
     @Override
     public void enterStructure_type_declaration(StructuredTextParser.Structure_type_declarationContext ctx) {
@@ -142,15 +174,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitStructure_element_declaration(StructuredTextParser.Structure_element_declarationContext ctx) {
-        // System.out.println("");
-
         String structureElementName = ctx.structure_element_name().getText();
-
-        // System.out.println(dataType);
-
-        structureDataType.addField(structureElementName, dataType);
-
-        // System.out.println("");
+        structureDataType.addField(structureElementName, dataType, initialValue);
     }
 
     @Override
@@ -158,7 +183,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // System.out.println(ctx.getClass().getSimpleName() + " " +
         // ctx.getStart().getText());
 
-        // TypeScope typeScope = typeScopeStack.peek();
         TypeScope typeScope = globalTypeScope;
 
         String dataTypeAsString = ctx.getStart().getText();
@@ -167,8 +191,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         if (dataType == null) {
             throw new RuntimeException("Type \"" + dataTypeAsString + "\" not defined!");
         }
-
-        // dataType = DataType.valueOf(dataTypeAsString);
     }
 
     @Override
@@ -219,8 +241,12 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         topScope.getVariables().add(variable);
 
         variable.setName(ctx.getStart().getText());
+
         variable.setDataType(dataType);
         dataType = null;
+
+        variable.setInitialValue(initialValue);
+        initialValue = null;
 
         expressionList.clear();
 
@@ -333,10 +359,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             return;
         }
 
-        String operatorAsString = ctx.add_operator().getText();
-
         Expression arithmeticExpression = new Expression();
 
+        String operatorAsString = ctx.add_operator().getText();
         if (StringUtils.equalsIgnoreCase(operatorAsString, "+")) {
             arithmeticExpression.setExpressionType(ExpressionType.ADD);
         } else if (StringUtils.equalsIgnoreCase(operatorAsString, "-")) {
@@ -350,6 +375,90 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         expressionList.remove(1);
 
         expressionList.add(arithmeticExpression);
+    }
+
+    @Override
+    public void exitAnd_expression(StructuredTextParser.And_expressionContext ctx) {
+
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        // ctx.getStart().getText());
+
+        final String literal = ctx.getStart().getText();
+
+        if (StringUtils.equalsIgnoreCase(literal, "and")) {
+
+            Expression expression = expressionList.get(0);
+
+            Expression andExpression = new Expression();
+            andExpression.setExpressionType(ExpressionType.AND);
+
+            Expression lhs = new Expression();
+            ComparisonContext lhsComparisonContext = ctx.comparison(0);
+            // System.out.println(lhsComparisonContext.getText());
+            lhs.setVariableNameValue(lhsComparisonContext.getText());
+            andExpression.getExpressionList().add(lhs);
+
+            Expression rhs = new Expression();
+            ComparisonContext rhsComparisonContext = ctx.comparison(1);
+            // System.out.println(rhsComparisonContext.getText());
+            rhs.setVariableNameValue(rhsComparisonContext.getText());
+            andExpression.getExpressionList().add(rhs);
+
+            expressionList.clear();
+            expressionList.add(expression);
+            expressionList.add(andExpression);
+        }
+    }
+
+    @Override
+    public void exitUnary_expression(StructuredTextParser.Unary_expressionContext ctx) {
+
+        Expression notExpression = new Expression();
+        notExpression.setExpressionType(ExpressionType.NOT);
+
+        if (ctx.unary_operator() != null) {
+            String operatorAsString = ctx.unary_operator().getText();
+            if (StringUtils.equalsIgnoreCase(operatorAsString, "not")) {
+                notExpression.getExpressionList().add(expressionList.get(1));
+                expressionList.remove(1);
+                expressionList.add(notExpression);
+            }
+        }
+    }
+
+    @Override
+    public void enterSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
+
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        //         ctx.getStart().getText());
+
+        String subprogramName = ctx.getStart().getText();
+
+        subprogrammControlStatement = new SubprogrammControlStatement();
+        subprogrammControlStatement.setSubprogramName(subprogramName);
+
+        scopeStack.peek().addStatement(subprogrammControlStatement);
+    }
+
+    @Override
+    public void exitSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
+        subprogrammControlStatement = null;
+    }
+
+    @Override
+    public void exitFb_invocation(StructuredTextParser.Fb_invocationContext ctx) {
+
+        List<Param_assignmentContext> paramAssignments = ctx.param_assignment();
+        for (Param_assignmentContext param_assignmentContext : paramAssignments) {
+
+            String varName = param_assignmentContext.variable_name().getText();
+            // System.out.println(varName);
+
+            String expression = param_assignmentContext.expression().getText();
+            // System.out.println(expression);
+
+            subprogrammControlStatement.addParameterAssignment(varName, expression);
+        }
     }
 
     @Override
@@ -397,9 +506,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitProgram_configuration(StructuredTextParser.Program_configurationContext ctx) {
 
-        System.out.println("ProgramName: " + ctx.program_name().getText());
-        System.out.println("TaskName: " + ctx.task_name().getText());
-        System.out.println("ProgramType: " + ctx.program_type_name().getText());
+        // System.out.println("ProgramName: " + ctx.program_name().getText());
+        // System.out.println("TaskName: " + ctx.task_name().getText());
+        // System.out.println("ProgramType: " + ctx.program_type_name().getText());
 
         ProgramConfiguration programConfiguration = new ProgramConfiguration();
         programConfiguration.setProgramName(ctx.program_name().getText());

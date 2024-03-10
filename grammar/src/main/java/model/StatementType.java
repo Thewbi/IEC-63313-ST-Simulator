@@ -6,6 +6,8 @@ public enum StatementType {
 
     ASSIGNMENT,
 
-    REPEAT
+    REPEAT,
+
+    SUBPROGRAM_CONTROL
     
 }

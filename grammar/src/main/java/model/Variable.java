@@ -6,9 +6,15 @@ public class Variable {
 
     private DataType dataType; // = DataType.UNKNOWN;
 
+    private String initialValue;
+
     @Override
     public String toString() {
-        return "Variable [name=" + name + ", dataType=" + dataType + "]";
+        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + "]";
+    }
+
+    public Object toShortString() {
+        return "Variable [name=" + name + ", dataType=" + dataType.getName() + ", initialValue=" + initialValue + "]";
     }
 
     public String getName() {
@@ -26,5 +32,15 @@ public class Variable {
     public void setDataType(DataType dataType) {
         this.dataType = dataType;
     }
+
+    public String getInitialValue() {
+        return initialValue;
+    }
+
+    public void setInitialValue(String initialValue) {
+        this.initialValue = initialValue;
+    }
+
+    
     
 }

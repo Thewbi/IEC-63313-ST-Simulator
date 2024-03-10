@@ -52,7 +52,8 @@ public class Main {
 
         //String pathAsString = "C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\self_contained_program.st";
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\small_program.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\small_program.st";
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration_with_variables.st";
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\type_bool_struct.st";

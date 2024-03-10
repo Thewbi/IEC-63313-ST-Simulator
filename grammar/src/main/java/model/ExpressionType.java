@@ -16,6 +16,12 @@ public enum ExpressionType {
     
     EQUALS_COMPARISON, 
     
-    NOT_EQUALS_COMPARISON
+    NOT_EQUALS_COMPARISON,
+
+    NOT,
+
+    AND
+
+    //,SUBPROGRAM_CONTROL
 
 }

@@ -4,8 +4,6 @@ public class Program extends VarScope {
 
     private String name;
 
-    
-
     public String getName() {
         return name;
     }
