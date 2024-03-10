@@ -60,12 +60,13 @@ FUNCTION FA_SERV : BOOL
     NotHalt : BOOL;
   END_VAR
 
-  status.BART_Hand := BART_Hand;
-  FA_SERV := status.BART_Hand;
+  status.BART_Hand := BART_Hand;  
   status.BART_Auto := BART_Auto;
   status.Stoerung := Stoerung;
   status.Stoer_Quit := Stoer_Quit;
   status.NotHalt := NotHalt;
+
+  FA_SERV := status.BART_Hand;
 END_FUNCTION
 
 PROGRAM program0_POU
