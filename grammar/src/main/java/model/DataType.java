@@ -1,9 +1,27 @@
 package model;
 
-public enum DataType {
-    
-    UNKNOWN,
+import java.util.HashMap;
+import java.util.Map;
 
-    BOOL
+public class DataType {
+    
+    private String name;
+
+    private Map<String, DataType> fields = new HashMap<>();
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void addField(String fieldName, DataType dataType) {
+        if (fields.containsKey(fieldName)) {
+            throw new RuntimeException("Field \"" + fieldName + "\" already contained!");
+        }
+        fields.put(fieldName, dataType);
+    }
     
 }

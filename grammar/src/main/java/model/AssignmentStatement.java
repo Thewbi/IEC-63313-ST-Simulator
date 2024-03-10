@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 public class AssignmentStatement extends Statement {
 
-    // private String variableQualifier;
-
     private List<Expression> expressionList = new ArrayList<>();
 
     /**
@@ -22,13 +20,13 @@ public class AssignmentStatement extends Statement {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("AssignmentStatement\n");
-        System.out.println("AssignmentStatement\n");
+        // System.out.println("AssignmentStatement\n");
 
         for (Expression childExpression : expressionList) {
             // int indent = 1;
             // printExpression(childExpression, indent, stringBuilder);
             stringBuilder.append(childExpression);
-            System.out.println(childExpression);
+            // System.out.println(childExpression);
         }
 
         return stringBuilder.toString();
@@ -38,25 +36,15 @@ public class AssignmentStatement extends Statement {
         for (int i = 0; i < indent; i++)
         {
             stringBuilder.append("  ");
-            System.out.print("  ");
+            // System.out.print("  ");
         }
         stringBuilder.append(expression).append("\n\n");
-        System.out.print(expression);
-        System.out.print("\n\n");
+        // System.out.print(expression);
+        // System.out.print("\n\n");
         for (Expression childExpression : expression.getExpressionList()) {
             printExpression(childExpression, indent + 1, stringBuilder);
         }
-    }
-
-    // public String getVariableQualifier() {
-    //     return variableQualifier;
-    // }
-
-    // public void setVariableQualifier(String variableQualifier) {
-    //     this.variableQualifier = variableQualifier;
-    // }
-
-    
+    }    
 
     public List<Expression> getExpressionList() {
         return expressionList;

@@ -4,7 +4,7 @@ public class Variable {
 
     private String name;
 
-    private DataType dataType = DataType.UNKNOWN;
+    private DataType dataType; // = DataType.UNKNOWN;
 
     @Override
     public String toString() {

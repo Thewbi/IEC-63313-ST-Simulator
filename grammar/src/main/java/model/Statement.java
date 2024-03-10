@@ -1,6 +1,6 @@
 package model;
 
-public class Statement extends Scope {
+public class Statement extends VarScope {
 
     private StatementType statementType;
 

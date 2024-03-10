@@ -378,10 +378,9 @@ configuration_declaration:
 //[global_var_declarations]
 //single_resource_declaration
 //’END_RESOURCE’
-
 resource_declaration:
     'RESOURCE' resource_name 'ON' resource_type_name
-    (global_var_declarations)?
+    ( global_var_declarations )?
     single_resource_declaration
     'END_RESOURCE'
     ;

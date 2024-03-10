@@ -1,9 +1,6 @@
 package model;
 
-import java.util.List;
-import java.util.ArrayList;
-
-public class Program extends Scope {
+public class Program extends VarScope {
 
     private String name;
 
@@ -18,14 +15,14 @@ public class Program extends Scope {
         stringBuilder.append("\n\n");
         stringBuilder.append("Variables:");
         for (Variable variable : getVariables()) {
-            stringBuilder.append("\n\n").append(variable);
+            stringBuilder.append("\n").append(variable);
         }
 
         stringBuilder.append("\n\n");
         stringBuilder.append("Statements:");
         for (Statement statment : getStatements()) {
-            stringBuilder.append("\n\n\n\n");
-            stringBuilder.append(statment);
+            //stringBuilder.append("\n");
+            stringBuilder.append("\n").append(statment);
         }
 
         return stringBuilder.toString();

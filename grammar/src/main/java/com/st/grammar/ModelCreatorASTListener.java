@@ -7,32 +7,118 @@ import java.util.Stack;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 
+import com.st.grammar.StructuredTextParser.Data_sourceContext;
+import com.st.grammar.StructuredTextParser.IntegerContext;
+
 import model.AssignmentStatement;
 import model.DataType;
 import model.Expression;
 import model.ExpressionType;
+import model.GlobalScope;
 import model.Program;
+import model.ProgramConfiguration;
 import model.RepeatStatement;
-import model.Scope;
+import model.Task;
+import model.TypeScope;
+import model.VarScope;
 import model.Variable;
+import model.Configuration;
 
 public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
-    private Program program;
+    public Program program;
 
-    private Variable variable;
+    public Variable variable;
 
-    private DataType dataType = DataType.UNKNOWN;
+    public DataType dataType;
 
-    private List<Expression> expressionList = new ArrayList<>();
+    public DataType structureDataType;
 
-    private Expression comparisonExpression;
+    public List<Expression> expressionList = new ArrayList<>();
 
-    private Stack<Scope> scopeStack = new Stack<>();
+    public Expression comparisonExpression;
 
-    private boolean equalsDetected;
+    public Stack<VarScope> scopeStack = new Stack<>();
 
-    private boolean notEqualsDetected;
+    public GlobalScope globalVarScope = new GlobalScope();
+
+    // private Stack<TypeScope> typeScopeStack = new Stack<>();
+
+    public TypeScope globalTypeScope = new TypeScope();
+
+    public boolean equalsDetected;
+
+    public boolean notEqualsDetected;
+
+    public Configuration configuration;
+
+    /**
+     * ctor
+     */
+    public ModelCreatorASTListener() {
+
+        scopeStack.push(globalVarScope);
+
+        DataType dataType = new DataType();
+        dataType.setName("BOOL");
+
+        globalTypeScope.addType(dataType.getName(), dataType);
+
+        // typeScopeStack.push(globalTypeScope);
+    }
+
+    @Override
+    public void enterStructure_type_declaration(StructuredTextParser.Structure_type_declarationContext ctx) {
+        // System.out.println("");
+
+        final String typeName = ctx.structure_type_name().getText();
+
+        // System.out.println("typeName: " + typeName);
+
+        structureDataType = new DataType();
+        structureDataType.setName(typeName);
+
+        // TypeScope typeScope = typeScopeStack.peek();
+        // typeScope.addType(typeName, structureDataType);
+
+        globalTypeScope.addType(typeName, structureDataType);
+    }
+
+    @Override
+    public void exitStructure_type_declaration(StructuredTextParser.Structure_type_declarationContext ctx) {
+        structureDataType = null;
+    }
+
+    @Override
+    public void exitStructure_element_declaration(StructuredTextParser.Structure_element_declarationContext ctx) {
+        // System.out.println("");
+
+        String structureElementName = ctx.structure_element_name().getText();
+
+        // System.out.println(dataType);
+
+        structureDataType.addField(structureElementName, dataType);
+
+        // System.out.println("");
+    }
+
+    @Override
+    public void exitSimple_spec_init(StructuredTextParser.Simple_spec_initContext ctx) {
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        // ctx.getStart().getText());
+
+        // TypeScope typeScope = typeScopeStack.peek();
+        TypeScope typeScope = globalTypeScope;
+
+        String dataTypeAsString = ctx.getStart().getText();
+
+        dataType = typeScope.retrieveDataTypeByTypeName(dataTypeAsString);
+        if (dataType == null) {
+            throw new RuntimeException("Type \"" + dataTypeAsString + "\" not defined!");
+        }
+
+        // dataType = DataType.valueOf(dataTypeAsString);
+    }
 
     @Override
     public void enterProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
@@ -46,9 +132,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
 
-        System.out.println(program);
+        // System.out.println(program);
 
-        program = null;
+        // program = null;
         scopeStack.pop();
     }
 
@@ -75,7 +161,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitVar1_init_decl(StructuredTextParser.Var1_init_declContext ctx) {
 
-        Scope topScope = scopeStack.peek();
+        VarScope topScope = scopeStack.peek();
 
         // a new variable is defined
         variable = new Variable();
@@ -88,14 +174,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         expressionList.clear();
 
         variable = null;
-    }
-
-    @Override
-    public void exitSimple_spec_init(StructuredTextParser.Simple_spec_initContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
-        dataType = DataType.valueOf(ctx.getStart().getText());
     }
 
     @Override
@@ -169,9 +247,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterBoolean_literal(StructuredTextParser.Boolean_literalContext ctx) {
-
-        System.out.println("BooleanLiteral: " + ctx.getStart().getText() + " Line: " + ctx.start.getLine() + " pos: "
-                + ctx.start.getCharPositionInLine());
+        // System.out.println("BooleanLiteral: " + ctx.getStart().getText() + " Line: "
+        // + ctx.start.getLine() + " pos: "
+        // + ctx.start.getCharPositionInLine());
 
         Expression expression = new Expression();
         expressionList.add(expression);
@@ -195,7 +273,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitAdd_expression(StructuredTextParser.Add_expressionContext ctx) {
         // System.out.println(ctx.getClass().getSimpleName() + " " +
-        //         ctx.getStart().getText());
+        // ctx.getStart().getText());
 
         if (ctx.add_operator() == null) {
             return;
@@ -230,6 +308,64 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         if (StringUtils.equalsIgnoreCase("<>", node.getText())) {
             notEqualsDetected = true;
         }
+    }
+
+    @Override
+    public void enterConfiguration_declaration(StructuredTextParser.Configuration_declarationContext ctx) {
+        configuration = new Configuration();
+    }
+
+    @Override
+    public void exitConfiguration_name(StructuredTextParser.Configuration_nameContext ctx) {
+        configuration.setName(ctx.getText());
+    }
+
+    @Override
+    public void enterTask_configuration(StructuredTextParser.Task_configurationContext ctx) {
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        // ctx.getStart().getText());
+
+        Task task = new Task();
+
+        configuration.setTask(task);
+
+        String taskName = ctx.task_name().getText();
+        task.setName(taskName);
+
+        // System.out.println("taskName: " + taskName);
+    }
+
+    @Override
+    public void exitTask_initialization(StructuredTextParser.Task_initializationContext ctx) {
+        // System.out.println(ctx.getClass().getSimpleName() + " " +
+        // ctx.getStart().getText());
+
+        IntegerContext priorityIntegerContext = ctx.integer();
+        // System.out.println("Priority: " + priorityIntegerContext.getText());
+        configuration.getTask().setPriority(Integer.parseInt(priorityIntegerContext.getText()));
+
+        List<Data_sourceContext> data_sourceContextList = (List<Data_sourceContext>) ctx.data_source();
+
+        for (Data_sourceContext data_sourceContext : data_sourceContextList) {
+            // System.out.println("INTERVAL: " + data_sourceContext.constant().getText());
+            configuration.getTask().setInterval(data_sourceContext.constant().getText());
+        }
+    }
+
+    @Override
+    public void exitProgram_configuration(StructuredTextParser.Program_configurationContext ctx) {
+
+        System.out.println("ProgramName: " + ctx.program_name().getText());
+        System.out.println("TaskName: " + ctx.task_name().getText());
+        System.out.println("ProgramType: " + ctx.program_type_name().getText());
+
+        ProgramConfiguration programConfiguration = new ProgramConfiguration();
+        programConfiguration.setProgramName(ctx.program_name().getText());
+        programConfiguration.setTaskName(ctx.task_name().getText());
+        programConfiguration.setProgramType(ctx.program_type_name().getText());
+
+        configuration.setProgramConfiguration(programConfiguration);
+
     }
 
 }

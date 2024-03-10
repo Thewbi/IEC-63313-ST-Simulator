@@ -19,15 +19,15 @@ public class RepeatStatement extends Statement {
         //         + ", statements=" + getStatements() + "]";
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("RepeatStatement\n\n");
+        stringBuilder.append("RepeatStatement\n");
 
         stringBuilder.append("terminationCondition:\n");
         stringBuilder.append(terminationCondition);
 
-        stringBuilder.append("\n\nstatements:\n");
+        stringBuilder.append("\nstatements:");
         for (Statement statment : getStatements()) {
-            stringBuilder.append(statment);
-            stringBuilder.append("\n\n");
+            stringBuilder.append("\n").append(statment);
+            // stringBuilder.append("\n\n");
         }
 
         //System.out.println(stringBuilder.toString());
