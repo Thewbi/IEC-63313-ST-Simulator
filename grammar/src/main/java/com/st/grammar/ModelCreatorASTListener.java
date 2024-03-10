@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.st.grammar.StructuredTextParser.VariableContext;
 
+import model.ArithmeticStatement;
 import model.AssignmentStatement;
 import model.DataType;
 import model.Expression;
@@ -17,6 +18,7 @@ import model.Program;
 import model.RepeatStatement;
 import model.Scope;
 import model.Statement;
+import model.StatementType;
 import model.Variable;
 
 public class ModelCreatorASTListener extends StructuredTextBaseListener {
@@ -41,11 +43,13 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private Stack<Scope> scopeStack = new Stack<>();
 
-    private boolean addOperatorFound;
-
     private boolean equalsDetected;
 
     private boolean notEqualsDetected;
+
+    // private boolean addOperatorFound;
+
+    // private boolean subtractOperatorFound;
 
     @Override
     public void enterProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
@@ -147,7 +151,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // the expression is added into the statement in exitStatement
         // use the parse expression and copy it into the statement
-        //assignmentStatement.setExpression(comparisonExpression);
+        // assignmentStatement.setExpression(comparisonExpression);
         assignmentStatement.getExpressionList().addAll(expressionList);
 
         expressionList.clear();
@@ -241,20 +245,20 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     // @Override
     // public void exitExpression(StructuredTextParser.ExpressionContext ctx) {
-    //     // System.out.println(ctx.getClass().getSimpleName() + " " +
-    //     // ctx.getStart().getText());
+    // // System.out.println(ctx.getClass().getSimpleName() + " " +
+    // // ctx.getStart().getText());
 
-    //     // System.out.println(expressionList);
-    //     // expressionList.clear();
+    // // System.out.println(expressionList);
+    // // expressionList.clear();
 
-    //     // AssignmentStatement assignmentStatement = (AssignmentStatement) statement;
+    // // AssignmentStatement assignmentStatement = (AssignmentStatement) statement;
 
-    //     // assignmentExpression = expressionList.get(0);
+    // // assignmentExpression = expressionList.get(0);
 
-    //     // System.out.println(assignmentExpression);
-    //     // assignmentStatement.setExpression(expression);
+    // // System.out.println(assignmentExpression);
+    // // assignmentStatement.setExpression(expression);
 
-    //     // expressionList.clear();
+    // // expressionList.clear();
     // }
 
     @Override
@@ -282,7 +286,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         expressionList.clear();
 
-        //expressionList.add(expression);
+        // expressionList.add(expression);
 
         // Scope topScope = scopeStack.peek();
         // System.out.println(topScope);
@@ -331,31 +335,76 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitAdd_expression(StructuredTextParser.Add_expressionContext ctx) {
+        System.out.println(ctx.getClass().getSimpleName() + " " +
+                ctx.getStart().getText());
 
-        // if the is only a single operand, no and node is required
-        if (!addOperatorFound) {
+        if (ctx.add_operator() == null) {
             return;
         }
 
-        // build a new Add-Expression and copy all the expression parsed so far into it
-        Expression expression = new Expression();
-        expression.setExpressionType(ExpressionType.ADD);
-        expression.getExpressionList().addAll(expressionList);
+        String operatorAsString = ctx.add_operator().getText();
 
-        // remove the expressions parsed so far
-        expressionList.clear();
+        Expression arithmeticExpression = new Expression();
 
-        // place the new add expression into the list so it can be used by further
-        // expressions
-        expressionList.add(expression);
+        if (StringUtils.equalsIgnoreCase(operatorAsString, "+")) {
+            arithmeticExpression.setExpressionType(ExpressionType.ADD);
+        } else if (StringUtils.equalsIgnoreCase(operatorAsString, "-")) {
+            arithmeticExpression.setExpressionType(ExpressionType.SUBTRACT);
+        }
 
-        addOperatorFound = false;
+        arithmeticExpression.getExpressionList().add(expressionList.get(1));
+        expressionList.remove(1);
+
+        arithmeticExpression.getExpressionList().add(expressionList.get(1));
+        expressionList.remove(1);
+
+        expressionList.add(arithmeticExpression);
     }
 
-    @Override
-    public void exitAdd_operator(StructuredTextParser.Add_operatorContext ctx) {
-        addOperatorFound = true;
-    }
+    // @Override
+    // public void exitAdd_expression(StructuredTextParser.Add_expressionContext
+    // ctx) {
+
+    // // if the is only a single operand, no and node is required
+    // if ((!addOperatorFound) && (!subtractOperatorFound)) {
+    // return;
+    // }
+
+    // // build a new Add-Expression and copy all the expression parsed so far into
+    // it
+    // Expression expression = new Expression();
+    // if (addOperatorFound) {
+    // expression.setExpressionType(ExpressionType.ADD);
+    // }
+    // if (subtractOperatorFound) {
+    // expression.setExpressionType(ExpressionType.SUBTRACT);
+    // }
+    // expression.getExpressionList().addAll(expressionList);
+
+    // // remove the expressions parsed so far
+    // expressionList.clear();
+
+    // // place the new add expression into the list so it can be used by further
+    // // expressions
+    // expressionList.add(expression);
+
+    // addOperatorFound = false;
+    // subtractOperatorFound = false;
+    // }
+
+    // @Override
+    // public void exitAdd_operator(StructuredTextParser.Add_operatorContext ctx) {
+
+    // System.out.println(ctx.getStart().getText());
+
+    // String operatorAsString = ctx.getStart().getText();
+
+    // if (StringUtils.equalsIgnoreCase(operatorAsString, "+")) {
+    // addOperatorFound = true;
+    // } else if (StringUtils.equalsIgnoreCase(operatorAsString, "-")) {
+    // subtractOperatorFound = true;
+    // }
+    // }
 
     @Override
     public void visitTerminal(TerminalNode node) {

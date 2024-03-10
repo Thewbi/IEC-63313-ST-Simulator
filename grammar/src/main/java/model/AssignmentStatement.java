@@ -18,7 +18,34 @@ public class AssignmentStatement extends Statement {
 
     @Override
     public String toString() {
-        return "AssignmentStatement [expressionList=" + expressionList + "]";
+        //return "AssignmentStatement [expressionList=" + expressionList + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("AssignmentStatement\n");
+        System.out.println("AssignmentStatement\n");
+
+        for (Expression childExpression : expressionList) {
+            // int indent = 1;
+            // printExpression(childExpression, indent, stringBuilder);
+            stringBuilder.append(childExpression);
+            System.out.println(childExpression);
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private void printExpression(Expression expression, int indent, StringBuilder stringBuilder) {
+        for (int i = 0; i < indent; i++)
+        {
+            stringBuilder.append("  ");
+            System.out.print("  ");
+        }
+        stringBuilder.append(expression).append("\n\n");
+        System.out.print(expression);
+        System.out.print("\n\n");
+        for (Expression childExpression : expression.getExpressionList()) {
+            printExpression(childExpression, indent + 1, stringBuilder);
+        }
     }
 
     // public String getVariableQualifier() {
@@ -28,6 +55,8 @@ public class AssignmentStatement extends Statement {
     // public void setVariableQualifier(String variableQualifier) {
     //     this.variableQualifier = variableQualifier;
     // }
+
+    
 
     public List<Expression> getExpressionList() {
         return expressionList;

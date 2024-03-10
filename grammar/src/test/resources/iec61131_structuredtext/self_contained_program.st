@@ -5,16 +5,17 @@ PROGRAM stexample
   END_VAR
 
 /**/
-  x4 := TRUE;
-  x := 1 + 2 + 3;
-  x5 := 4 + 5 - 6;
+  x5 := TRUE;
+  
+  x6 := 1 + 2 + 3;
+  x7 := 4 + 5 - 6;
 
 
 /**/
   REPEAT
     x1 := FALSE;
     x2 := FALSE;
-  UNTIL x2 = FALSE
+  UNTIL x4 = FALSE
   //UNTIL TRUE
   END_REPEAT;
 

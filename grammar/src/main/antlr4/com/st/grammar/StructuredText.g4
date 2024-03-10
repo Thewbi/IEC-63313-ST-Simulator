@@ -1177,7 +1177,12 @@ comparison_operator :
 
 // add_expression ::= term {add_operator term}
 add_expression :
-	term (add_operator term)*
+	//term (add_operator term)*
+    term
+    |
+    //term add_operator add_expression
+    add_expression add_operator term
+    //add_expression add_operator add_expression
 	;
 
 //add_operator ::= '+' | '-'

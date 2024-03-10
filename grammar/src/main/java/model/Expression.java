@@ -16,34 +16,84 @@ public class Expression {
 
     private String variableNameValue;
 
+    // @Override
+    // public String toString() {
+    //     // return "Expression [expressionType=" + expressionType + ", integerValue=" +
+    //     // integerValue + ", booleanValue="
+    //     // + booleanValue + ", expressionList=" + expressionList + "]";
+
+    //     StringBuffer stringBuffer = new StringBuffer();
+    //     stringBuffer.append("Expression [ ");
+    //     stringBuffer.append(" expressionType=" + expressionType + " ");
+
+    //     if (integerValue != null) {
+    //         stringBuffer.append(" integerValue=" + integerValue + " ");
+    //     }
+
+    //     if (booleanValue != null) {
+    //         stringBuffer.append(" booleanValue=" + booleanValue + " ");
+    //     }
+
+    //     if (variableNameValue != null) {
+    //         stringBuffer.append(" variableNameValue=" + variableNameValue + " ");
+    //     }
+
+    //     if (CollectionUtils.isNotEmpty(expressionList)) {
+    //         stringBuffer.append("\n expressionList=" + expressionList + " ");
+    //     }
+
+    //     stringBuffer.append(" ]");
+    //     return stringBuffer.toString();
+    // }
+
     @Override
     public String toString() {
-        // return "Expression [expressionType=" + expressionType + ", integerValue=" +
-        // integerValue + ", booleanValue="
-        // + booleanValue + ", expressionList=" + expressionList + "]";
 
-        StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Expression [ ");
-        stringBuffer.append(" expressionType=" + expressionType + " ");
+        int indent = 1;
+
+        StringBuilder stringBuilder = new StringBuilder();
+        toStringSelf(stringBuilder, indent);
+
+        for (Expression childExpression : expressionList) {
+            stringBuilder.append(childExpression.toString(indent + 1));
+        }
+
+        return stringBuilder.toString();
+    }
+
+    public String toString(int indent) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        toStringSelf(stringBuilder, indent);
+
+        for (Expression childExpression : expressionList) {
+            stringBuilder.append(childExpression.toString(indent + 1));
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private void toStringSelf(StringBuilder stringBuilder, int indent) {
+
+        for (int i = 0; i < indent; i++)
+        {
+            stringBuilder.append("  ");
+        }
+        stringBuilder.append("Expression [ ");
+        stringBuilder.append(" expressionType=" + expressionType + " ");
 
         if (integerValue != null) {
-            stringBuffer.append(" integerValue=" + integerValue + " ");
+            stringBuilder.append(" integerValue=" + integerValue + " ");
         }
 
         if (booleanValue != null) {
-            stringBuffer.append(" booleanValue=" + booleanValue + " ");
+            stringBuilder.append(" booleanValue=" + booleanValue + " ");
         }
 
         if (variableNameValue != null) {
-            stringBuffer.append(" variableNameValue=" + variableNameValue + " ");
+            stringBuilder.append(" variableNameValue=" + variableNameValue + " ");
         }
-
-        if (CollectionUtils.isNotEmpty(expressionList)) {
-            stringBuffer.append("\n expressionList=" + expressionList + " ");
-        }
-
-        stringBuffer.append(" ]");
-        return stringBuffer.toString();
+        stringBuilder.append(" ]\n");
     }
 
     private List<Expression> expressionList = new ArrayList<>();

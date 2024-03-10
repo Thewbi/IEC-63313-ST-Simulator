@@ -8,7 +8,11 @@ public enum ExpressionType {
 
     BOOLEAN_CONSTANT,
 
-    ADD, VARIABLE_NAME, 
+    ADD,
+
+    SUBTRACT,
+    
+    VARIABLE_NAME, 
     
     EQUALS_COMPARISON, 
     
