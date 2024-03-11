@@ -99,10 +99,10 @@ PROGRAM program0_POU
   END_VAR
 
   global_status.BART_Hand := FA_BART_Hand_T_HMI;
-  _TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI, FA_BART_Auto_T_HMI, FA_Stoerung_T_HMI, FA_Stoer_Quit_T_HMI, FA_NotHalt_T_HMI);
-  DebugBoolean := _TMP_FA_SERV1_OUT;
-  AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI);
-  s_MV_P2_FF := AKT_5_2_MV0.s_MV_P2_FF;
+  //_TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI, FA_BART_Auto_T_HMI, FA_Stoerung_T_HMI, FA_Stoer_Quit_T_HMI, FA_NotHalt_T_HMI);
+  //DebugBoolean := _TMP_FA_SERV1_OUT;
+  //AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI);
+  //s_MV_P2_FF := AKT_5_2_MV0.s_MV_P2_FF;
 END_PROGRAM
 
 FUNCTION_BLOCK FA

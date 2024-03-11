@@ -443,6 +443,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
         subprogrammControlStatement = null;
+        expressionList.clear();
     }
 
     @Override
