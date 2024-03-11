@@ -58,8 +58,11 @@ FUNCTION_BLOCK AKT_5_2_MV
   _TMP_AND15_OUT := AND(_TMP_NOT17_OUT, Hand_P2);
   TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
   DebugBoolean := TON0.Q;
-  
+
 END_FUNCTION_BLOCK
+
+
+
 
 /* We cannot parse functions yet!
 FUNCTION FA_SERV : BOOL
@@ -119,7 +122,13 @@ PROGRAM program0_POU
   
   DebugBoolean := _TMP_FA_SERV1_OUT;
   
-  AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI);
+  AKT_5_2_MV0(
+    status := global_status, 
+    Hand_P1 := Zyl1_T_P1_HMI, 
+    Hand_P2 := Zyl1_T_P2_HMI, 
+    SEN_P1 := SEN_P1_T_HMI, 
+    SEN_P2 := SEN_P2_T_HMI
+  );
   
   s_MV_P2_FF := AKT_5_2_MV0.s_MV_P2_FF;
 

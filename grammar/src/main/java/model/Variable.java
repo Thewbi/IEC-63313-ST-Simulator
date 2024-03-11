@@ -4,9 +4,11 @@ public class Variable {
 
     private String name;
 
-    private DataType dataType; // = DataType.UNKNOWN;
+    private DataType dataType;
 
     private String initialValue;
+
+    private boolean external;
 
     @Override
     public String toString() {
@@ -41,6 +43,12 @@ public class Variable {
         this.initialValue = initialValue;
     }
 
-    
+    public boolean isExternal() {
+        return external;
+    }
+
+    public void setExternal(boolean external) {
+        this.external = external;
+    }
     
 }

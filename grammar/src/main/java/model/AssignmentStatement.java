@@ -5,7 +5,6 @@ import java.util.ArrayList;
 
 public class AssignmentStatement extends Statement {
 
-    //private List<Expression> variableList = new ArrayList<>();
     private String variable;
 
     private List<Expression> expressionList = new ArrayList<>();

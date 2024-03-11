@@ -7,17 +7,13 @@ public class TypeScope {
 
     private Map<String, DataType> typeMap = new HashMap<>();
 
-    // private TypeScope parentTypeScope;
-
     @Override
     public String toString() {
-        //return "TypeScope [typeMap=" + typeMap + "]";
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (Map.Entry<String, DataType> entry : typeMap.entrySet())
-        {
-            stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue()/*.getName() */);
+        for (Map.Entry<String, DataType> entry : typeMap.entrySet()) {
+            stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue()/* .getName() */);
             stringBuilder.append("\n");
         }
 
@@ -31,26 +27,16 @@ public class TypeScope {
         typeMap.put(typeName, object);
     }
 
-    public DataType retrieveDataTypeByTypeName(String dataTypeAsString) {
+    public DataType retrieveDataTypeByTypeName(String dataTypeName) {
 
-        if (typeMap.containsKey(dataTypeAsString)) {
-            return typeMap.get(dataTypeAsString);
+        if (typeMap.containsKey(dataTypeName)) {
+            return typeMap.get(dataTypeName);
         }
 
         return null;
-
-        // if (parentTypeScope == null) {
-        //     return null;
-        // }
-
-        // return parentTypeScope.retrieveDataTypeByTypeName(dataTypeAsString);
     }
 
-    // public TypeScope getParentTypeScope() {
-    //     return parentTypeScope;
-    // }
-
-    // public void setParentTypeScope(TypeScope parentTypeScope) {
-    //     this.parentTypeScope = parentTypeScope;
-    // }
+    public DataType get(String dataTypeName) {
+        return retrieveDataTypeByTypeName(dataTypeName);
+    }
 }

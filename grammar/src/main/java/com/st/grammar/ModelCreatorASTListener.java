@@ -49,9 +49,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     public GlobalScope globalVarScope = new GlobalScope();
 
-    // private Stack<TypeScope> typeScopeStack = new Stack<>();
-
-    public TypeScope globalTypeScope = new TypeScope();
+    public TypeScope globalTypeScope;
 
     public boolean equalsDetected;
 
@@ -73,29 +71,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public ModelCreatorASTListener() {
 
         scopeStack.push(globalVarScope);
-
-        // BOOL
-        DataType dataType = new DataType();
-        dataType.setName("BOOL");
-        globalTypeScope.addType(dataType.getName(), dataType);
-
-        // SR FlipFlop (reset precedence)
-        dataType = new DataType();
-        dataType.setName("SR");
-        globalTypeScope.addType(dataType.getName(), dataType);
-
-        // TON Timer to ON (TRUE) (delays it's output going to HIGH/ON/TRUE for a
-        // configurable amount of time adter the input goes high)
-        dataType = new DataType();
-        dataType.setName("TON");
-        globalTypeScope.addType(dataType.getName(), dataType);
-
-        // TIME
-        dataType = new DataType();
-        dataType.setName("TIME");
-        globalTypeScope.addType(dataType.getName(), dataType);
-
-        // typeScopeStack.push(globalTypeScope);
     }
 
     @Override
@@ -116,7 +91,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // System.out.println(functionBlock);
 
         scopeStack.pop();
-        // scopeStack.peek().addType(functionBlock.getName(), functionBlock);
 
         globalTypeScope.addType(functionBlock.getName(), functionBlock);
 
@@ -258,19 +232,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable = null;
     }
 
-    // @Override
-    // public void
-    // enterExternal_var_declarations(StructuredTextParser.External_var_declarationsContext
-    // ctx) {
-    // }
-
-    // @Override
-    // public void
-    // exitExternal_var_declarations(StructuredTextParser.External_var_declarationsContext
-    // ctx) {
-
-    // }
-
     @Override
     public void enterExternal_declaration(StructuredTextParser.External_declarationContext ctx) {
         variable = null;
@@ -285,8 +246,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable = new Variable();
         topScope.getVariables().add(variable);
 
+        variable.setExternal(true);
+
         String variableName = ctx.getStart().getText();
-        // System.out.println(variableName);
         variable.setName(variableName);
 
         String simpleSpecification = ctx.simple_specification().getText();
@@ -479,7 +441,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         if (StringUtils.equalsIgnoreCase(literal, "and")) {
 
-            Expression expression = expressionList.get(0);
+            // Expression expression = expressionList.get(0);
 
             Expression andExpression = new Expression();
             andExpression.setExpressionType(ExpressionType.AND);
@@ -488,16 +450,18 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             ComparisonContext lhsComparisonContext = ctx.comparison(0);
             // System.out.println(lhsComparisonContext.getText());
             lhs.setVariableNameValue(lhsComparisonContext.getText());
+            lhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             andExpression.getExpressionList().add(lhs);
 
             Expression rhs = new Expression();
             ComparisonContext rhsComparisonContext = ctx.comparison(1);
             // System.out.println(rhsComparisonContext.getText());
             rhs.setVariableNameValue(rhsComparisonContext.getText());
+            rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             andExpression.getExpressionList().add(rhs);
 
             expressionList.clear();
-            expressionList.add(expression);
+            // expressionList.add(expression);
             expressionList.add(andExpression);
         }
     }
@@ -621,5 +585,13 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         if (StringUtils.equalsIgnoreCase("<>", node.getText())) {
             notEqualsDetected = true;
         }
+    }
+
+    public TypeScope getGlobalTypeScope() {
+        return globalTypeScope;
+    }
+
+    public void setGlobalTypeScope(TypeScope globalTypeScope) {
+        this.globalTypeScope = globalTypeScope;
     }
 }

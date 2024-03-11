@@ -5,14 +5,17 @@ import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
 
-public class DataType {
+public abstract class DataType {
 
     private String name;
 
-    //private Map<String, DataType> fields = new HashMap<>();
     private Map<String, Field> fields = new HashMap<>();
 
     private String initialValue;
+
+    public Object getDefaultValue() {
+        return null;
+    }
 
     @Override
     public String toString() {
@@ -35,6 +38,7 @@ public class DataType {
         }
 
         Field field = new Field();
+        field.setName(fieldName);
         field.setDataType(dataType);
         field.setInitialValue(initialValue);
 
