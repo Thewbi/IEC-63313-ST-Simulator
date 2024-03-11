@@ -116,7 +116,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // System.out.println(functionBlock);
 
         scopeStack.pop();
-        //scopeStack.peek().addType(functionBlock.getName(), functionBlock);
+        // scopeStack.peek().addType(functionBlock.getName(), functionBlock);
 
         globalTypeScope.addType(functionBlock.getName(), functionBlock);
 
@@ -244,8 +244,54 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         topScope.getVariables().add(variable);
 
         String variableName = ctx.getStart().getText();
-        //System.out.println(variableName);
+        // System.out.println(variableName);
         variable.setName(variableName);
+
+        variable.setDataType(dataType);
+        dataType = null;
+
+        variable.setInitialValue(initialValue);
+        initialValue = null;
+
+        expressionList.clear();
+
+        variable = null;
+    }
+
+    // @Override
+    // public void
+    // enterExternal_var_declarations(StructuredTextParser.External_var_declarationsContext
+    // ctx) {
+    // }
+
+    // @Override
+    // public void
+    // exitExternal_var_declarations(StructuredTextParser.External_var_declarationsContext
+    // ctx) {
+
+    // }
+
+    @Override
+    public void enterExternal_declaration(StructuredTextParser.External_declarationContext ctx) {
+        variable = null;
+    }
+
+    @Override
+    public void exitExternal_declaration(StructuredTextParser.External_declarationContext ctx) {
+
+        VarScope topScope = scopeStack.peek();
+
+        // a new variable is defined
+        variable = new Variable();
+        topScope.getVariables().add(variable);
+
+        String variableName = ctx.getStart().getText();
+        // System.out.println(variableName);
+        variable.setName(variableName);
+
+        String simpleSpecification = ctx.simple_specification().getText();
+
+        dataType = globalTypeScope.retrieveDataTypeByTypeName(simpleSpecification);
 
         variable.setDataType(dataType);
         dataType = null;
@@ -262,7 +308,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void exitAssignment_statement(StructuredTextParser.Assignment_statementContext ctx) {
 
         final String variable = ctx.variable().getText();
-        //System.out.println(variable);
+        // System.out.println(variable);
 
         AssignmentStatement assignmentStatement = new AssignmentStatement();
         scopeStack.peek().addStatement(assignmentStatement);
@@ -398,7 +444,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitTerm(StructuredTextParser.TermContext ctx) {
 
-        //System.out.println("");
+        // System.out.println("");
 
         if (ctx.multiply_operator() == null) {
             return;

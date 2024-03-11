@@ -10,24 +10,25 @@ public class Struct extends DataType {
 
     // @Override
     // public String toString() {
-    //     StringBuilder stringBuilder = new StringBuilder();
+    // StringBuilder stringBuilder = new StringBuilder();
 
-    //     stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + " ");
-    //     stringBuilder.append("\n");
+    // stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + "
+    // ");
+    // stringBuilder.append("\n");
 
-    //     stringBuilder.append("Fields:\n");
-    //     if (CollectionUtils.isEmpty(GetField())) {
-    //         stringBuilder.append("No Variables");
-    //     } else {
-    //         for (Variable variable : getVariables()) {
+    // stringBuilder.append("Fields:\n");
+    // if (CollectionUtils.isEmpty(GetField())) {
+    // stringBuilder.append("No Variables");
+    // } else {
+    // for (Variable variable : getVariables()) {
 
-    //             if (variable.getDataType() instanceof FunctionBlock) {
-    //                 stringBuilder.append("\n").append(variable.toShortString());
-    //             } else {
-    //                 stringBuilder.append("\n").append(variable);
-    //             }
-    //         }
-    //     }
+    // if (variable.getDataType() instanceof FunctionBlock) {
+    // stringBuilder.append("\n").append(variable.toShortString());
+    // } else {
+    // stringBuilder.append("\n").append(variable);
+    // }
+    // }
+    // }
     // }
 
     @Override
@@ -42,7 +43,9 @@ public class Struct extends DataType {
 
         if (MapUtils.isNotEmpty(getFields())) {
             for (Map.Entry<String, Field> entry : getFields().entrySet()) {
-                stringBuilder.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue().getDataType().getName());
+                stringBuilder.append("  ").append(entry.getKey()).append(" = ")
+                        .append(entry.getValue().getDataType().getName())
+                        .append(" InitialValue: ").append(entry.getValue().getInitialValue());
                 stringBuilder.append("\n");
             }
         }
@@ -51,5 +54,5 @@ public class Struct extends DataType {
 
         return stringBuilder.toString();
     }
-    
+
 }
