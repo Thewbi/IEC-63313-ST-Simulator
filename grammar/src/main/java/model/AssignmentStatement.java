@@ -5,6 +5,9 @@ import java.util.ArrayList;
 
 public class AssignmentStatement extends Statement {
 
+    //private List<Expression> variableList = new ArrayList<>();
+    private String variable;
+
     private List<Expression> expressionList = new ArrayList<>();
 
     /**
@@ -22,6 +25,9 @@ public class AssignmentStatement extends Statement {
         stringBuilder.append("AssignmentStatement\n");
         // System.out.println("AssignmentStatement\n");
 
+        stringBuilder.append("  variable: " + variable + "\n");
+
+        stringBuilder.append("  expression: \n");
         for (Expression childExpression : expressionList) {
             // int indent = 1;
             // printExpression(childExpression, indent, stringBuilder);
@@ -54,4 +60,11 @@ public class AssignmentStatement extends Statement {
         this.expressionList = expressionList;
     }
     
+    public String getVariable() {
+        return variable;
+    }
+
+    public void setVariable(String variable) {
+        this.variable = variable;
+    }
 }

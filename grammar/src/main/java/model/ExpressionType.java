@@ -20,7 +20,7 @@ public enum ExpressionType {
 
     NOT,
 
-    AND
+    AND, MULTIPLY, DIVIDE
 
     //,SUBPROGRAM_CONTROL
 

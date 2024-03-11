@@ -44,6 +44,8 @@ public class VarScope extends DataType {
             }
         }
 
+        System.out.println(stringBuilder.toString());
+
         return stringBuilder.toString();
     }
 

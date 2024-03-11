@@ -16,8 +16,6 @@ public class DataType {
 
     @Override
     public String toString() {
-        // return "TypeScope [typeMap=" + typeMap + "]";
-
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(name);
 
@@ -57,6 +55,10 @@ public class DataType {
 
     public void setInitialValue(String initialValue) {
         this.initialValue = initialValue;
+    }
+
+    public Map<String, Field> getFields() {
+        return fields;
     }
 
 }

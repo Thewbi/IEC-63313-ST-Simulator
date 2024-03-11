@@ -23,6 +23,7 @@ import model.GlobalScope;
 import model.Program;
 import model.ProgramConfiguration;
 import model.RepeatStatement;
+import model.Struct;
 import model.SubprogrammControlStatement;
 import model.Task;
 import model.TypeScope;
@@ -108,12 +109,14 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         functionBlock.setName(typeName);
 
         scopeStack.push(functionBlock);
-
     }
 
     @Override
     public void exitFunction_block_declaration(StructuredTextParser.Function_block_declarationContext ctx) {
         // System.out.println(functionBlock);
+
+        scopeStack.pop();
+        //scopeStack.peek().addType(functionBlock.getName(), functionBlock);
 
         globalTypeScope.addType(functionBlock.getName(), functionBlock);
 
@@ -158,7 +161,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // System.out.println("typeName: " + typeName);
 
-        structureDataType = new DataType();
+        structureDataType = new Struct();
         structureDataType.setName(typeName);
 
         // TypeScope typeScope = typeScopeStack.peek();
@@ -240,7 +243,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable = new Variable();
         topScope.getVariables().add(variable);
 
-        variable.setName(ctx.getStart().getText());
+        String variableName = ctx.getStart().getText();
+        //System.out.println(variableName);
+        variable.setName(variableName);
 
         variable.setDataType(dataType);
         dataType = null;
@@ -256,14 +261,27 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitAssignment_statement(StructuredTextParser.Assignment_statementContext ctx) {
 
+        final String variable = ctx.variable().getText();
+        //System.out.println(variable);
+
         AssignmentStatement assignmentStatement = new AssignmentStatement();
         scopeStack.peek().addStatement(assignmentStatement);
+
+        assignmentStatement.setVariable(variable);
 
         // the expression is added into the statement in exitStatement
         // use the parse expression and copy it into the statement
         // assignmentStatement.setExpression(comparisonExpression);
         assignmentStatement.getExpressionList().addAll(expressionList);
 
+        expressionList.clear();
+    }
+
+    @Override
+    public void enterExpression(StructuredTextParser.ExpressionContext ctx) {
+
+        // forget all expression because the expression part of a assignment starts
+        // and we only want expression expressions here
         expressionList.clear();
     }
 
@@ -368,13 +386,41 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             arithmeticExpression.setExpressionType(ExpressionType.SUBTRACT);
         }
 
-        arithmeticExpression.getExpressionList().add(expressionList.get(1));
-        expressionList.remove(1);
+        arithmeticExpression.getExpressionList().add(expressionList.get(0));
+        expressionList.remove(0);
 
-        arithmeticExpression.getExpressionList().add(expressionList.get(1));
-        expressionList.remove(1);
+        arithmeticExpression.getExpressionList().add(expressionList.get(0));
+        expressionList.remove(0);
 
         expressionList.add(arithmeticExpression);
+    }
+
+    @Override
+    public void exitTerm(StructuredTextParser.TermContext ctx) {
+
+        //System.out.println("");
+
+        if (ctx.multiply_operator() == null) {
+            return;
+        }
+
+        Expression expression = new Expression();
+
+        String operatorAsString = ctx.multiply_operator().getText();
+        if (StringUtils.equalsIgnoreCase(operatorAsString, "*")) {
+            expression.setExpressionType(ExpressionType.MULTIPLY);
+        } else if (StringUtils.equalsIgnoreCase(operatorAsString, "/")) {
+            expression.setExpressionType(ExpressionType.DIVIDE);
+        }
+
+        expression.getExpressionList().add(expressionList.get(0));
+        expressionList.remove(0);
+
+        expression.getExpressionList().add(expressionList.get(0));
+        expressionList.remove(0);
+
+        expressionList.add(expression);
+
     }
 
     @Override
@@ -419,8 +465,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         if (ctx.unary_operator() != null) {
             String operatorAsString = ctx.unary_operator().getText();
             if (StringUtils.equalsIgnoreCase(operatorAsString, "not")) {
-                notExpression.getExpressionList().add(expressionList.get(1));
-                expressionList.remove(1);
+                notExpression.getExpressionList().add(expressionList.get(0));
+                expressionList.remove(0);
                 expressionList.add(notExpression);
             }
         }
@@ -430,7 +476,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void enterSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
 
         // System.out.println(ctx.getClass().getSimpleName() + " " +
-        //         ctx.getStart().getText());
+        // ctx.getStart().getText());
 
         String subprogramName = ctx.getStart().getText();
 

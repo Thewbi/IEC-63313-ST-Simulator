@@ -17,7 +17,7 @@ public class TypeScope {
 
         for (Map.Entry<String, DataType> entry : typeMap.entrySet())
         {
-            stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue());
+            stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue()/*.getName() */);
             stringBuilder.append("\n");
         }
 
