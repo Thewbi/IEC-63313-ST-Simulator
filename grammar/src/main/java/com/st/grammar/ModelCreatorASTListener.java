@@ -24,7 +24,7 @@ import model.Program;
 import model.ProgramConfiguration;
 import model.RepeatStatement;
 import model.Struct;
-import model.SubprogrammControlStatement;
+import model.SubprogramControlStatement;
 import model.Task;
 import model.TypeScope;
 import model.VarScope;
@@ -65,7 +65,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private String initialValue;
 
-    private SubprogrammControlStatement subprogrammControlStatement;
+    private SubprogramControlStatement subprogramControlStatement;
 
     /**
      * ctor
@@ -526,15 +526,15 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         String subprogramName = ctx.getStart().getText();
 
-        subprogrammControlStatement = new SubprogrammControlStatement();
-        subprogrammControlStatement.setSubprogramName(subprogramName);
+        subprogramControlStatement = new SubprogramControlStatement();
+        subprogramControlStatement.setSubprogramName(subprogramName);
 
-        scopeStack.peek().addStatement(subprogrammControlStatement);
+        scopeStack.peek().addStatement(subprogramControlStatement);
     }
 
     @Override
     public void exitSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
-        subprogrammControlStatement = null;
+        subprogramControlStatement = null;
         expressionList.clear();
     }
 
@@ -550,7 +550,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             String expression = param_assignmentContext.expression().getText();
             // System.out.println(expression);
 
-            subprogrammControlStatement.addParameterAssignment(varName, expression);
+            subprogramControlStatement.addParameterAssignment(varName, expression);
         }
     }
 

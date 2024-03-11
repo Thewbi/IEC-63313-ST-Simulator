@@ -117,3 +117,63 @@ nicely.
 
 TODO: What about retained variables?
 
+
+
+
+## Assumptions about the execution model:
+
+* Global variables (defined in the configuration) are retained (they keep their values) over task iterations.
+* External variables have reference semantics (not copy semantics)
+* Local variable are not retained unless they have the 'retained' specifier.
+
+## Program Execution
+
+An instance of the configuration is created.
+All the global variables in the configuration are created.
+Global variables in the configuration are retained (they keep their values) over task iterations.
+
+The configuration contains the program to execute and the task that executes the program.
+
+The configuration's program instance is created.
+Recursively, if the program contains function blocks, those function blocks are instantiated
+and the program keeps a reference to all it's function blocks. (If function blocks have external
+variables, references to those external variables are created)
+If the program has external variables defined, a reference from the program to the global
+variables are created. External variables have reference semantics (not copy semantics).
+Local variables are reserved in the instance.
+
+The configuration's task instance is created.
+The task instance is started. 
+The task has access to the global variables so it can pass them to the program.
+
+Each iteration the task will execute the program.
+Each iteration, local variables that have no retain flag are reset to their data type's default value
+or, if there is an initial value specified, they are reset to that initial value.
+The local variables of contained function blocks are also treated according to the above rules.
+(--> Have a cycleStart() interface method that is recursively executed from the program over all it children recursively.
+cycleStart() has to reset the variables according to the rules defined above.)
+Retained variables are not reset.
+External variables are not reset.
+The list of statements is executed one after the other in the order they are listed.
+
+If a statement executes a function block (SubprogramControlStatement), 
+1. for all input variables (not output or local variables!) the parameters are passed in 
+using copy semantics and they are copied into local variables 
+overriding deault and initial values.
+2. all the statements of the function block are executed in order.
+
+If a statement is an assignment (AssignmentStatement) that assignment expression is executed/evaluated
+and the evaluated value is stored into the assigned variable.
+
+If a statement is a RepeatStatement, the repeatStatement is executed.
+
+If a SubprogramControlStatement is executed on an SR or RS FlipFlop function block, 
+the flip flop function block has to compute it's new state and retain that state.
+
+If a SubprogramControlStatement is executed on a TON function block, the TON function block
+has to check if the retained input from the last cycle and the current input form a rising edge.
+If they form a rising edge, the timer is started.
+If they form a falling edge, the timer is stopped and reset to 0.
+The TON function block has to now retain the current input for the next cycle.
+The timer is read and the input time configuration is read. If the time on the timer is greater 
+then the configured time of the TON function block, then the output goes high.

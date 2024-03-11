@@ -3,7 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubprogrammControlStatement extends Statement {
+public class SubprogramControlStatement extends Statement {
 
     private String subprogramName;
 
@@ -12,7 +12,7 @@ public class SubprogrammControlStatement extends Statement {
     /**
      * ctor
      */
-    public SubprogrammControlStatement() {
+    public SubprogramControlStatement() {
         setStatementType(StatementType.SUBPROGRAM_CONTROL);
     }
 
@@ -27,11 +27,9 @@ public class SubprogrammControlStatement extends Statement {
 
     @Override
     public String toString() {
-        //return "SubprogrammControlStatement [subprogramName=" + subprogramName + "]";
-
         StringBuilder stringBuilder = new StringBuilder();
 
-        stringBuilder.append("SubprogrammControlStatement [subprogramName=" + subprogramName + "]");
+        stringBuilder.append("SubprogramControlStatement [subprogramName=" + subprogramName + "]");
 
         for (ParameterAssignment parameterAssignment : parameterAssignments) {
             stringBuilder.append("\n  ").append(parameterAssignment);
