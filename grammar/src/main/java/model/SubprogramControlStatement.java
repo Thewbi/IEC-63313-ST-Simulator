@@ -8,7 +8,7 @@ public class SubprogramControlStatement extends Statement {
     private String subprogramName;
 
     private List<ParameterAssignment> parameterAssignments = new ArrayList<>();
-
+    
     /**
      * ctor
      */
@@ -45,6 +45,10 @@ public class SubprogramControlStatement extends Statement {
 
     public void setSubprogramName(String subprogramName) {
         this.subprogramName = subprogramName;
+    }
+    
+    public List<ParameterAssignment> getParameterAssignments() {
+        return parameterAssignments;
     }
     
 }

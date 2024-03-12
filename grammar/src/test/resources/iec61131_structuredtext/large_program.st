@@ -109,7 +109,9 @@ PROGRAM program0_POU
   VAR
     AKT_5_2_MV0 : AKT_5_2_MV;
     Zyl1_T_P1_HMI : BOOL;
-    Zyl1_T_P2_HMI : BOOL;
+    Zyl1_T_P2_HMI : BOOL := TRUE;
+    //Zyl1_T_P2_HMI : BOOL := FALSE;
+    //Zyl1_T_P2_HMI : BOOL;
     s_MV_P2_FF : BOOL;
     SEN_P1_T_HMI : BOOL := TRUE;
     SEN_P2_T_HMI : BOOL := FALSE;

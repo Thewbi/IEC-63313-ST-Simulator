@@ -73,5 +73,13 @@ public class VariableInstance {
     public List<Statement> getStatements() {
         return statements;
     }
+
+    public Map<String, VariableDescriptor> getElements() {
+        return elements;
+    }
+
+    // public void setElements(Map<String, VariableDescriptor> elements) {
+    //     this.elements = elements;
+    // }
     
 }

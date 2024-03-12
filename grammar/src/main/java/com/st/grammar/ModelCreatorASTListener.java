@@ -106,23 +106,19 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitSeconds(StructuredTextParser.SecondsContext ctx) {
-        // System.out.println(ctx);
 
         Fixed_pointContext fixedPointContext = ctx.fixed_point();
         if (fixedPointContext != null) {
-            // System.out.println(fixedPointContext.getText());
             initialValue = fixedPointContext.getText() + " Seconds";
         }
 
         IntegerContext integerContext = ctx.integer();
         if (integerContext != null) {
-            // System.out.println(integerContext.getText());
             initialValue = fixedPointContext.getText() + " Seconds";
         }
 
         MillisecondsContext millisecondsContext = ctx.milliseconds();
         if (millisecondsContext != null) {
-            // System.out.println(millisecondsContext.getText());
             initialValue = fixedPointContext.getText() + " Milliseconds";
         }
     }

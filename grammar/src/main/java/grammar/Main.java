@@ -2,11 +2,13 @@ package grammar;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.List;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +27,7 @@ import com.st.grammar.StructuredTextParser.Program_declarationContext;
 
 import instance.ConfigurationInstance;
 import instance.ProgramInstance;
+import instance.VariableDescriptor;
 import instance.VariableInstance;
 import model.AssignmentStatement;
 import model.BooleanDataType;
@@ -32,6 +35,7 @@ import model.DataType;
 import model.Expression;
 import model.Field;
 import model.FunctionBlock;
+import model.ParameterAssignment;
 import model.Program;
 import model.Statement;
 import model.Struct;
@@ -136,7 +140,7 @@ public class Main {
 
         // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
 
-        // // Create a generic parse tree walker that can trigger callbacks
+        // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
@@ -147,14 +151,17 @@ public class Main {
 
         // System.out.println();
 
-        System.out.println("\nTypes");
-        System.out.println(listener.globalTypeScope);
+        boolean outputItems = false;
+        if (outputItems) {
+            System.out.println("\nTypes");
+            System.out.println(listener.globalTypeScope);
 
-        System.out.println("\nProgram");
-        System.out.println(listener.program);
+            System.out.println("\nProgram");
+            System.out.println(listener.program);
 
-        System.out.println("\nConfiguration");
-        System.out.println(listener.configuration);
+            System.out.println("\nConfiguration");
+            System.out.println(listener.configuration);
+        }
 
         //
         // Instantiation
@@ -238,12 +245,114 @@ public class Main {
         // execution
         //
 
-        executeStatements(programInstance);
+        executeStatements(programInstance, null, null);
 
         System.out.println("");
     }
 
-    private static void executeStatements(VariableInstance variableInstance) {
+    private static void executeStatements(VariableInstance variableInstance, VariableInstance parentVariableInstance,
+            List<ParameterAssignment> parameterAssignments) {
+
+        //
+        // TODO: reset all values to their defaults / initial values
+        //
+
+        //
+        // load input variables with values from the parent
+        //
+
+        if (parentVariableInstance != null && CollectionUtils.isNotEmpty(parameterAssignments)) {
+
+            for (ParameterAssignment parameterAssignment : parameterAssignments) {
+
+                System.out.println(parameterAssignment);
+
+                VariableInstance target = variableInstance.getElement(parameterAssignment.getParameterName());
+                System.out.println(target);
+
+                VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
+                System.out.println(source);
+
+                target.setValue(source.getValue());
+
+                for (Map.Entry<String, VariableDescriptor> entry : source.getElements().entrySet()) {
+
+                    VariableDescriptor sourceDescriptor = entry.getValue();
+                    VariableInstance sourceElement = sourceDescriptor.variableInstance;
+                    System.out.println(sourceElement);
+
+                    VariableInstance targetElement = target.getElement(sourceElement.getName());
+                    System.out.println(targetElement);
+
+                    // copy the value
+                    targetElement.setValue(sourceElement.getValue());
+                }
+
+            }
+        }
+
+        //
+        // intrinsic blocks (TON, SR, RS, ...)
+        //
+
+        if (variableInstance.getDataType() != null) {
+
+            String dataTypeAsString = variableInstance.getDataType().getName();
+
+            if (StringUtils.equalsIgnoreCase(dataTypeAsString, "SR")) {
+
+                boolean s1 = Boolean.parseBoolean(variableInstance.getElement("S1").getValue());
+                boolean r = Boolean.parseBoolean(variableInstance.getElement("R").getValue());
+
+                boolean newValue = false;
+
+                // implement reset dominance by putting the reset operation last
+                if (s1) {
+                    newValue = true;
+                }
+                if (r) {
+                    newValue = false;
+                }
+
+                variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
+
+            } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "RS")) {
+                
+                boolean s1 = Boolean.parseBoolean(variableInstance.getElement("S1").getValue());
+                boolean r = Boolean.parseBoolean(variableInstance.getElement("R").getValue());
+
+                boolean newValue = false;
+                
+                // implement set dominance by putting the set operation last
+                if (r) {
+                    newValue = false;
+                }
+                if (s1) {
+                    newValue = true;
+                }
+
+                variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
+
+            } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "TON")) {
+
+                // TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
+
+                String inValue = variableInstance.getElement("IN").getValue();
+                System.out.println(inValue);
+
+                variableInstance.getElement("Q").getValue();
+                variableInstance.getElement("PT").getValue();
+                variableInstance.getElement("currentValue").getValue();
+
+                throw new RuntimeException(dataTypeAsString + " not implemented yet!");
+
+            }
+
+        }
+
+        //
+        // execute statements if any
+        //
 
         for (Statement statement : variableInstance.getStatements()) {
 
@@ -286,9 +395,10 @@ public class Main {
                         functionBlock = functionBlock.getElement(subProgSplit[i]);
                     }
 
-                    System.out.println(subprogramControlStatement);
+                    // System.out.println(subprogramControlStatement);
 
-                    executeStatements(functionBlock);
+                    executeStatements(functionBlock, variableInstance,
+                            subprogramControlStatement.getParameterAssignments());
                 }
                     break;
 
@@ -480,9 +590,7 @@ public class Main {
                     }
 
                     variableInstance.addElement(simpleVariableInstance);
-
                 }
-
             }
         }
 
