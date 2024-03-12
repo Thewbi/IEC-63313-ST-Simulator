@@ -77,9 +77,5 @@ public class VariableInstance {
     public Map<String, VariableDescriptor> getElements() {
         return elements;
     }
-
-    // public void setElements(Map<String, VariableDescriptor> elements) {
-    //     this.elements = elements;
-    // }
     
 }
