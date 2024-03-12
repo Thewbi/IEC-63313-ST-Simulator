@@ -319,7 +319,6 @@ public class Main {
                 }
 
                 return target;
-            // break;
 
             case AND: {
                 Expression temp = expression.getExpressionList().get(0);
@@ -327,12 +326,26 @@ public class Main {
                 temp = expression.getExpressionList().get(1);
                 VariableInstance rhsVariableInstance = evaluateExpression(source, temp);
 
-                System.out.println(lhsVariableInstance.getValue());
-                System.out.println(rhsVariableInstance.getValue());
+                // System.out.println(lhsVariableInstance.getValue());
+                // System.out.println(rhsVariableInstance.getValue());
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
                         & Boolean.parseBoolean(rhsVariableInstance.getValue());
-                System.out.println(result);
+                // System.out.println(result);
+
+                VariableInstance variableInstance = new VariableInstance();
+                variableInstance.setValue(Boolean.toString(result));
+
+                return variableInstance;
+            }
+
+            case NOT: {
+                Expression temp = expression.getExpressionList().get(0);
+                VariableInstance lhsVariableInstance = evaluateExpression(source, temp);
+
+                boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue());
+                result = !result;
+                // System.out.println(result);
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));
@@ -395,19 +408,19 @@ public class Main {
 
             // the value presented at the input during the current iteration
             VariableInstance inputValueVariableInstance = new VariableInstance();
-            inputValueVariableInstance.setName("inputValue");
+            inputValueVariableInstance.setName("IN");
             inputValueVariableInstance.setDataType(globalTypeScope.get("BOOL"));
             variableInstance.addElement(inputValueVariableInstance);
 
             // the output
             VariableInstance outputValueVariableInstance = new VariableInstance();
-            outputValueVariableInstance.setName("outputValue");
+            outputValueVariableInstance.setName("Q");
             outputValueVariableInstance.setDataType(globalTypeScope.get("BOOL"));
             variableInstance.addElement(outputValueVariableInstance);
 
             // the threshold time
             VariableInstance thresholdTimeValueVariableInstance = new VariableInstance();
-            thresholdTimeValueVariableInstance.setName("thresholdTime");
+            thresholdTimeValueVariableInstance.setName("PT");
             thresholdTimeValueVariableInstance.setDataType(globalTypeScope.get("TIME"));
             variableInstance.addElement(thresholdTimeValueVariableInstance);
 
