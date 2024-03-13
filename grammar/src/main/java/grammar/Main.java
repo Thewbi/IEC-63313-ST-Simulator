@@ -51,6 +51,8 @@ import model.TypeScope;
 import model.UIntDataType;
 import model.VarScope;
 import model.Variable;
+import virtual_devices.Cylinder;
+import virtual_devices.CylinderCallback;
 
 import javax.swing.*;
 
@@ -315,6 +317,60 @@ public class Main {
         programInstance.getStatements().addAll(listener.program.getStatements());
 
         //
+        // virtual hardware
+        //
+
+        CylinderCallback cylinderCallback = new CylinderCallback() {
+
+            @Override
+            public void position1Exited() {
+
+                System.out.println("position 1 Exited()");
+
+                VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
+                senP1.setValue("false");
+            }
+
+            @Override
+            public void position1Reached() {
+                System.out.println("position 1 Reached()");
+
+                VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
+                senP1.setValue("true");
+
+                // turn off the button
+                VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
+                hmi.setValue("false");
+            }
+
+            @Override
+            public void position2Exited() {
+                System.out.println("position 2 Exited()");
+                VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+                senP2.setValue("false");
+            }
+
+            @Override
+            public void position2Reached() {
+                System.out.println("position 2 Reached()");
+
+                VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+                senP2.setValue("true");
+
+                // turn off the button
+                VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
+                hmi.setValue("false");
+            }
+            
+        };
+
+        Cylinder cylinder = new Cylinder();
+        cylinder.setCylinderCallback(cylinderCallback);
+
+        cylinder.setHasErrorNeverReachesPosition1(true);
+        //cylinder.setHasErrorNeverReachesPosition2(true);
+
+        //
         // GUI
         //
 
@@ -331,6 +387,8 @@ public class Main {
                 // user has requested the cylinder move to P1
                 VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
                 hmi.setValue("true");
+
+                cylinder.moveToPosition1();
             }
 
         });
@@ -358,6 +416,8 @@ public class Main {
                 // user has requested the cylinder move to P2
                 VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
                 hmi.setValue("true");
+
+                cylinder.moveToPosition2();
             }
 
         });
@@ -515,14 +575,10 @@ public class Main {
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "TON")) {
 
-                // System.out.println(variableInstance.getClass().getSimpleName());
-
-                // TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
-
-                System.out.println("TON: " + variableInstance.getName());
+                //System.out.println("TON: " + variableInstance.getName());
 
                 String inValue = variableInstance.getElement("IN").getValue();
-                System.out.println("IN: " + inValue);
+                //System.out.println("IN: " + inValue);
 
                 // VariableInstance outputVariableInstance = variableInstance.getElement("Q");
 
@@ -720,16 +776,18 @@ public class Main {
                 temp = expression.getExpressionList().get(1);
                 VariableInstance rhsVariableInstance = evaluateExpression(source, temp);
 
-                System.out.println("AND");
-                System.out.println(lhsVariableInstance.getName() + " " +
-                lhsVariableInstance.getValue());
-                System.out.println(rhsVariableInstance.getName() + " " +
-                rhsVariableInstance.getValue());
+                // // DEBUG
+                // System.out.println("AND");
+                // System.out.println(lhsVariableInstance.getName() + " " +
+                // lhsVariableInstance.getValue());
+                // System.out.println(rhsVariableInstance.getName() + " " +
+                // rhsVariableInstance.getValue());
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
                         & Boolean.parseBoolean(rhsVariableInstance.getValue());
 
-                System.out.println("Result: " + result);
+                // // DEBUG
+                // System.out.println("Result: " + result);
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));

@@ -11,7 +11,7 @@ public class TONVariableInstance extends VariableInstance {
 
     public void startTimer() {
 
-        System.out.println("startTimer() startTimer() startTimer()");
+        System.out.println("startTimer() startTimer() startTimer() " + getName());
 
         if (timer != null) {
             throw new RuntimeException("why?");
