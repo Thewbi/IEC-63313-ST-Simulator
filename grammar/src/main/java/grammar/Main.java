@@ -1,5 +1,6 @@
 package grammar;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -101,7 +102,9 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
+
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -282,6 +285,13 @@ public class Main {
                     variableInstance.setName(entry.getName());
                     programInstance.addElement(variableInstance);
 
+                } else if (entry.getDataType() instanceof Struct) {
+
+                    VariableInstance variableInstance = instantiateStruct((Struct) entry.getDataType(),
+                            globalTypeScope, programInstance);
+                    variableInstance.setName(entry.getName());
+                    programInstance.addElement(variableInstance);
+
                 } else {
 
                     VariableInstance variableInstance = new VariableInstance();
@@ -307,8 +317,8 @@ public class Main {
         // GUI
         //
 
-        JFrame meinJFrame = new JFrame();
-        meinJFrame.setTitle("JButton Beispiel");
+        JFrame mainJFrame = new JFrame();
+        mainJFrame.setTitle("IEC 61131-3 Simulator HMI (Version: 0.0.0)");
         JPanel panel = new JPanel();
 
         // JButton mit Text "Drück mich" wird erstellt
@@ -341,13 +351,21 @@ public class Main {
         // JButton wird dem Panel hinzugefügt
         panel.add(buttonSensorP2);
 
-        meinJFrame.add(panel);
+        JLabel jLabel = new JLabel();
+        jLabel.setText("Stoerung");
+
+        panel.add(jLabel);
+
+        mainJFrame.add(panel);
 
         // Fenstergröße wird so angepasst, dass
         // der Inhalt reinpasst
-        meinJFrame.pack();
+        // mainJFrame.pack();
+        mainJFrame.setPreferredSize(new Dimension(600, 200));
+        mainJFrame.pack();
+        mainJFrame.setLocationRelativeTo(null);
 
-        meinJFrame.setVisible(true);
+        mainJFrame.setVisible(true);
 
         //
         // execution
@@ -369,6 +387,14 @@ public class Main {
             // DEBUG output global status struct
             VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
             System.out.println(stoerung.getName() + " " + stoerung.getValue());
+
+            //
+            // GUI (update the gui for example for errors)
+            //
+
+            VariableInstance diag = programInstance.getElement("Diag");
+            VariableInstance diagStoerung = diag.getElement("Stoerung");
+            jLabel.setText("Stoerung: " + diagStoerung.getValue());
 
             try {
                 Thread.sleep(3000);
@@ -524,9 +550,21 @@ public class Main {
                     String[] variableSplit = variableAsString.split("\\.");
                     VariableInstance target = variableInstance;
                     for (int i = 0; i < variableSplit.length; i++) {
-                        target = target.getElement(variableSplit[i]);
+                        VariableInstance tempTarget = target.getElement(variableSplit[i]);
+
+                        if (tempTarget == null) {
+                            String msg = "Cannot find \"" + variableSplit[i] + "\" in \"" + target.getName() + "\"";
+                            System.out.println(msg);
+                            throw new RuntimeException(msg);
+                        }
+
+                        target = tempTarget;
                     }
                     // System.out.println(target);
+
+                    if (target == null) {
+                        throw new RuntimeException("");
+                    }
 
                     // DEBUG
                     System.out.println(target.getName());
@@ -680,6 +718,87 @@ public class Main {
                 throw new NotImplementedException("\"" +
                         expression.getExpressionType() + "\" not implemented yet!");
         }
+    }
+
+    private static VariableInstance instantiateStruct(Struct structToCreate, TypeScope globalTypeScope,
+            ProgramInstance programInstance) {
+        
+        VariableInstance variableInstance = new VariableInstance();
+        variableInstance.setDataType(structToCreate);
+
+        // variableInstance.getStatements().addAll(functionBlock.getStatements());
+
+        for (Map.Entry<String, Field> mapEntry : structToCreate.getFields().entrySet()) {
+
+            Field entry = mapEntry.getValue();
+
+            // if (entry.isExternal()) {
+            //     throw new RuntimeException("Not implemented yet!");
+            // }
+
+            // if (entry.isInOut()) {
+            //     System.out.println("isInOut");
+            // }
+
+            if (entry.getDataType() instanceof FunctionBlock) {
+
+                VariableInstance fbVariableInstance = instantiateFunctionBlock((FunctionBlock) entry.getDataType(),
+                        globalTypeScope, variableInstance);
+                fbVariableInstance.setName(entry.getName());
+                variableInstance.addElement(fbVariableInstance);
+
+            } else {
+
+                // if (entry.isInOut()) {
+
+                // // Variable is an inout variable and as such has reference semantics.
+                // // It is taken as a reference from the outer scope
+
+                // VariableInstance inOutRef =
+                // parentVariableInstance.getElement(entry.getName());
+                // variableInstance.addElement(inOutRef);
+
+                // } else {
+
+                // normal variables (non-inout) are instantiated as local variables
+
+                VariableInstance simpleVariableInstance = new VariableInstance();
+                simpleVariableInstance.setName(entry.getName());
+                simpleVariableInstance.setDataType(entry.getDataType());
+
+                if (entry.getDataType() instanceof Struct) {
+
+                    Struct struct = (Struct) entry.getDataType();
+                    for (Map.Entry<String, Field> mapEntry2 : struct.getFields().entrySet()) {
+
+                        Field field = mapEntry2.getValue();
+
+                        VariableInstance structField = new VariableInstance();
+                        structField.setName(field.getName());
+                        structField.setDataType(field.getDataType());
+                        if (StringUtils.isNotBlank(field.getInitialValue())) {
+                            structField.setValue(field.getInitialValue());
+                        }
+
+                        simpleVariableInstance.addElement(structField);
+                    }
+
+                }
+
+                // initial / default value
+                if (StringUtils.isNotBlank(entry.getInitialValue())) {
+                    simpleVariableInstance.setValue(entry.getInitialValue());
+                } else {
+                    simpleVariableInstance.setValue((String) entry.getDataType().getDefaultValue());
+                }
+
+                variableInstance.addElement(simpleVariableInstance);
+
+            }
+            // }
+        }
+
+        return variableInstance;
     }
 
     private static VariableInstance instantiateFunctionBlock(FunctionBlock functionBlock, TypeScope globalTypeScope,

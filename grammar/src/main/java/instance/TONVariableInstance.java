@@ -43,6 +43,10 @@ public class TONVariableInstance extends VariableInstance {
 
     public void stopTimer() {
 
+        if (timer == null) {
+            return;
+        }
+
         System.out.println("stopTimer() stopTimer() stopTimer()");
 
         // set the TON output to false
