@@ -1199,11 +1199,15 @@ subscript :
 // expression ::= xor_expression {'OR' xor_expression}
 expression :
 	xor_expression ( 'OR' xor_expression )?
+    |
+    'OR' '(' xor_expression ',' xor_expression ')'
 	;
 	
 // xor_expression ::= and_expression {'XOR' and_expression}
 xor_expression :
-	and_expression ( 'OR' and_expression )?
+	and_expression ( 'XOR' and_expression )?
+    |
+    'XOR' '(' and_expression ',' and_expression ')'
 	;
 	
 // and_expression ::= comparison {('&' | 'AND') comparison}

@@ -102,7 +102,8 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
 
         String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
@@ -321,19 +322,45 @@ public class Main {
         mainJFrame.setTitle("IEC 61131-3 Simulator HMI (Version: 0.0.0)");
         JPanel panel = new JPanel();
 
-        // JButton mit Text "Drück mich" wird erstellt
+        // Button to make the cylinder travel towards P1
+        JButton buttonP1 = new JButton("P1");
+        buttonP1.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // user has requested the cylinder move to P1
+                VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
+                hmi.setValue("true");
+            }
+
+        });
+        panel.add(buttonP1);
+
+        JButton buttonSensorP1 = new JButton("Sensor P1");
+        buttonSensorP1.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // pneumatic cylinder arrived at P1 and sensor P1 sends high signal
+                VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
+                senP1.setValue("true");
+            }
+
+        });
+        panel.add(buttonSensorP1);
+
+        // Button to make the zylinder travel towards P2
         JButton buttonP2 = new JButton("P2");
         buttonP2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 // user has requested the cylinder move to P2
-                VariableInstance buttonP2 = programInstance.getElement("Zyl1_T_P2_HMI");
-                buttonP2.setValue("true");
+                VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
+                hmi.setValue("true");
             }
 
         });
-
         panel.add(buttonP2);
 
         JButton buttonSensorP2 = new JButton("Sensor P2");
@@ -347,8 +374,6 @@ public class Main {
             }
 
         });
-
-        // JButton wird dem Panel hinzugefügt
         panel.add(buttonSensorP2);
 
         JLabel jLabel = new JLabel();
@@ -384,9 +409,10 @@ public class Main {
 
             executeStatements(programInstance, null, null);
 
-            // DEBUG output global status struct
-            VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
-            System.out.println(stoerung.getName() + " " + stoerung.getValue());
+            // // DEBUG output global status struct
+            // VariableInstance stoerung =
+            // globalStatusVariableInstance.getElement("Stoerung");
+            // System.out.println(stoerung.getName() + " " + stoerung.getValue());
 
             //
             // GUI (update the gui for example for errors)
@@ -395,6 +421,12 @@ public class Main {
             VariableInstance diag = programInstance.getElement("Diag");
             VariableInstance diagStoerung = diag.getElement("Stoerung");
             jLabel.setText("Stoerung: " + diagStoerung.getValue());
+
+            // DEBUG
+            // VariableInstance magnetVentil_5_2 =
+            // programInstance.getElement("AKT_5_2_MV0");
+            // VariableInstance sr0 = magnetVentil_5_2.getElement("SR0");
+            // System.out.println(sr0);
 
             try {
                 Thread.sleep(3000);
@@ -426,13 +458,13 @@ public class Main {
                 Variable variableFromDataType = varScope.getVariableByName(parameterAssignment.getParameterName());
 
                 if (variableFromDataType != null && variableFromDataType.isInOut()) {
-                    System.out.println("Reference Semantics!");
+                    // System.out.println("Reference Semantics!");
 
                     VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
 
                     variableInstance.setElement(parameterAssignment.getParameterName(), source);
                 } else {
-                    System.out.println("Copy Semantics!");
+                    // System.out.println("Copy Semantics!");
                     copySemantics(variableInstance, parentVariableInstance, parameterAssignment);
                 }
 
@@ -487,10 +519,12 @@ public class Main {
 
                 // TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
 
-                String inValue = variableInstance.getElement("IN").getValue();
-                // System.out.println("IN: " + inValue);
+                System.out.println("TON: " + variableInstance.getName());
 
-                VariableInstance outputVariableInstance = variableInstance.getElement("Q");
+                String inValue = variableInstance.getElement("IN").getValue();
+                System.out.println("IN: " + inValue);
+
+                // VariableInstance outputVariableInstance = variableInstance.getElement("Q");
 
                 variableInstance.getElement("PT").getValue();
 
@@ -546,7 +580,6 @@ public class Main {
                     String variableAsString = assignmentStatement.getVariable();
 
                     // find the variable that is assigned a new value
-                    // System.out.println("" + variableSplit);
                     String[] variableSplit = variableAsString.split("\\.");
                     VariableInstance target = variableInstance;
                     for (int i = 0; i < variableSplit.length; i++) {
@@ -566,11 +599,11 @@ public class Main {
                         throw new RuntimeException("");
                     }
 
-                    // DEBUG
-                    System.out.println(target.getName());
-                    if (target.getName().equals("Stoerung")) {
-                        System.out.println("test");
-                    }
+                    // // DEBUG
+                    // System.out.println(target.getName());
+                    // if (target.getName().equals("Stoerung")) {
+                    // System.out.println("test");
+                    // }
 
                     // find the value to assign
                     VariableInstance source = variableInstance;
@@ -625,8 +658,8 @@ public class Main {
             VariableInstance tempCurr = source.getElement(path);
 
             if (tempCurr == null) {
-                System.out.println(tempCurr);
-    
+                // System.out.println(tempCurr);
+
                 throw new RuntimeException("Cannot find \"" + path + "\" in \""
                         + source.getName() + "\"");
             }
@@ -634,11 +667,11 @@ public class Main {
             source = tempCurr;
         }
 
-        //VariableInstance source = curr.getElement();
+        // VariableInstance source = curr.getElement();
         // System.out.println(source);
 
         if (source == null) {
-            System.out.println(source);
+            // System.out.println(source);
 
             throw new RuntimeException("Cannot find \"" + parameterAssignment.getValue() + "\" in \""
                     + parentVariableInstance.getName() + "\"");
@@ -687,12 +720,39 @@ public class Main {
                 temp = expression.getExpressionList().get(1);
                 VariableInstance rhsVariableInstance = evaluateExpression(source, temp);
 
-                // System.out.println(lhsVariableInstance.getValue());
-                // System.out.println(rhsVariableInstance.getValue());
+                System.out.println("AND");
+                System.out.println(lhsVariableInstance.getName() + " " +
+                lhsVariableInstance.getValue());
+                System.out.println(rhsVariableInstance.getName() + " " +
+                rhsVariableInstance.getValue());
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
                         & Boolean.parseBoolean(rhsVariableInstance.getValue());
-                // System.out.println(result);
+
+                System.out.println("Result: " + result);
+
+                VariableInstance variableInstance = new VariableInstance();
+                variableInstance.setValue(Boolean.toString(result));
+
+                return variableInstance;
+            }
+
+            case OR: {
+                Expression temp = expression.getExpressionList().get(0);
+                VariableInstance lhsVariableInstance = evaluateExpression(source, temp);
+                temp = expression.getExpressionList().get(1);
+                VariableInstance rhsVariableInstance = evaluateExpression(source, temp);
+
+                // System.out.println("OR");
+                // System.out.println(lhsVariableInstance.getName() + " " +
+                // lhsVariableInstance.getValue());
+                // System.out.println(rhsVariableInstance.getName() + " " +
+                // rhsVariableInstance.getValue());
+
+                boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
+                        || Boolean.parseBoolean(rhsVariableInstance.getValue());
+
+                // System.out.println("Result: " + result);
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));
@@ -722,7 +782,7 @@ public class Main {
 
     private static VariableInstance instantiateStruct(Struct structToCreate, TypeScope globalTypeScope,
             ProgramInstance programInstance) {
-        
+
         VariableInstance variableInstance = new VariableInstance();
         variableInstance.setDataType(structToCreate);
 
@@ -733,11 +793,11 @@ public class Main {
             Field entry = mapEntry.getValue();
 
             // if (entry.isExternal()) {
-            //     throw new RuntimeException("Not implemented yet!");
+            // throw new RuntimeException("Not implemented yet!");
             // }
 
             // if (entry.isInOut()) {
-            //     System.out.println("isInOut");
+            // System.out.println("isInOut");
             // }
 
             if (entry.getDataType() instanceof FunctionBlock) {

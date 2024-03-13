@@ -13,6 +13,7 @@ import com.st.grammar.StructuredTextParser.Fixed_pointContext;
 import com.st.grammar.StructuredTextParser.IntegerContext;
 import com.st.grammar.StructuredTextParser.MillisecondsContext;
 import com.st.grammar.StructuredTextParser.Param_assignmentContext;
+import com.st.grammar.StructuredTextParser.Xor_expressionContext;
 
 import model.AssignmentStatement;
 import model.DataType;
@@ -281,7 +282,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         String variableName = ctx.getStart().getText();
         variable.setName(variableName);
 
-        System.out.println(ctx.temp_var_decl().getText());
+        // System.out.println(ctx.temp_var_decl().getText());
 
         // String simpleSpecification = ctx.simple_specification().getText();
         // dataType = globalTypeScope.retrieveDataTypeByTypeName(simpleSpecification);
@@ -332,6 +333,37 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // forget all expression because the expression part of a assignment starts
         // and we only want expression expressions here
         expressionList.clear();
+    }
+
+    @Override
+    public void exitExpression(StructuredTextParser.ExpressionContext ctx) {
+
+        final String literal = ctx.getStart().getText();
+
+        if (StringUtils.equalsIgnoreCase(literal, "or")) {
+
+            Expression orExpression = new Expression();
+            orExpression.setExpressionType(ExpressionType.OR);
+
+            Expression lhs = new Expression();
+            Xor_expressionContext lhsXor_expressionContext = ctx.xor_expression(0);
+            // System.out.println(lhsComparisonContext.getText());
+            lhs.setVariableNameValue(lhsXor_expressionContext.getText());
+            lhs.setExpressionType(ExpressionType.VARIABLE_NAME);
+            orExpression.getExpressionList().add(lhs);
+
+            Expression rhs = new Expression();
+            Xor_expressionContext rhsXor_expressionContext = ctx.xor_expression(1);
+            // System.out.println(rhsComparisonContext.getText());
+            rhs.setVariableNameValue(rhsXor_expressionContext.getText());
+            rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
+            orExpression.getExpressionList().add(rhs);
+
+            expressionList.clear();
+            // expressionList.add(expression);
+            expressionList.add(orExpression);
+
+        }
     }
 
     @Override
@@ -482,8 +514,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         if (StringUtils.equalsIgnoreCase(literal, "and")) {
 
-            // Expression expression = expressionList.get(0);
-
             Expression andExpression = new Expression();
             andExpression.setExpressionType(ExpressionType.AND);
 
@@ -504,6 +534,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             expressionList.clear();
             // expressionList.add(expression);
             expressionList.add(andExpression);
+
         }
     }
 

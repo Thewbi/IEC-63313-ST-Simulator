@@ -27,13 +27,16 @@ FUNCTION_BLOCK AKT_5_2_MV
   END_VAR
   VAR
     SR0 : SR;
+    SR1 : SR;
   END_VAR
   VAR_OUTPUT
+    s_MV_P1_FF : BOOL;
     s_MV_P2_FF : BOOL;
   END_VAR
   VAR
     DebugBoolean : BOOL;
     TON0 : TON;
+    TON1 : TON;
   END_VAR
   VAR CONSTANT
     const_T_Laufzeit_P2 : TIME := T#10s;
@@ -44,12 +47,14 @@ FUNCTION_BLOCK AKT_5_2_MV
   END_VAR
   VAR
     RS0 : RS;
+    RS1 : RS;
   END_VAR
   VAR_INPUT
     F_LZ_P2 : RS;
   END_VAR
   VAR_OUTPUT
     F_LZ_P3 : BOOL;
+    F_LZ_P4 : BOOL;
   END_VAR
   VAR_IN_OUT
     Diag : Diag;
@@ -59,19 +64,40 @@ FUNCTION_BLOCK AKT_5_2_MV
     _TMP_AND9_OUT : BOOL;
     _TMP_NOT17_OUT : BOOL;
     _TMP_AND15_OUT : BOOL;
+    _TMP_OR30_OUT : BOOL;
+    _TMP_NOT2_OUT : BOOL;
+    _TMP_AND19_OUT : BOOL;
+    _TMP_AND18_OUT : BOOL;
+    _TMP_AND36_OUT : BOOL;
   END_VAR
 
   _TMP_AND6_OUT := AND(status.BART_Hand, Hand_P2);
   _TMP_AND9_OUT := AND(status.BART_Hand, Hand_P1);
   SR0(S1 := _TMP_AND6_OUT, R := _TMP_AND9_OUT);
   s_MV_P2_FF := SR0.Q1;
+
   _TMP_NOT17_OUT := NOT(SEN_P2);
   _TMP_AND15_OUT := AND(_TMP_NOT17_OUT, Hand_P2);
   TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
-  RS0(S := TON0.Q);
+  RS0(S := TON0.Q);  
+
+  _TMP_NOT2_OUT := NOT(SEN_P1);
+  _TMP_AND19_OUT := AND(_TMP_NOT2_OUT, Hand_P1);
+  TON1(IN := _TMP_AND19_OUT, PT := const_T_Laufzeit_P2);
+  RS1(S := TON1.Q);
+
   F_LZ_P3 := RS0.Q1;
-  Diag.Stoerung := F_LZ_P3;
+  _TMP_OR30_OUT := OR(F_LZ_P3, F_LZ_P4);
+  Diag.Stoerung := _TMP_OR30_OUT;
+
+  F_LZ_P4 := RS1.Q1;
+  _TMP_AND18_OUT := AND(status.BART_Hand, Hand_P1);
+  _TMP_AND36_OUT := AND(status.BART_Hand, Hand_P2);
+  SR1(S1 := _TMP_AND18_OUT, R := _TMP_AND36_OUT);
+  s_MV_P1_FF := SR1.Q1;
+
 END_FUNCTION_BLOCK
+
 /*
 FUNCTION FA_SERV : BOOL
   VAR_INPUT
@@ -91,6 +117,7 @@ FUNCTION FA_SERV : BOOL
   status.NotHalt := NotHalt;
 END_FUNCTION
 */
+
 PROGRAM program0_POU
   VAR
     FA_Start_T_HMI : BOOL;
@@ -113,7 +140,7 @@ PROGRAM program0_POU
     Zyl1_T_P1_HMI : BOOL;
     Zyl1_T_P2_HMI : BOOL;
     s_MV_P2_FF : BOOL;
-    SEN_P1_T_HMI : BOOL := TRUE;
+    SEN_P1_T_HMI : BOOL := FALSE;
     SEN_P2_T_HMI : BOOL := FALSE;
     Diag : Diag;
     _TMP_FA_SERV1_OUT : BOOL;
