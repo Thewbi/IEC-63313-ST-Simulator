@@ -48,6 +48,7 @@ import model.SubprogramControlStatement;
 import model.TimeDataType;
 import model.TypeScope;
 import model.UIntDataType;
+import model.VarScope;
 import model.Variable;
 
 import javax.swing.*;
@@ -55,8 +56,6 @@ import javax.swing.*;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-
-        
 
         System.out.println("Start");
 
@@ -96,9 +95,10 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\small_program.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -109,8 +109,10 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\type_bool_struct.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_simple.st";
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_simple.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
@@ -127,7 +129,7 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        //debugOutputAST(root);
+        // debugOutputAST(root);
         execute(root);
 
         System.out.println("");
@@ -205,7 +207,7 @@ public class Main {
     }
 
     private static void executeParsedObjects(TypeScope globalTypeScope, ModelCreatorASTListener listener) {
-        
+
         //
         // Instantiation
         //
@@ -273,7 +275,7 @@ public class Main {
                 if (entry.getDataType() instanceof FunctionBlock) {
 
                     VariableInstance variableInstance = instantiateFunctionBlock((FunctionBlock) entry.getDataType(),
-                            globalTypeScope);
+                            globalTypeScope, programInstance);
                     variableInstance.setName(entry.getName());
                     programInstance.addElement(variableInstance);
 
@@ -305,7 +307,7 @@ public class Main {
         JFrame meinJFrame = new JFrame();
         meinJFrame.setTitle("JButton Beispiel");
         JPanel panel = new JPanel();
- 
+
         // JButton mit Text "Drück mich" wird erstellt
         JButton buttonP2 = new JButton("P2");
         buttonP2.addActionListener(new ActionListener() {
@@ -316,7 +318,7 @@ public class Main {
                 VariableInstance buttonP2 = programInstance.getElement("Zyl1_T_P2_HMI");
                 buttonP2.setValue("true");
             }
-            
+
         });
 
         panel.add(buttonP2);
@@ -330,21 +332,19 @@ public class Main {
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
                 senP2.setValue("true");
             }
-            
+
         });
- 
+
         // JButton wird dem Panel hinzugefügt
         panel.add(buttonSensorP2);
- 
+
         meinJFrame.add(panel);
- 
-        // Fenstergröße wird so angepasst, dass 
-        // der Inhalt reinpasst    
+
+        // Fenstergröße wird so angepasst, dass
+        // der Inhalt reinpasst
         meinJFrame.pack();
- 
+
         meinJFrame.setVisible(true);
-
-
 
         //
         // execution
@@ -356,9 +356,9 @@ public class Main {
 
             // // DEBUG - prevent TON timeout
             // if (step == 3) {
-            //     System.out.println("TON turn off");
-            //     VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
-            //     senP2.setValue("true");
+            // System.out.println("TON turn off");
+            // VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+            // senP2.setValue("true");
             // }
 
             executeStatements(programInstance, null, null);
@@ -389,29 +389,22 @@ public class Main {
 
         if (parentVariableInstance != null && CollectionUtils.isNotEmpty(parameterAssignments)) {
 
+            DataType dataType = variableInstance.getDataType();
+            VarScope varScope = (VarScope) dataType;
+
             for (ParameterAssignment parameterAssignment : parameterAssignments) {
 
-                // System.out.println(parameterAssignment);
+                Variable variableFromDataType = varScope.getVariableByName(parameterAssignment.getParameterName());
 
-                VariableInstance target = variableInstance.getElement(parameterAssignment.getParameterName());
-                // System.out.println(target);
+                if (variableFromDataType != null && variableFromDataType.isInOut()) {
+                    System.out.println("Reference Semantics!");
 
-                VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
-                // System.out.println(source);
+                    VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
 
-                target.setValue(source.getValue());
-
-                for (Map.Entry<String, VariableDescriptor> entry : source.getElements().entrySet()) {
-
-                    VariableDescriptor sourceDescriptor = entry.getValue();
-                    VariableInstance sourceElement = sourceDescriptor.variableInstance;
-                    // System.out.println(sourceElement);
-
-                    VariableInstance targetElement = target.getElement(sourceElement.getName());
-                    // System.out.println(targetElement);
-
-                    // copy the value
-                    targetElement.setValue(sourceElement.getValue());
+                    variableInstance.setElement(parameterAssignment.getParameterName(), source);
+                } else {
+                    System.out.println("Copy Semantics!");
+                    copySemantics(variableInstance, parentVariableInstance, parameterAssignment);
                 }
 
             }
@@ -576,6 +569,32 @@ public class Main {
         }
     }
 
+    private static void copySemantics(VariableInstance variableInstance, VariableInstance parentVariableInstance,
+            ParameterAssignment parameterAssignment) {
+        // System.out.println(parameterAssignment);
+
+        VariableInstance target = variableInstance.getElement(parameterAssignment.getParameterName());
+        // System.out.println(target);
+
+        VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
+        // System.out.println(source);
+
+        target.setValue(source.getValue());
+
+        for (Map.Entry<String, VariableDescriptor> entry : source.getElements().entrySet()) {
+
+            VariableDescriptor sourceDescriptor = entry.getValue();
+            VariableInstance sourceElement = sourceDescriptor.variableInstance;
+            // System.out.println(sourceElement);
+
+            VariableInstance targetElement = target.getElement(sourceElement.getName());
+            // System.out.println(targetElement);
+
+            // copy the value
+            targetElement.setValue(sourceElement.getValue());
+        }
+    }
+
     private static VariableInstance evaluateExpression(VariableInstance source, Expression expression) {
 
         switch (expression.getExpressionType()) {
@@ -585,14 +604,14 @@ public class Main {
                 VariableInstance target = source;
                 for (int i = 0; i < variableSplit.length; i++) {
                     VariableInstance oldTarget = target;
-                    target = target.getElement(variableSplit[i]);
-                    if (target == null) {
-
+                    VariableInstance tempTarget = target.getElement(variableSplit[i]);
+                    if (tempTarget == null) {
                         String msg = "Cannot find \"" + variableSplit[i] + "\" in " + oldTarget.getName()
                                 + " " + oldTarget.getDataType();
                         System.out.println(msg);
                         throw new RuntimeException(msg);
                     }
+                    target = tempTarget;
                 }
 
                 return target;
@@ -636,7 +655,8 @@ public class Main {
         }
     }
 
-    private static VariableInstance instantiateFunctionBlock(FunctionBlock functionBlock, TypeScope globalTypeScope) {
+    private static VariableInstance instantiateFunctionBlock(FunctionBlock functionBlock, TypeScope globalTypeScope,
+            VariableInstance parentVariableInstance) {
 
         if (StringUtils.equalsIgnoreCase(functionBlock.getName(), "SR")) {
 
@@ -716,53 +736,69 @@ public class Main {
         for (Variable entry : functionBlock.getVariables()) {
 
             if (entry.isExternal()) {
-
                 throw new RuntimeException("Not implemented yet!");
+            }
+
+            if (entry.isInOut()) {
+                System.out.println("isInOut");
+            }
+
+            if (entry.getDataType() instanceof FunctionBlock) {
+
+                VariableInstance fbVariableInstance = instantiateFunctionBlock((FunctionBlock) entry.getDataType(),
+                        globalTypeScope, variableInstance);
+                fbVariableInstance.setName(entry.getName());
+                variableInstance.addElement(fbVariableInstance);
 
             } else {
 
-                if (entry.getDataType() instanceof FunctionBlock) {
+                // if (entry.isInOut()) {
 
-                    VariableInstance fbVariableInstance = instantiateFunctionBlock((FunctionBlock) entry.getDataType(),
-                            globalTypeScope);
-                    fbVariableInstance.setName(entry.getName());
-                    variableInstance.addElement(fbVariableInstance);
+                // // Variable is an inout variable and as such has reference semantics.
+                // // It is taken as a reference from the outer scope
 
-                } else {
+                // VariableInstance inOutRef =
+                // parentVariableInstance.getElement(entry.getName());
+                // variableInstance.addElement(inOutRef);
 
-                    VariableInstance simpleVariableInstance = new VariableInstance();
-                    simpleVariableInstance.setName(entry.getName());
-                    simpleVariableInstance.setDataType(entry.getDataType());
+                // } else {
 
-                    if (entry.getDataType() instanceof Struct) {
+                // normal variables (non-inout) are instantiated as local variables
 
-                        Struct struct = (Struct) entry.getDataType();
-                        for (Map.Entry<String, Field> mapEntry : struct.getFields().entrySet()) {
+                VariableInstance simpleVariableInstance = new VariableInstance();
+                simpleVariableInstance.setName(entry.getName());
+                simpleVariableInstance.setDataType(entry.getDataType());
 
-                            Field field = mapEntry.getValue();
+                if (entry.getDataType() instanceof Struct) {
 
-                            VariableInstance structField = new VariableInstance();
-                            structField.setName(field.getName());
-                            structField.setDataType(field.getDataType());
-                            if (StringUtils.isNotBlank(field.getInitialValue())) {
-                                structField.setValue(field.getInitialValue());
-                            }
+                    Struct struct = (Struct) entry.getDataType();
+                    for (Map.Entry<String, Field> mapEntry : struct.getFields().entrySet()) {
 
-                            simpleVariableInstance.addElement(structField);
+                        Field field = mapEntry.getValue();
+
+                        VariableInstance structField = new VariableInstance();
+                        structField.setName(field.getName());
+                        structField.setDataType(field.getDataType());
+                        if (StringUtils.isNotBlank(field.getInitialValue())) {
+                            structField.setValue(field.getInitialValue());
                         }
 
+                        simpleVariableInstance.addElement(structField);
                     }
 
-                    // initial / default value
-                    if (StringUtils.isNotBlank(entry.getInitialValue())) {
-                        simpleVariableInstance.setValue(entry.getInitialValue());
-                    } else {
-                        simpleVariableInstance.setValue((String) entry.getDataType().getDefaultValue());
-                    }
-
-                    variableInstance.addElement(simpleVariableInstance);
                 }
+
+                // initial / default value
+                if (StringUtils.isNotBlank(entry.getInitialValue())) {
+                    simpleVariableInstance.setValue(entry.getInitialValue());
+                } else {
+                    simpleVariableInstance.setValue((String) entry.getDataType().getDefaultValue());
+                }
+
+                variableInstance.addElement(simpleVariableInstance);
+
             }
+            // }
         }
 
         return variableInstance;

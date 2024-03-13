@@ -39,6 +39,16 @@ public class VariableInstance {
         elements.put(element.getName(), variableDescriptor);
     }
 
+    public void setElement(String parameterName, VariableInstance variableInstance) {
+
+        VariableDescriptor variableDescriptor = new VariableDescriptor();
+        variableDescriptor.variableInstance = variableInstance;
+        variableDescriptor.retain = false;
+        variableDescriptor.external = false;
+
+        elements.put(parameterName, variableDescriptor);
+    }
+
     public VariableInstance getElement(String name) {
         if (!elements.containsKey(name)) {
             return null;

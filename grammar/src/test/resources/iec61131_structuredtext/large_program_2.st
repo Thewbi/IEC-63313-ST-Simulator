@@ -10,10 +10,13 @@ TYPE
 END_TYPE
 
 FUNCTION_BLOCK AKT_5_2_MV
+    /**/
   VAR_IN_OUT
     status : S_FA_STATUS;
   END_VAR
+  
   VAR_INPUT
+    //status : S_FA_STATUS;
     Hand_P1 : BOOL;
     Hand_P2 : BOOL;
   END_VAR

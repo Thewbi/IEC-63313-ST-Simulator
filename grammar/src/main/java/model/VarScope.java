@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
@@ -11,6 +12,21 @@ public class VarScope extends DataType {
     private List<Variable> variables = new ArrayList<>();
 
     private List<Statement> statements = new ArrayList<>();
+
+    public Variable getVariableByName(String name) {
+
+        if (CollectionUtils.isEmpty(variables)) {
+            return null;
+        }
+
+        for (Variable variable : variables) {
+            if (StringUtils.equalsIgnoreCase(variable.getName(), name)) {
+                return variable;
+            }
+        }
+
+        return null;
+    }
 
     @Override
     public String toString() {

@@ -14,7 +14,7 @@ public class Variable {
 
     @Override
     public String toString() {
-        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + " inOut: "
+        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + ", inOut: "
                 + inOut + "]";
     }
 
