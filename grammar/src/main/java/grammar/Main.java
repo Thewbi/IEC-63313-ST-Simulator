@@ -98,7 +98,10 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
+
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -437,16 +440,16 @@ public class Main {
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "RS")) {
 
-                boolean s1 = Boolean.parseBoolean(variableInstance.getElement("S1").getValue());
-                boolean r = Boolean.parseBoolean(variableInstance.getElement("R").getValue());
+                boolean s = Boolean.parseBoolean(variableInstance.getElement("S").getValue());
+                boolean r1 = Boolean.parseBoolean(variableInstance.getElement("R1").getValue());
 
                 boolean newValue = false;
 
                 // implement set dominance by putting the set operation last
-                if (r) {
+                if (r1) {
                     newValue = false;
                 }
-                if (s1) {
+                if (s) {
                     newValue = true;
                 }
 
@@ -576,8 +579,32 @@ public class Main {
         VariableInstance target = variableInstance.getElement(parameterAssignment.getParameterName());
         // System.out.println(target);
 
-        VariableInstance source = parentVariableInstance.getElement(parameterAssignment.getValue());
+        String pathToObject = parameterAssignment.getValue();
+        String[] pathToObjectSplit = StringUtils.split(pathToObject, "\\.");
+
+        VariableInstance source = parentVariableInstance;
+        for (String path : pathToObjectSplit) {
+            VariableInstance tempCurr = source.getElement(path);
+
+            if (tempCurr == null) {
+                System.out.println(tempCurr);
+    
+                throw new RuntimeException("Cannot find \"" + path + "\" in \""
+                        + source.getName() + "\"");
+            }
+
+            source = tempCurr;
+        }
+
+        //VariableInstance source = curr.getElement();
         // System.out.println(source);
+
+        if (source == null) {
+            System.out.println(source);
+
+            throw new RuntimeException("Cannot find \"" + parameterAssignment.getValue() + "\" in \""
+                    + parentVariableInstance.getName() + "\"");
+        }
 
         target.setValue(source.getValue());
 
@@ -691,7 +718,27 @@ public class Main {
             VariableInstance variableInstance = new RSVariableInstance();
             variableInstance.setDataType(functionBlock);
 
-            throw new RuntimeException("Basic Functionblock RS not implemented yet!");
+            // the stored value from the last iteration
+            VariableInstance currentValueVariableInstance = new VariableInstance();
+            currentValueVariableInstance.setName("Q1");
+            currentValueVariableInstance.setDataType(globalTypeScope.get("BOOL"));
+            boolean retain = false;
+            boolean external = false;
+            variableInstance.addElement(currentValueVariableInstance, retain, external);
+
+            // the value presented at the set input during the current iteration
+            VariableInstance setValueVariableInstance = new VariableInstance();
+            setValueVariableInstance.setName("S");
+            setValueVariableInstance.setDataType(globalTypeScope.get("BOOL"));
+            variableInstance.addElement(setValueVariableInstance);
+
+            // the value presented at the reset input during the current iteration
+            VariableInstance resetValueVariableInstance = new VariableInstance();
+            resetValueVariableInstance.setName("R1");
+            resetValueVariableInstance.setDataType(globalTypeScope.get("BOOL"));
+            variableInstance.addElement(resetValueVariableInstance);
+
+            return variableInstance;
         }
 
         if (StringUtils.equalsIgnoreCase(functionBlock.getName(), "TON")) {
