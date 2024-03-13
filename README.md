@@ -177,3 +177,15 @@ If they form a falling edge, the timer is stopped and reset to 0.
 The TON function block has to now retain the current input for the next cycle.
 The timer is read and the input time configuration is read. If the time on the timer is greater 
 then the configured time of the TON function block, then the output goes high.
+
+
+# Next Steps
+
+1. Move code out of main into TONVariableInstance as much as possible.
+2. In OpenPLC editor, add Laufzeitüberwachung to P1
+3. In OpenPLC editor, combine both laufzeitüberwachungsfehler into a system error status and display it on the GUI
+4. Add failure quittierung
+5. Add checking for collisions
+6. Add workflows
+7. Make the ampel work
+8. Add parsing of functions (!= function blocks)

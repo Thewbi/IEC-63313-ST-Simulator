@@ -10,13 +10,17 @@ public class Variable {
 
     private boolean external;
 
+    private boolean inOut;
+
     @Override
     public String toString() {
-        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + "]";
+        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + " inOut: "
+                + inOut + "]";
     }
 
     public Object toShortString() {
-        return "Variable [name=" + name + ", dataType=" + dataType.getName() + ", initialValue=" + initialValue + "]";
+        return "Variable [name=" + name + ", dataType=" + dataType.getName() + ", initialValue=" + initialValue
+                + " inOut: " + inOut + "]";
     }
 
     public String getName() {
@@ -50,5 +54,13 @@ public class Variable {
     public void setExternal(boolean external) {
         this.external = external;
     }
-    
+
+    public boolean isInOut() {
+        return inOut;
+    }
+
+    public void setInOut(boolean inOut) {
+        this.inOut = inOut;
+    }
+
 }

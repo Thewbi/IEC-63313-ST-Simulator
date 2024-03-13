@@ -1,5 +1,7 @@
 package grammar;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.Map;
 import java.util.List;
@@ -45,11 +47,16 @@ import model.Struct;
 import model.SubprogramControlStatement;
 import model.TimeDataType;
 import model.TypeScope;
+import model.UIntDataType;
 import model.Variable;
+
+import javax.swing.*;
 
 public class Main {
 
     public static void main(String[] args) throws IOException {
+
+        
 
         System.out.println("Start");
 
@@ -79,19 +86,31 @@ public class Main {
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\assignment.st";
+
         // String pathAsString =
         // "C:/Users/U5353/Documents/OpenPLC/OpenPLC_Editor_TestProject/generated_st_code.st";
+
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\self_contained_program.st";
+
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\small_program.st";
+
         String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program.st";
+
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_2.st";
+
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
+
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration_with_variables.st";
+
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\type_bool_struct.st";
+
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_simple.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
@@ -108,7 +127,24 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        // ASTListener listener = new ASTListener();
+        //debugOutputAST(root);
+        execute(root);
+
+        System.out.println("");
+    }
+
+    private static void debugOutputAST(Compilation_unitContext root) {
+        ASTListener listener = new ASTListener();
+
+        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
+
+        // Create a generic parse tree walker that can trigger callbacks
+        final ParseTreeWalker walker = new ParseTreeWalker();
+        // Walk the tree created during the parse, trigger callbacks
+        walker.walk(listener, root);
+    }
+
+    private static void execute(Compilation_unitContext root) {
 
         TypeScope globalTypeScope = new TypeScope();
 
@@ -116,6 +152,11 @@ public class Main {
         DataType boolDataType = new BooleanDataType();
         boolDataType.setName("BOOL");
         globalTypeScope.addType(boolDataType.getName(), boolDataType);
+
+        // UINT
+        DataType uIntDataType = new UIntDataType();
+        uIntDataType.setName("UINT");
+        globalTypeScope.addType(uIntDataType.getName(), uIntDataType);
 
         // SR FlipFlop (reset precedence)
         DataType srDataType = new FunctionBlock();
@@ -141,31 +182,30 @@ public class Main {
         ModelCreatorASTListener listener = new ModelCreatorASTListener();
         listener.setGlobalTypeScope(globalTypeScope);
 
-        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-
         // Create a generic parse tree walker that can trigger callbacks
         final ParseTreeWalker walker = new ParseTreeWalker();
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
-        // // dump output
-        // Node rootNode = listener.getRootNode();
-        // rootNode.print(0);
+        outputItems(listener);
 
-        // System.out.println();
+        executeParsedObjects(globalTypeScope, listener);
+    }
 
-        boolean outputItems = false;
-        if (outputItems) {
-            System.out.println("\nTypes");
-            System.out.println(listener.globalTypeScope);
+    private static void outputItems(ModelCreatorASTListener listener) {
 
-            System.out.println("\nProgram");
-            System.out.println(listener.program);
+        System.out.println("\nTypes");
+        System.out.println(listener.globalTypeScope);
 
-            System.out.println("\nConfiguration");
-            System.out.println(listener.configuration);
-        }
+        System.out.println("\nProgram");
+        System.out.println(listener.program);
 
+        System.out.println("\nConfiguration");
+        System.out.println(listener.configuration);
+    }
+
+    private static void executeParsedObjects(TypeScope globalTypeScope, ModelCreatorASTListener listener) {
+        
         //
         // Instantiation
         //
@@ -178,6 +218,8 @@ public class Main {
         globalStatusVariableInstance.setName("global_status");
         globalStatusVariableInstance.setDataType(sFaStatusDataType);
 
+        // instantiate function blocks in S_FA_STATUS
+        // set fields of S_FA_STATUS to default / initial values
         for (Map.Entry<String, Field> entry : sFaStatusDataType.getFields().entrySet()) {
 
             Field field = entry.getValue();
@@ -257,10 +299,58 @@ public class Main {
         programInstance.getStatements().addAll(listener.program.getStatements());
 
         //
+        // GUI
+        //
+
+        JFrame meinJFrame = new JFrame();
+        meinJFrame.setTitle("JButton Beispiel");
+        JPanel panel = new JPanel();
+ 
+        // JButton mit Text "Drück mich" wird erstellt
+        JButton buttonP2 = new JButton("P2");
+        buttonP2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // user has requested the cylinder move to P2
+                VariableInstance buttonP2 = programInstance.getElement("Zyl1_T_P2_HMI");
+                buttonP2.setValue("true");
+            }
+            
+        });
+
+        panel.add(buttonP2);
+
+        JButton buttonSensorP2 = new JButton("Sensor P2");
+        buttonSensorP2.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                // pneumatic cylinder arrived at P2 and sensor P2 sends high signal
+                VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+                senP2.setValue("true");
+            }
+            
+        });
+ 
+        // JButton wird dem Panel hinzugefügt
+        panel.add(buttonSensorP2);
+ 
+        meinJFrame.add(panel);
+ 
+        // Fenstergröße wird so angepasst, dass 
+        // der Inhalt reinpasst    
+        meinJFrame.pack();
+ 
+        meinJFrame.setVisible(true);
+
+
+
+        //
         // execution
         //
 
-        for (int step = 0; step < 5; step++) {
+        for (int step = 0; step < 500; step++) {
 
             System.out.println("step " + step);
 
@@ -273,6 +363,10 @@ public class Main {
 
             executeStatements(programInstance, null, null);
 
+            // DEBUG output global status struct
+            VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
+            System.out.println(stoerung.getName() + " " + stoerung.getValue());
+
             try {
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
@@ -280,8 +374,6 @@ public class Main {
             }
 
         }
-
-        System.out.println("");
     }
 
     private static void executeStatements(VariableInstance variableInstance, VariableInstance parentVariableInstance,
@@ -420,7 +512,7 @@ public class Main {
         }
 
         //
-        // execute statements if any
+        // execute statements
         //
 
         for (Statement statement : variableInstance.getStatements()) {
@@ -439,6 +531,12 @@ public class Main {
                         target = target.getElement(variableSplit[i]);
                     }
                     // System.out.println(target);
+
+                    // DEBUG
+                    System.out.println(target.getName());
+                    if (target.getName().equals("Stoerung")) {
+                        System.out.println("test");
+                    }
 
                     // find the value to assign
                     VariableInstance source = variableInstance;
@@ -752,13 +850,7 @@ public class Main {
         // Function_block_declarationContext root = parser.function_block_declaration();
         Compilation_unitContext root = parser.compilation_unit();
 
-        ASTListener listener = new ASTListener();
-        // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
-
-        // // Create a generic parse tree walker that can trigger callbacks
-        final ParseTreeWalker walker = new ParseTreeWalker();
-        // Walk the tree created during the parse, trigger callbacks
-        walker.walk(listener, root);
+        debugOutputAST(root);
 
         // // dump output
         // Node rootNode = listener.getRootNode();

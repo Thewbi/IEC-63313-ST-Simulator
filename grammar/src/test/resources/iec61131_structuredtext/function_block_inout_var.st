@@ -1,0 +1,13 @@
+FUNCTION_BLOCK FNC_BLK
+
+  VAR_IN_OUT
+    var_1 : BOOL;
+    var_2 : BOOL;
+  END_VAR
+
+  VAR_INPUT
+    var_3 : UINT;
+    var_4 : UINT;
+  END_VAR
+
+END_FUNCTION_BLOCK

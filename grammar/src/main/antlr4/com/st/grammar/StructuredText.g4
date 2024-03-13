@@ -570,12 +570,67 @@ io_var_declarations:
 	input_declarations
 	|
 	output_declarations
+    |
+    input_output_declarations
 	;
+
+//input_output_declarations ::= ’VAR_IN_OUT’ var_declaration ’;’ {var_declaration ’;’} ’END_VAR’
+input_output_declarations:
+    VAR_IN_OUT
+    ( var_declaration SEMICOLON )*
+    END_VAR
+    ;
+
+// var_declaration ::= temp_var_decl | fb_name_decl
+var_declaration:
+    temp_var_decl 
+    | 
+    fb_name_decl
+    ;
+
+//fb_name_decl ::= fb_name_list ’:’ function_block_type_name [ ’:=’ structure_initialization ]
+fb_name_decl :
+    fb_name_list COLON function_block_type_name ( ':=' structure_initialization )?
+    ;
+
+//fb_name_list ::= fb_name {’,’ fb_name}
+fb_name_list :
+    fb_name ( COMMA fb_name )*
+    ;
+
+// temp_var_decl ::= var1_declaration | array_var_declaration | structured_var_declaration | string_var_declaration
+temp_var_decl:
+    var1_declaration 
+    //| 
+    //array_var_declaration 
+    //| 
+    //structured_var_declaration 
+    //| 
+    //string_var_declaration
+    ;
+
+// var1_declaration ::= var1_list ’:’ (simple_specification | subrange_specification | enumerated_specification)
+var1_declaration:
+    var1_list COLON
+    (
+        simple_specification 
+        //| 
+        //subrange_specification 
+        //| 
+        //enumerated_specification
+    )
+    ;
+
+// array_var_declaration ::= var1_list ’:’ array_specification
+
+// structured_var_declaration ::= var1_list ’:’ structure_type_name
+
+// string_var_declaration ::= single_byte_string_var_declaration | double_byte_string_var_declaration
 	
 // input_declarations ::= 'VAR_INPUT' ['RETAIN' | 'NON_RETAIN'] input_declaration ';' {input_declaration ';'} 'END_VAR'
 input_declarations:
-	VAR_INPUT (RETAIN | NON_RETAIN)?
-	(input_declaration SEMICOLON)*
+	VAR_INPUT ( RETAIN | NON_RETAIN )?
+	( input_declaration SEMICOLON )*
 	END_VAR
 	;
 	
@@ -1406,6 +1461,7 @@ VAR : 'VAR';
 VAR_EXTERNAL : 'VAR_EXTERNAL';
 VAR_INPUT : 'VAR_INPUT';
 VAR_OUTPUT : 'VAR_OUTPUT';
+VAR_IN_OUT : 'VAR_IN_OUT';
 VAR_GLOBAL : 'VAR_GLOBAL';
 
 // ZERO
