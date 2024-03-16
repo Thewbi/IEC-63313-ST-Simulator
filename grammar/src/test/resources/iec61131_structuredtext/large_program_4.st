@@ -218,7 +218,7 @@ CONFIGURATION Config0
     VAR_GLOBAL
       global_status : S_FA_STATUS;
     END_VAR
-    TASK task0(INTERVAL := T#20ms,PRIORITY := 0);
+    TASK task0(INTERVAL := T#20ms, PRIORITY := 0);
     PROGRAM instance0 WITH task0 : program0_POU;
   END_RESOURCE
 END_CONFIGURATION

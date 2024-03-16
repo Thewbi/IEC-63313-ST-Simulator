@@ -7,26 +7,33 @@ import java.util.Stack;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.apache.commons.lang3.StringUtils;
 
+import com.st.grammar.StructuredTextParser.Action_associationContext;
 import com.st.grammar.StructuredTextParser.ComparisonContext;
 import com.st.grammar.StructuredTextParser.Data_sourceContext;
-import com.st.grammar.StructuredTextParser.Fixed_pointContext;
 import com.st.grammar.StructuredTextParser.IntegerContext;
-import com.st.grammar.StructuredTextParser.MillisecondsContext;
 import com.st.grammar.StructuredTextParser.Param_assignmentContext;
+import com.st.grammar.StructuredTextParser.Step_nameContext;
+import com.st.grammar.StructuredTextParser.StepsContext;
+import com.st.grammar.StructuredTextParser.Transition_conditionContext;
 import com.st.grammar.StructuredTextParser.Xor_expressionContext;
 
+import model.Action;
+import model.ActionAssociation;
 import model.AssignmentStatement;
 import model.DataType;
 import model.Expression;
 import model.ExpressionType;
 import model.FunctionBlock;
+import model.FunctionBlockType;
 import model.GlobalScope;
 import model.Program;
 import model.ProgramConfiguration;
 import model.RepeatStatement;
+import model.Step;
 import model.Struct;
 import model.SubprogramControlStatement;
 import model.Task;
+import model.Transition;
 import model.TypeScope;
 import model.VarScope;
 import model.Variable;
@@ -108,20 +115,22 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitSeconds(StructuredTextParser.SecondsContext ctx) {
 
-        Fixed_pointContext fixedPointContext = ctx.fixed_point();
-        if (fixedPointContext != null) {
-            initialValue = fixedPointContext.getText() + " Seconds";
-        }
+        // Fixed_pointContext fixedPointContext = ctx.fixed_point();
+        // if (fixedPointContext != null) {
+        // initialValue = fixedPointContext.getText() + " Seconds";
+        // }
 
-        IntegerContext integerContext = ctx.integer();
-        if (integerContext != null) {
-            initialValue = fixedPointContext.getText() + " Seconds";
-        }
+        // IntegerContext integerContext = ctx.integer();
+        // if (integerContext != null) {
+        // initialValue = fixedPointContext.getText() + " Seconds";
+        // }
 
-        MillisecondsContext millisecondsContext = ctx.milliseconds();
-        if (millisecondsContext != null) {
-            initialValue = fixedPointContext.getText() + " Milliseconds";
-        }
+        // MillisecondsContext millisecondsContext = ctx.milliseconds();
+        // if (millisecondsContext != null) {
+        // initialValue = fixedPointContext.getText() + " Milliseconds";
+        // }
+
+        initialValue = "T#" + ctx.getText();
     }
 
     @Override
@@ -178,10 +187,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
-
-        // System.out.println(program);
-
-        // program = null;
         scopeStack.pop();
     }
 
@@ -646,6 +651,140 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         configuration.setProgramConfiguration(programConfiguration);
     }
+
+    @Override
+    public void exitInitial_step(StructuredTextParser.Initial_stepContext ctx) {
+
+        Step step = new Step();
+        step.setInitial(true);
+
+        String stepName = ctx.step_name().getText();
+        System.out.println("stepName: " + stepName + " (INITIAL STEP)");
+        step.setName(stepName);
+
+        functionBlock.addStep(step.getName(), step);
+
+        for (Action_associationContext action_associationContext : ctx.action_association()) {
+
+            String actionName = action_associationContext.action_name().getText();
+            String actionQualifier = action_associationContext.action_qualifier().getText();
+
+            System.out.println("  actionName: " + actionName);
+            System.out.println("  actionQualifier: " + actionQualifier);
+
+            ActionAssociation actionAssociation = new ActionAssociation();
+            actionAssociation.setName(actionName);
+            actionAssociation.setQualifier(actionQualifier);
+
+            step.getActionAssociations().add(actionAssociation);
+        }
+    }
+
+    @Override
+    public void exitStep(StructuredTextParser.StepContext ctx) {
+
+        Step step = new Step();
+
+        String stepName = ctx.step_name().getText();
+        System.out.println("stepName: " + stepName + " (NORMAL STEP)");
+        step.setName(stepName);
+
+        functionBlock.addStep(step.getName(), step);
+
+        for (Action_associationContext action_associationContext : ctx.action_association()) {
+
+            String actionName = action_associationContext.action_name().getText();
+            String actionQualifier = action_associationContext.action_qualifier().getText();
+
+            System.out.println("  actionName: " + actionName);
+            System.out.println("  actionQualifier: " + actionQualifier);
+
+            ActionAssociation actionAssociation = new ActionAssociation();
+            actionAssociation.setName(actionName);
+            actionAssociation.setQualifier(actionQualifier);
+
+            step.getActionAssociations().add(actionAssociation);
+        }
+    }
+
+    @Override
+    public void exitTransition(StructuredTextParser.TransitionContext ctx) {
+
+        System.out.println("Transition");
+
+        Transition transition = new Transition();
+        functionBlock.getTempTransitions().add(transition);
+
+        if (ctx.transition_name() != null) {
+            String transitionName = ctx.transition_name().getText();
+            System.out.println("  transitionName: " + transitionName);
+
+            transition.setName(transitionName);
+        }
+
+        int stepIndex = 0;
+        for (StepsContext stepsContext : ctx.steps()) {
+
+            List<Step_nameContext> step_nameContext = stepsContext.step_name();
+            for (Step_nameContext Step_nameContext : step_nameContext) {
+
+                String stepName = Step_nameContext.getText();
+                System.out.println("  stepName: " + stepName);
+
+                if (stepIndex == 0) {
+                    transition.setSourceStepName(stepName);
+                } else {
+                    transition.getTargetStepNames().add(stepName);
+                }
+            }
+            stepIndex++;
+        }
+
+        // the transition condition
+        Transition_conditionContext transition_conditionContext = ctx.transition_condition();
+        System.out.println("  transition_conditionContext: " + transition_conditionContext.getText());
+
+        // store transition inte temp list for later insertion into the source action
+        transition.getExpressionList().addAll(expressionList);
+
+        expressionList.clear();
+    }
+
+    @Override
+    public void enterAction(StructuredTextParser.ActionContext ctx) {
+
+        String actionName = ctx.action_name().getText();
+        System.out.println("actionName: " + actionName);
+
+        Action action = new Action();
+        functionBlock.getTempActions().add(action);
+        action.setName(actionName);
+
+        // action is the new scope
+        scopeStack.push(action);
+    }
+
+    @Override
+    public void exitAction(StructuredTextParser.ActionContext ctx) {
+        scopeStack.pop();
+    }
+
+    @Override
+    public void enterSequential_function_chart(StructuredTextParser.Sequential_function_chartContext ctx) {
+
+        // when a sequential function chart node is found, the function block was
+        // created from a
+        // SequentialFunctionChart and the type is updated to qualify the function block
+        // more explicitly
+        functionBlock.setFunctionBlockType(FunctionBlockType.SEQUENTIAL_FUNCTION_CHART);
+    }
+
+    // @Override
+    // public void
+    // exitSequential_function_chart(StructuredTextParser.Sequential_function_chartContext
+    // ctx) {
+    // asdf
+    // }
 
     @Override
     public void visitTerminal(TerminalNode node) {

@@ -3,6 +3,7 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.apache.commons.collections4.MapUtils;
 
 public abstract class DataType {
@@ -13,21 +14,40 @@ public abstract class DataType {
 
     private String initialValue;
 
+    public static void addIndent(StringBuilder stringBuilder, int indent) {
+        for (int i = 0; i < indent; i++) {
+            stringBuilder.append("  ");
+        }
+    }
+
+    public void initialize() {
+        // do nothing
+    }
+
     public Object getDefaultValue() {
         return null;
     }
 
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(name);
 
         if (MapUtils.isNotEmpty(fields)) {
             for (Map.Entry<String, Field> entry : fields.entrySet()) {
-                stringBuilder.append("  ").append(entry.getKey()).append(" = ").append(entry.getValue());
+                addIndent(stringBuilder, indent+1);
+                stringBuilder.append(entry.getKey()).append(" = ").append(entry.getValue().toString(0));
             }
             stringBuilder.append("\n");
-        }
+        } 
+        // else {
+        //     stringBuilder.append("\n");
+        // }
 
         return stringBuilder.toString();
     }
@@ -64,5 +84,4 @@ public abstract class DataType {
     public Map<String, Field> getFields() {
         return fields;
     }
-
 }

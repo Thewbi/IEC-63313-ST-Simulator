@@ -76,6 +76,24 @@ The OpenPLC editor has compilers that can transform the graphical representation
 The editor can save your solution to a .st file and fill that file with structured text that implements 
 your logic.
 
+The OpenPLC editor will first generate a .st file from your diagrams. It will then use the iec2c.exe compiler
+to generate C-Code from IEC 61131-3 languages. The iec2c.exe tends to fail to compile the IEC 61131-3.
+The issue is that whenever the iec2c.exe compiler fails, the OpenPLC editor will not open a dialog that lets
+you download the generated IEC 61131-3 code! If that happens but you are only interested in the IEC 61131-3 code, 
+it is still possible to use the IEC 61131-3 code that the OpenPLC editor has created. You can open a
+intermediate file that are placed in this directory: 
+
+```
+C:\Users\<UserName>\Documents\OpenPLC\<ProjectName>\build
+```
+
+There are two files: generated_plc.st and plc.st. plc.st is the file that is fed to the iec2c.exe compiler
+and plc.st contains a logger and I am not sure if it contains any other additional objects that are added 
+by the OpenPLC editor.
+
+generated_plc.st contains only the objects that the user has created using the OpenPLC editor. 
+generated_plc.st is the file that can be processed by this runtime.
+
 The software in this solution will directly consume ST code and execute it without any intermediate steps.
 For example it would probably easier from the perspective of executing the ST code to first transpile it
 to IL. IL is a more assembler like syntax and a execution environment for IL could be build more easily since
@@ -125,6 +143,16 @@ TODO: What about retained variables?
 * Global variables (defined in the configuration) are retained (they keep their values) over task iterations.
 * External variables have reference semantics (not copy semantics)
 * Local variable are not retained unless they have the 'retained' specifier.
+
+From: https://epub.jku.at/obvulihs/download/pdf/4817795?originalFilename=true
+
+> A IEC 61131-3 function block can execute exactly one algorithm and multiple programs can be executed on a processing facility,
+> which is called resource. Every program is executed by its own thread on the resource,
+> which is depicted as task in Figure 1. Communication between programs is only possible, with global variables or communication function blocks. > Using global variables as
+> communication between programs is a bad practice. It will produce large monolithic
+> applications, that are hard to maintain. Scaling is also challenging with this system
+> model. If parts of a program are to be executed on another resource, it must be split
+> into several parts. This is a complicated task, because the system needs to behave exactly the same after splitting
 
 ## Program Execution
 
@@ -177,6 +205,39 @@ If they form a falling edge, the timer is stopped and reset to 0.
 The TON function block has to now retain the current input for the next cycle.
 The timer is read and the input time configuration is read. If the time on the timer is greater 
 then the configured time of the TON function block, then the output goes high.
+
+
+## SequentialFunctionChart execution
+
+The SequentialFunctionChart that is drawn in the OpenPLC editor is converted to a textual 
+representation in StructuredText by the OpenPLC editor and saved to the plc.st file.
+
+The SequentialFunctionChart is formulated as a function block. The function block is
+executed in the program, which means it is executed on every cycle.
+
+The SequentialFunctionChart function block has
+* variables
+* a list of global actions
+* a list of currently active steps
+
+A step consists of
+* a list of actions
+
+When the SequentialFunctionChart is instantiated
+
+1. the variables are initialized
+2. the initial steps are added to the list of current steps.
+
+When the SequentialFunctionChart function block is executed for the current cycle:
+
+1. all steps in the current step list are executed.
+2. if the current step executes an action using the S qualifier, the action is added to the list
+of global actions of the SequentialFunctionChart function block unless the action is added already.
+3. the global actions of the SequentialFunctionChart function block are executed.
+4. the local actions of all current steps are executed.
+5. All transitions are evaluated. For each transition that is activated
+* the old state is removed from the current step list
+* the new state is added to the current step list
 
 
 # Next Steps

@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 
+import org.antlr.v4.runtime.RuntimeMetaData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -30,37 +31,54 @@ public class VarScope extends DataType {
 
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
 
         StringBuilder stringBuilder = new StringBuilder();
 
+        addIndent(stringBuilder, indent);
         stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + " ");
 
-        stringBuilder.append("\n\n");
-        stringBuilder.append("Variables:");
+        stringBuilder.append("\n");
+        addIndent(stringBuilder, indent+1);
+        stringBuilder.append("Variables: ");
         if (CollectionUtils.isEmpty(getVariables())) {
             stringBuilder.append("No Variables");
         } else {
+            stringBuilder.append("\n");
             for (Variable variable : getVariables()) {
 
                 if (variable.getDataType() instanceof FunctionBlock) {
-                    stringBuilder.append("\n").append(variable.toShortString());
+
+                    // stringBuilder.append("\n");
+                    addIndent(stringBuilder, indent+2);
+                    stringBuilder.append(variable.toShortString());
+
                 } else {
-                    stringBuilder.append("\n").append(variable);
+
+                    // stringBuilder.append("\n");
+                    // addIndent(stringBuilder, indent+2);
+                    stringBuilder.append(variable.toString(indent+2));
                 }
+
+                stringBuilder.append("\n");
             }
         }
 
-        stringBuilder.append("\n\n");
-        stringBuilder.append("Statements:");
+        stringBuilder.append("\n");
+        addIndent(stringBuilder, indent+1);
+        stringBuilder.append("Statements: ");
         if (CollectionUtils.isEmpty(getStatements())) {
             stringBuilder.append("No Statements");
         } else {
+            
             for (Statement statment : getStatements()) {
-                stringBuilder.append("\n").append(statment);
+                stringBuilder.append("\n");
+                stringBuilder.append(statment.toString(indent+2));
             }
         }
-
-        // System.out.println(stringBuilder.toString());
 
         return stringBuilder.toString();
     }

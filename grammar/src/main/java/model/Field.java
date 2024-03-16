@@ -10,6 +10,10 @@ public class Field {
 
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
         return "Field [dataType=" + dataType + ", initialValue=" + initialValue + "]";
     }
 

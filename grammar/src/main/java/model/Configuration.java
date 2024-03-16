@@ -1,5 +1,7 @@
 package model;
 
+import org.antlr.v4.runtime.RuntimeMetaData;
+
 public class Configuration {
 
     private String name;
@@ -8,13 +10,32 @@ public class Configuration {
 
     private ProgramConfiguration programConfiguration;
 
+    public void addIndent(StringBuilder stringBuilder, int indent) {
+        for (int i = 0; i < indent; i++) {
+            stringBuilder.append("  ");
+        }
+    }
+
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Configuration: name: ").append(name);
-        stringBuilder.append("\n").append(task);
-        stringBuilder.append("\n").append(programConfiguration);
+
+        addIndent(stringBuilder, indent);
+
+        stringBuilder.append("Configuration: name: ").append(name).append("\n");
+        
+        addIndent(stringBuilder, indent+1);
+        stringBuilder.append(task);
+        stringBuilder.append("\n");
+
+        addIndent(stringBuilder, indent+1);
+        stringBuilder.append(programConfiguration);
+        stringBuilder.append("\n");
 
         return stringBuilder.toString();
     }

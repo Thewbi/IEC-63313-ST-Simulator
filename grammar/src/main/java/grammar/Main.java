@@ -28,6 +28,7 @@ import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
 import com.st.grammar.StructuredTextParser.Program_declarationContext;
 
+import common.TimeUtils;
 import instance.ConfigurationInstance;
 import instance.ProgramInstance;
 import instance.RSVariableInstance;
@@ -107,7 +108,8 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -122,6 +124,8 @@ public class Main {
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_simple.st";
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
+
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
@@ -198,6 +202,8 @@ public class Main {
         // Walk the tree created during the parse, trigger callbacks
         walker.walk(listener, root);
 
+        listener.globalTypeScope.initialize();
+
         outputItems(listener);
 
         executeParsedObjects(globalTypeScope, listener);
@@ -205,14 +211,16 @@ public class Main {
 
     private static void outputItems(ModelCreatorASTListener listener) {
 
-        System.out.println("\nTypes");
-        System.out.println(listener.globalTypeScope);
+        int indent = 0;
 
-        System.out.println("\nProgram");
-        System.out.println(listener.program);
+        System.out.println("\nTypes\n");
+        System.out.println(listener.globalTypeScope.toString(indent + 1));
 
-        System.out.println("\nConfiguration");
-        System.out.println(listener.configuration);
+        System.out.println("\nProgram\n");
+        System.out.println(listener.program.toString(indent + 1));
+
+        System.out.println("\nConfiguration\n");
+        System.out.println(listener.configuration.toString(indent + 1));
     }
 
     private static void executeParsedObjects(TypeScope globalTypeScope, ModelCreatorASTListener listener) {
@@ -221,49 +229,52 @@ public class Main {
         // Instantiation
         //
 
+        // configuration
+        ConfigurationInstance configurationInstance = new ConfigurationInstance();
+
         TypeScope types = listener.globalTypeScope;
 
         // global_status : S_FA_STATUS;
         DataType sFaStatusDataType = types.get("S_FA_STATUS");
-        VariableInstance globalStatusVariableInstance = new VariableInstance();
-        globalStatusVariableInstance.setName("global_status");
-        globalStatusVariableInstance.setDataType(sFaStatusDataType);
+        if (sFaStatusDataType != null) {
+            VariableInstance globalStatusVariableInstance = new VariableInstance();
+            globalStatusVariableInstance.setName("global_status");
+            globalStatusVariableInstance.setDataType(sFaStatusDataType);
 
-        // instantiate function blocks in S_FA_STATUS
-        // set fields of S_FA_STATUS to default / initial values
-        for (Map.Entry<String, Field> entry : sFaStatusDataType.getFields().entrySet()) {
+            // instantiate function blocks in S_FA_STATUS
+            // set fields of S_FA_STATUS to default / initial values
+            for (Map.Entry<String, Field> entry : sFaStatusDataType.getFields().entrySet()) {
 
-            Field field = entry.getValue();
-            DataType fieldDataType = field.getDataType();
+                Field field = entry.getValue();
+                DataType fieldDataType = field.getDataType();
 
-            VariableInstance fieldVariableInstance = null;
+                VariableInstance fieldVariableInstance = null;
 
-            if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "SR")) {
-                fieldVariableInstance = new SRVariableInstance();
-            } else if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "RS")) {
-                fieldVariableInstance = new RSVariableInstance();
-            } else if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "TON")) {
-                fieldVariableInstance = new TONVariableInstance();
-            } else {
-                fieldVariableInstance = new VariableInstance();
+                if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "SR")) {
+                    fieldVariableInstance = new SRVariableInstance();
+                } else if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "RS")) {
+                    fieldVariableInstance = new RSVariableInstance();
+                } else if (StringUtils.equalsIgnoreCase(fieldDataType.getName(), "TON")) {
+                    fieldVariableInstance = new TONVariableInstance();
+                } else {
+                    fieldVariableInstance = new VariableInstance();
+                }
+
+                fieldVariableInstance.setName(field.getName());
+                fieldVariableInstance.setDataType(field.getDataType());
+
+                // initial / default value
+                if (StringUtils.isNotBlank(field.getInitialValue())) {
+                    fieldVariableInstance.setValue(field.getInitialValue());
+                } else {
+                    fieldVariableInstance.setValue((String) field.getDataType().getDefaultValue());
+                }
+
+                globalStatusVariableInstance.addElement(fieldVariableInstance);
             }
 
-            fieldVariableInstance.setName(field.getName());
-            fieldVariableInstance.setDataType(field.getDataType());
-
-            // initial / default value
-            if (StringUtils.isNotBlank(field.getInitialValue())) {
-                fieldVariableInstance.setValue(field.getInitialValue());
-            } else {
-                fieldVariableInstance.setValue((String) field.getDataType().getDefaultValue());
-            }
-
-            globalStatusVariableInstance.addElement(fieldVariableInstance);
+            configurationInstance.addElement(globalStatusVariableInstance);
         }
-
-        // configuration
-        ConfigurationInstance configurationInstance = new ConfigurationInstance();
-        configurationInstance.addElement(globalStatusVariableInstance);
 
         // program
         Program program = listener.program;
@@ -271,6 +282,7 @@ public class Main {
         ProgramInstance programInstance = new ProgramInstance();
         programInstance.setName(program.getName());
 
+        // instantiate the variables in the program
         for (Variable entry : program.getVariables()) {
 
             if (entry.isExternal()) {
@@ -361,14 +373,16 @@ public class Main {
                 VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
                 hmi.setValue("false");
             }
-            
+
         };
 
         Cylinder cylinder = new Cylinder();
         cylinder.setCylinderCallback(cylinderCallback);
 
-        cylinder.setHasErrorNeverReachesPosition1(true);
-        //cylinder.setHasErrorNeverReachesPosition2(true);
+        // here you can simulate the cylinder never reaching some position
+        //
+        // cylinder.setHasErrorNeverReachesPosition1(true);
+        // cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
         // GUI
@@ -478,9 +492,12 @@ public class Main {
             // GUI (update the gui for example for errors)
             //
 
+            // update the stoerung value in the GUI
             VariableInstance diag = programInstance.getElement("Diag");
-            VariableInstance diagStoerung = diag.getElement("Stoerung");
-            jLabel.setText("Stoerung: " + diagStoerung.getValue());
+            if (diag != null) {
+                VariableInstance diagStoerung = diag.getElement("Stoerung");
+                jLabel.setText("Stoerung: " + diagStoerung.getValue());
+            }
 
             // DEBUG
             // VariableInstance magnetVentil_5_2 =
@@ -575,10 +592,10 @@ public class Main {
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "TON")) {
 
-                //System.out.println("TON: " + variableInstance.getName());
+                // System.out.println("TON: " + variableInstance.getName());
 
                 String inValue = variableInstance.getElement("IN").getValue();
-                //System.out.println("IN: " + inValue);
+                // System.out.println("IN: " + inValue);
 
                 // VariableInstance outputVariableInstance = variableInstance.getElement("Q");
 
@@ -697,25 +714,43 @@ public class Main {
             }
 
         }
+
+        //
+        // execute sequential function chart
+        //
+
+        if (variableInstance.getDataType() instanceof FunctionBlock) {
+            System.out.println("");
+            FunctionBlock functionBlock = (FunctionBlock) variableInstance.getDataType();
+            functionBlock.executeStateMachine();
+        }
     }
 
     private static void copySemantics(VariableInstance variableInstance, VariableInstance parentVariableInstance,
             ParameterAssignment parameterAssignment) {
-        // System.out.println(parameterAssignment);
 
         VariableInstance target = variableInstance.getElement(parameterAssignment.getParameterName());
-        // System.out.println(target);
 
         String pathToObject = parameterAssignment.getValue();
         String[] pathToObjectSplit = StringUtils.split(pathToObject, "\\.");
 
         VariableInstance source = parentVariableInstance;
         for (String path : pathToObjectSplit) {
+
+            // check for constant values
+            if (path.startsWith("T#")) {
+
+                // // convert to millis
+                // long timeInMillis = TimeUtils.timeToMillis(path);
+
+                source = new VariableInstance();
+                // source.setValue(Long.toString(timeInMillis));
+                source.setValue(path);
+                break;
+            }
+
             VariableInstance tempCurr = source.getElement(path);
-
             if (tempCurr == null) {
-                // System.out.println(tempCurr);
-
                 throw new RuntimeException("Cannot find \"" + path + "\" in \""
                         + source.getName() + "\"");
             }
@@ -723,12 +758,7 @@ public class Main {
             source = tempCurr;
         }
 
-        // VariableInstance source = curr.getElement();
-        // System.out.println(source);
-
         if (source == null) {
-            // System.out.println(source);
-
             throw new RuntimeException("Cannot find \"" + parameterAssignment.getValue() + "\" in \""
                     + parentVariableInstance.getName() + "\"");
         }
@@ -739,10 +769,7 @@ public class Main {
 
             VariableDescriptor sourceDescriptor = entry.getValue();
             VariableInstance sourceElement = sourceDescriptor.variableInstance;
-            // System.out.println(sourceElement);
-
             VariableInstance targetElement = target.getElement(sourceElement.getName());
-            // System.out.println(targetElement);
 
             // copy the value
             targetElement.setValue(sourceElement.getValue());

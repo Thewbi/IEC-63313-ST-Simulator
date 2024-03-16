@@ -3,6 +3,8 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.v4.runtime.RuntimeMetaData;
+
 public class SubprogramControlStatement extends Statement {
 
     private String subprogramName;
@@ -27,12 +29,20 @@ public class SubprogramControlStatement extends Statement {
 
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
+
         StringBuilder stringBuilder = new StringBuilder();
 
+        addIndent(stringBuilder, indent);
         stringBuilder.append("SubprogramControlStatement [subprogramName=" + subprogramName + "]");
 
         for (ParameterAssignment parameterAssignment : parameterAssignments) {
-            stringBuilder.append("\n  ").append(parameterAssignment);
+            stringBuilder.append("\n");
+            addIndent(stringBuilder, indent+1);
+            stringBuilder.append(parameterAssignment);
         }
         stringBuilder.append("\n");
 

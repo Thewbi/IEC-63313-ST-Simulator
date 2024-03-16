@@ -14,8 +14,19 @@ public class Variable {
 
     @Override
     public String toString() {
-        return "Variable [name=" + name + ", dataType=" + dataType + ", initialValue=" + initialValue + ", inOut: "
-                + inOut + "]";
+        throw new RuntimeException();
+    }
+
+    public String toString(final int indent) {
+
+        StringBuilder stringBuilder = new StringBuilder();
+        DataType.addIndent(stringBuilder, indent);
+
+        stringBuilder.append("Variable [name=" + name + ", dataType=" + dataType.toString(indent) + ", initialValue="
+                + initialValue + ", inOut: "
+                + inOut + "]");
+
+        return stringBuilder.toString();
     }
 
     public Object toShortString() {

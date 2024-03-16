@@ -1,6 +1,9 @@
 package instance;
 
 import org.apache.commons.lang3.StringUtils;
+
+import common.TimeUtils;
+
 import java.util.Timer;
 
 public class TONVariableInstance extends VariableInstance {
@@ -18,18 +21,18 @@ public class TONVariableInstance extends VariableInstance {
         }
 
         VariableInstance variableInstance = this.getElement("PT");
-        // System.out.println(variableInstance);
-        String countdownDuration = variableInstance.getValue();
 
-        String countdownDurationSplit[] = countdownDuration.split(" ");
+        // convert to millis
+        long millis = TimeUtils.timeToMillis(variableInstance.getValue());
 
-        long millis = Long.parseLong(countdownDurationSplit[0]);
-
-        if (StringUtils.equalsIgnoreCase(countdownDurationSplit[1], "Seconds")) {
-            millis *= 1000;
-        } else {
-            throw new RuntimeException(countdownDurationSplit[1] + " Not implented yet!");
-        }
+        // String countdownDuration = variableInstance.getValue();
+        // String countdownDurationSplit[] = countdownDuration.split(" ");
+        // long millis = Long.parseLong(countdownDurationSplit[0]);
+        // if (StringUtils.equalsIgnoreCase(countdownDurationSplit[1], "Seconds")) {
+        //     millis *= 1000;
+        // } else {
+        //     throw new RuntimeException(countdownDurationSplit[1] + " Not implented yet!");
+        // }
 
         tonTimerTask = new TONTimerTask();
         tonTimerTask.setTonVariableInstance(this);
