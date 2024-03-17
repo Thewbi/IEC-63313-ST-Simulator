@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.List;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.antlr.v4.runtime.CharStream;
@@ -131,6 +132,8 @@ public class Main {
 
         String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
+
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
 
@@ -146,7 +149,7 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        // debugOutputAST(root);
+        //debugOutputAST(root);
         execute(root);
 
         System.out.println("");
@@ -386,7 +389,7 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        // cylinder.setHasErrorNeverReachesPosition1(true);
+        cylinder.setHasErrorNeverReachesPosition1(true);
         // cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
@@ -487,7 +490,13 @@ public class Main {
             // senP2.setValue("true");
             // }
 
-            programInstance.executeStatements(programInstance, null, null);
+            programInstance.executeStatements(globalTypeScope, programInstance, null, null);
+
+            // // DEBUG
+            // Collection<VariableDescriptor> variables = programInstance.getElements().values();
+            // for (VariableDescriptor variableDescriptor : variables) {
+            //     System.out.println(variableDescriptor);
+            // }
 
             // // DEBUG output global status struct
             // VariableInstance stoerung =
@@ -702,21 +711,7 @@ public class Main {
                 simpleVariableInstance.setDataType(entry.getDataType());
 
                 if (entry.getDataType() instanceof Struct) {
-
-                    Struct struct = (Struct) entry.getDataType();
-                    for (Map.Entry<String, Field> mapEntry : struct.getFields().entrySet()) {
-
-                        Field field = mapEntry.getValue();
-
-                        VariableInstance structField = new VariableInstance();
-                        structField.setName(field.getName());
-                        structField.setDataType(field.getDataType());
-                        if (StringUtils.isNotBlank(field.getInitialValue())) {
-                            structField.setValue(field.getInitialValue());
-                        }
-
-                        simpleVariableInstance.addElement(structField);
-                    }
+                    instantiateStruct(entry, simpleVariableInstance);
                 }
 
                 // initial / default value
@@ -744,6 +739,23 @@ public class Main {
         variableInstance.initialize();
 
         return variableInstance;
+    }
+
+    public static void instantiateStruct(Variable entry, VariableInstance simpleVariableInstance) {
+        Struct struct = (Struct) entry.getDataType();
+        for (Map.Entry<String, Field> mapEntry : struct.getFields().entrySet()) {
+
+            Field field = mapEntry.getValue();
+
+            VariableInstance structField = new VariableInstance();
+            structField.setName(field.getName());
+            structField.setDataType(field.getDataType());
+            if (StringUtils.isNotBlank(field.getInitialValue())) {
+                structField.setValue(field.getInitialValue());
+            }
+
+            simpleVariableInstance.addElement(structField);
+        }
     }
 
     private static void assignment() throws IOException {

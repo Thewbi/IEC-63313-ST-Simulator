@@ -26,6 +26,10 @@ public enum ExpressionType {
 
     MULTIPLY, 
 
-    DIVIDE
+    DIVIDE,
+
+    PARAMETER_ASSIGNMENT,
+
+    FUNCTION_CALL
 
 }

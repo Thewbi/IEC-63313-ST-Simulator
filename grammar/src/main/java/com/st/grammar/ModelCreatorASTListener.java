@@ -24,6 +24,7 @@ import model.Configuration;
 import model.DataType;
 import model.Expression;
 import model.ExpressionType;
+import model.Function;
 import model.FunctionBlock;
 import model.FunctionBlockType;
 import model.GlobalScope;
@@ -69,16 +70,99 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private FunctionBlock functionBlock;
 
+    private Function function;
+
     private String initialValue;
 
     private SubprogramControlStatement subprogramControlStatement;
+
+    // private String parameterAssignments = "";
 
     /**
      * ctor
      */
     public ModelCreatorASTListener() {
-
         scopeStack.push(globalVarScope);
+    }
+
+    public void addToExpressionList(final Expression expression) {
+        System.out.println(expression);
+        expressionList.add(expression);
+    }
+
+    public void clearExpressionList() {
+        expressionList.clear();
+    }
+
+    @Override
+    public void enterFunction_call(StructuredTextParser.Function_callContext ctx) {
+        System.out.println(ctx.getText());
+
+        clearExpressionList();
+    }
+
+    @Override
+    public void exitFunction_call(StructuredTextParser.Function_callContext ctx) {
+
+        System.out.println(ctx.getText());
+
+        final String functionName = ctx.function_name().getText();
+        System.out.println(functionName);
+
+        for (Param_assignmentContext param_assignment : ctx.param_assignment()) {
+			final String paramAssignmentAsString = param_assignment.getText();
+            System.out.println(paramAssignmentAsString);
+		}
+
+        System.out.println("");
+
+        Expression expression = new Expression();
+        expression.setExpressionType(ExpressionType.FUNCTION_CALL);
+        expression.setVariableNameValue(functionName);
+        expression.getExpressionList().addAll(expressionList);
+
+        clearExpressionList();
+
+        expressionList.add(expression);
+    }
+
+    // @Override
+    // public void enterParam_assignment(StructuredTextParser.Param_assignmentContext ctx) {
+        
+    // }
+
+    // @Override
+    // public void exitParam_assignment(StructuredTextParser.Param_assignmentContext ctx) {
+    //     System.out.println(ctx.getText());
+    //     System.out.println("aaaa");
+
+    //     // parameterAssignments += ("+" + ctx.getText());
+
+    //     Expression expression = new Expression();
+    //     expression.setExpressionType(ExpressionType.PARAMETER_ASSIGNMENT);
+    //     expression.setVariableNameValue(ctx.getText());
+
+    //     // expressionList.add(expression);
+    //     addToExpressionList(expression);
+    // }
+
+    @Override
+    public void enterDerived_function_name(StructuredTextParser.Derived_function_nameContext ctx) {
+        final String functionName = ctx.getText();
+        function.setName(functionName);
+    }
+
+    @Override
+    public void enterFunction_declaration(StructuredTextParser.Function_declarationContext ctx) {
+        function = new Function();
+        scopeStack.push(function);
+    }
+
+    @Override
+    public void exitFunction_declaration(StructuredTextParser.Function_declarationContext ctx) {
+        scopeStack.pop();
+        globalTypeScope.addType(function.getName(), function);
+        function = null;
     }
 
     @Override
@@ -229,7 +313,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
 
         variable = null;
     }
@@ -263,7 +348,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
 
         variable = null;
     }
@@ -298,7 +384,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
 
         variable = null;
     }
@@ -329,15 +416,19 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // assignmentStatement.setExpression(comparisonExpression);
         assignmentStatement.getExpressionList().addAll(expressionList);
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
     }
 
     @Override
     public void enterExpression(StructuredTextParser.ExpressionContext ctx) {
 
-        // forget all expression because the expression part of a assignment starts
+        // forget all expressions because the expression part of an assignment starts
         // and we only want expression expressions here
-        expressionList.clear();
+        // expressionList.clear();
+
+        // TODO reactivate this
+        clearExpressionList();
     }
 
     @Override
@@ -364,9 +455,12 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             orExpression.getExpressionList().add(rhs);
 
-            expressionList.clear();
+            // expressionList.clear();
+            clearExpressionList();
+
             // expressionList.add(expression);
-            expressionList.add(orExpression);
+            // expressionList.add(orExpression);
+            addToExpressionList(orExpression);
 
         }
     }
@@ -414,7 +508,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         }
         comparisonExpression.getExpressionList().addAll(expressionList);
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
     }
 
     @Override
@@ -423,7 +518,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // ctx.getStart().getText());
 
         Expression expression = new Expression();
-        expressionList.add(expression);
+        // expressionList.add(expression);
+        addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.INTEGER_CONSTANT);
         expression.setIntegerValue(Integer.parseInt(ctx.getStart().getText()));
@@ -436,7 +532,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // + ctx.start.getCharPositionInLine());
 
         Expression expression = new Expression();
-        expressionList.add(expression);
+        // expressionList.add(expression);
+        addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.BOOLEAN_CONSTANT);
         expression.setBooleanValue(Boolean.parseBoolean(ctx.getStart().getText()));
@@ -448,7 +545,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         String varName = ctx.getStart().getText();
 
         Expression expression = new Expression();
-        expressionList.add(expression);
+        // expressionList.add(expression);
+        addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.VARIABLE_NAME);
         expression.setVariableNameValue(varName);
@@ -478,7 +576,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         arithmeticExpression.getExpressionList().add(expressionList.get(0));
         expressionList.remove(0);
 
-        expressionList.add(arithmeticExpression);
+        // expressionList.add(arithmeticExpression);
+        addToExpressionList(arithmeticExpression);
     }
 
     @Override
@@ -505,8 +604,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         expression.getExpressionList().add(expressionList.get(0));
         expressionList.remove(0);
 
-        expressionList.add(expression);
-
+        // expressionList.add(expression);
+        addToExpressionList(expression);
     }
 
     @Override
@@ -536,9 +635,12 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             andExpression.getExpressionList().add(rhs);
 
-            expressionList.clear();
+            // expressionList.clear();
+            clearExpressionList();
+
             // expressionList.add(expression);
-            expressionList.add(andExpression);
+            // expressionList.add(andExpression);
+            addToExpressionList(andExpression);
         }
     }
 
@@ -553,7 +655,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             if (StringUtils.equalsIgnoreCase(operatorAsString, "not")) {
                 notExpression.getExpressionList().add(expressionList.get(0));
                 expressionList.remove(0);
-                expressionList.add(notExpression);
+                // expressionList.add(notExpression);
+                addToExpressionList(notExpression);
             }
         }
     }
@@ -575,7 +678,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
         subprogramControlStatement = null;
-        expressionList.clear();
+
+        // expressionList.clear();
+        clearExpressionList();
     }
 
     @Override
@@ -668,8 +773,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
 
-            // System.out.println("  actionName: " + actionName);
-            // System.out.println("  actionQualifier: " + actionQualifier);
+            // System.out.println(" actionName: " + actionName);
+            // System.out.println(" actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -695,8 +800,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
 
-            // System.out.println("  actionName: " + actionName);
-            // System.out.println("  actionQualifier: " + actionQualifier);
+            // System.out.println(" actionName: " + actionName);
+            // System.out.println(" actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -716,7 +821,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         if (ctx.transition_name() != null) {
             String transitionName = ctx.transition_name().getText();
-            // System.out.println("  transitionName: " + transitionName);
+            // System.out.println(" transitionName: " + transitionName);
 
             transition.setName(transitionName);
         }
@@ -728,7 +833,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             for (Step_nameContext Step_nameContext : step_nameContext) {
 
                 String stepName = Step_nameContext.getText();
-                // System.out.println("  stepName: " + stepName);
+                // System.out.println(" stepName: " + stepName);
 
                 if (stepIndex == 0) {
                     transition.setSourceStepName(stepName);
@@ -741,12 +846,14 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // the transition condition
         Transition_conditionContext transition_conditionContext = ctx.transition_condition();
-        // System.out.println("  transition_conditionContext: " + transition_conditionContext.getText());
+        // System.out.println(" transition_conditionContext: " +
+        // transition_conditionContext.getText());
 
         // store transition inte temp list for later insertion into the source action
         transition.getExpressionList().addAll(expressionList);
 
-        expressionList.clear();
+        // expressionList.clear();
+        clearExpressionList();
     }
 
     @Override

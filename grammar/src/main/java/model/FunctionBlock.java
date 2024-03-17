@@ -17,8 +17,6 @@ public class FunctionBlock extends VarScope {
 
     private Map<String, Step> steps = new HashMap<>();
 
-    // private List<Step> currentSteps = new ArrayList<>();
-
     /**
      * first, transitions are inserted into this list, then in a second step
      * inserted into their respective source actions
@@ -69,7 +67,7 @@ public class FunctionBlock extends VarScope {
                 stringBuilder.append(step.toString(indent + 1));
             }
         }
-        stringBuilder.append("\n");
+        // stringBuilder.append("\n");
 
         return stringBuilder.toString();
     }

@@ -37,12 +37,13 @@ public class VarScope extends DataType {
 
         StringBuilder stringBuilder = new StringBuilder();
 
-        addIndent(stringBuilder, indent);
-        stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + " ");
+        // addIndent(stringBuilder, indent);
+        stringBuilder.append(getClass().getSimpleName() + " name=" + getName() + " ");
 
         stringBuilder.append("\n");
-        addIndent(stringBuilder, indent + 1);
+        addIndent(stringBuilder, indent + 0);
         stringBuilder.append("Variables: ");
+        
         if (CollectionUtils.isEmpty(getVariables())) {
             stringBuilder.append("No Variables");
         } else {
@@ -50,32 +51,32 @@ public class VarScope extends DataType {
             for (Variable variable : getVariables()) {
 
                 if (variable.getDataType() instanceof FunctionBlock) {
-
-                    // stringBuilder.append("\n");
-                    addIndent(stringBuilder, indent + 2);
+                    addIndent(stringBuilder, indent + 1);
                     stringBuilder.append(variable.toShortString());
-
+                } else if (variable.getDataType() instanceof Struct) {
+                    stringBuilder.append(variable.toString(indent + 1));
                 } else {
-
-                    // stringBuilder.append("\n");
-                    // addIndent(stringBuilder, indent+2);
-                    stringBuilder.append(variable.toString(indent + 2));
+                    stringBuilder.append(variable.toString(indent + 1));
                 }
 
                 stringBuilder.append("\n");
             }
         }
 
-        stringBuilder.append("\n");
-        addIndent(stringBuilder, indent + 1);
-        stringBuilder.append("Statements: ");
+        // stringBuilder.append("\n");
+        // addIndent(stringBuilder, indent + 0);
+        // stringBuilder.append("Statements: ").append("\n");
+        
         if (CollectionUtils.isEmpty(getStatements())) {
-            stringBuilder.append("No Statements");
+            stringBuilder.append("\n");
+            addIndent(stringBuilder, indent + 0);
+            stringBuilder.append("Statements: ").append("No Statements");
         } else {
-
+            addIndent(stringBuilder, indent + 0);
+            stringBuilder.append("Statements: ").append("\n");
             for (Statement statment : getStatements()) {
-                stringBuilder.append("\n");
-                stringBuilder.append(statment.toString(indent + 2));
+                // stringBuilder.append("\n");
+                stringBuilder.append(statment.toString(indent + 1));
             }
         }
 

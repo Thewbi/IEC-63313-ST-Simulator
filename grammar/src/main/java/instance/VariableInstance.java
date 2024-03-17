@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.stringtemplate.v4.ST;
 
 import model.Action;
 import model.DataType;
@@ -15,6 +14,7 @@ import model.Statement;
 import model.StatementContainer;
 import model.Step;
 import model.Transition;
+import model.TypeScope;
 
 public class VariableInstance implements StatementContainer {
 
@@ -64,7 +64,7 @@ public class VariableInstance implements StatementContainer {
 
         // DEBUG build transition names
         for (final Transition transition : tempTransitions) {
-            
+
             StringBuilder stringBuilder = new StringBuilder();
 
             final String sourceStepName = transition.getSourceStepName();
@@ -156,7 +156,7 @@ public class VariableInstance implements StatementContainer {
      * 
      * @param variableInstance
      */
-    public void executeStateMachine() {
+    public void executeStateMachine(TypeScope globalTypeScope) {
 
         if (MapUtils.isEmpty(steps)) {
             return;
@@ -172,7 +172,7 @@ public class VariableInstance implements StatementContainer {
         // executed.
         // After execution, isExecuted(true) is called.
         for (Action action : globalActions) {
-            action.execute();
+            action.execute(globalTypeScope);
         }
 
         // 3. all steps in the current step list are executed.
@@ -185,7 +185,7 @@ public class VariableInstance implements StatementContainer {
         // executed unless they have already
         // been executed: isExecuted(true).
         for (Action action : globalActions) {
-            action.execute();
+            action.execute(globalTypeScope);
         }
 
         // 7. All transitions are evaluated. For each transition that is activated</li>
@@ -195,7 +195,7 @@ public class VariableInstance implements StatementContainer {
         List<Step> stepsToRemove = new ArrayList<>();
         for (Step step : currentSteps) {
             for (Transition transition : step.getTransistions()) {
-                boolean evalResult = transition.evaluate(this);
+                boolean evalResult = transition.evaluate(globalTypeScope, this);
                 if (evalResult) {
 
                     System.out.println("Applying transition \"" + transition.getName() + "\"");

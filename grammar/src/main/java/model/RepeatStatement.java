@@ -24,10 +24,11 @@ public class RepeatStatement extends Statement {
         stringBuilder.append("terminationCondition:\n");
         stringBuilder.append(terminationCondition);
 
-        stringBuilder.append("\nstatements:");
+        stringBuilder.append("\n");
+        stringBuilder.append("statements:");
         for (Statement statment : getStatements()) {
-            stringBuilder.append("\n").append(statment);
-            // stringBuilder.append("\n\n");
+            stringBuilder.append(statment);
+            // stringBuilder.append("\n");
         }
 
         //System.out.println(stringBuilder.toString());

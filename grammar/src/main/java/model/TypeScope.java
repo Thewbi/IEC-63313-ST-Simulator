@@ -28,9 +28,9 @@ public class TypeScope {
             stringBuilder.append(entry.getKey()).append(" = ");
 
             DataType value = entry.getValue();
-            stringBuilder.append(value.toString(indent+1));
+            stringBuilder.append(value.toString(indent + 1));
 
-            stringBuilder.append("\n\n");
+            stringBuilder.append("\n");
         }
 
         return stringBuilder.toString();

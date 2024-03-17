@@ -12,7 +12,7 @@ public class Action extends VarScope implements StatementContainer {
 
     private VariableInstance parentVariableInstance;
 
-    public void execute() {
+    public void execute(TypeScope globalTypeScope) {
 
         if (executed) {
             return;
@@ -27,7 +27,7 @@ public class Action extends VarScope implements StatementContainer {
         System.out.println("Execution action: \"" + name + "\"");
 
         // execute the statements in the context of the output variableInstance (== FunctionBlock)
-        this.executeStatements(parentVariableInstance, this.getStatements());
+        this.executeStatements(globalTypeScope, parentVariableInstance, this.getStatements());
     }
 
     @Override

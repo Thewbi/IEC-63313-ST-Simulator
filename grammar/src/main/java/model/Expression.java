@@ -2,8 +2,6 @@ package model;
 
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.ArrayList;
 
 public class Expression {
@@ -15,38 +13,6 @@ public class Expression {
     private Boolean booleanValue;
 
     private String variableNameValue;
-
-    // private String subprogramName;
-
-    // @Override
-    // public String toString() {
-    //     // return "Expression [expressionType=" + expressionType + ", integerValue=" +
-    //     // integerValue + ", booleanValue="
-    //     // + booleanValue + ", expressionList=" + expressionList + "]";
-
-    //     StringBuffer stringBuffer = new StringBuffer();
-    //     stringBuffer.append("Expression [ ");
-    //     stringBuffer.append(" expressionType=" + expressionType + " ");
-
-    //     if (integerValue != null) {
-    //         stringBuffer.append(" integerValue=" + integerValue + " ");
-    //     }
-
-    //     if (booleanValue != null) {
-    //         stringBuffer.append(" booleanValue=" + booleanValue + " ");
-    //     }
-
-    //     if (variableNameValue != null) {
-    //         stringBuffer.append(" variableNameValue=" + variableNameValue + " ");
-    //     }
-
-    //     if (CollectionUtils.isNotEmpty(expressionList)) {
-    //         stringBuffer.append("\n expressionList=" + expressionList + " ");
-    //     }
-
-    //     stringBuffer.append(" ]");
-    //     return stringBuffer.toString();
-    // }
 
     @Override
     public String toString() {

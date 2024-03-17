@@ -13,10 +13,10 @@ public class ActionAssociation {
         DataType.addIndent(stringBuilder, indent);
         stringBuilder.append("ActionAssociation").append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("name = " + name).append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("qualifier = " + qualifier).append("\n");
 
         return stringBuilder.toString();

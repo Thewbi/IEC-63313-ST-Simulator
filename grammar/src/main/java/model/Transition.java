@@ -15,10 +15,10 @@ public class Transition {
 
     public List<Expression> expressionList = new ArrayList<>();
 
-    public boolean evaluate(VariableInstance variableInstance) {
+    public boolean evaluate(TypeScope globalTypeScope, VariableInstance variableInstance) {
         VariableInstance source = variableInstance;
         for (Expression expression : expressionList) {
-            source = ExpressionUtil.evaluateExpression(source, expression);
+            source = ExpressionUtil.evaluateExpression(globalTypeScope, source, expression);
         }
         return Boolean.parseBoolean(source.getValue());
     }

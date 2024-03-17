@@ -1281,10 +1281,14 @@ primary_expression :
 	variable 
 	| 
 	'(' expression ')' 
-	| 
-	// param_assignment also allows the use of a simple variable instead of only assignments. The name is misleading.
-	function_name '(' param_assignment (',' param_assignment)* ')'
+	|
+    function_call
 	;
+
+function_call:
+    // param_assignment also allows the use of a simple variable instead of only assignments. The name is misleading.
+	function_name '(' param_assignment (',' param_assignment)* ')'
+    ;
 	
 // iteration_statement ::= for_statement | while_statement | repeat_statement | exit_statement
 iteration_statement :

@@ -22,7 +22,7 @@ public class Variable {
         StringBuilder stringBuilder = new StringBuilder();
         DataType.addIndent(stringBuilder, indent);
 
-        stringBuilder.append("Variable [name=" + name + ", dataType=" + dataType.toString(indent) + ", initialValue="
+        stringBuilder.append("Variable [name=" + name + ", dataType=" + dataType.toString(indent + 1) + ", initialValue="
                 + initialValue + ", inOut: "
                 + inOut + "]");
 
