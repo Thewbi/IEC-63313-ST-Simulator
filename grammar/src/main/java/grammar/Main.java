@@ -113,8 +113,8 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
 
-        // String pathAsString =
-        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
+        String pathAsString =
+        "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -130,7 +130,7 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
         //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
 
@@ -492,11 +492,11 @@ public class Main {
 
             programInstance.executeStatements(globalTypeScope, programInstance, null, null);
 
-            // // DEBUG
-            // Collection<VariableDescriptor> variables = programInstance.getElements().values();
-            // for (VariableDescriptor variableDescriptor : variables) {
-            //     System.out.println(variableDescriptor);
-            // }
+            // DEBUG output all variable values
+            Collection<VariableDescriptor> variables = programInstance.getElements().values();
+            for (VariableDescriptor variableDescriptor : variables) {
+                System.out.println(variableDescriptor);
+            }
 
             // // DEBUG output global status struct
             // VariableInstance stoerung =

@@ -76,8 +76,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private SubprogramControlStatement subprogramControlStatement;
 
-    // private String parameterAssignments = "";
-
     /**
      * ctor
      */
@@ -126,26 +124,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         expressionList.add(expression);
     }
 
-    // @Override
-    // public void enterParam_assignment(StructuredTextParser.Param_assignmentContext ctx) {
-        
-    // }
-
-    // @Override
-    // public void exitParam_assignment(StructuredTextParser.Param_assignmentContext ctx) {
-    //     System.out.println(ctx.getText());
-    //     System.out.println("aaaa");
-
-    //     // parameterAssignments += ("+" + ctx.getText());
-
-    //     Expression expression = new Expression();
-    //     expression.setExpressionType(ExpressionType.PARAMETER_ASSIGNMENT);
-    //     expression.setVariableNameValue(ctx.getText());
-
-    //     // expressionList.add(expression);
-    //     addToExpressionList(expression);
-    // }
-
     @Override
     public void enterDerived_function_name(StructuredTextParser.Derived_function_nameContext ctx) {
         final String functionName = ctx.getText();
@@ -167,53 +145,26 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterFunction_block_declaration(StructuredTextParser.Function_block_declarationContext ctx) {
-
         final String typeName = ctx.IDENTIFIER().getText();
-
-        // System.out.println(typeName);
-
         functionBlock = new FunctionBlock();
         functionBlock.setName(typeName);
-
         scopeStack.push(functionBlock);
     }
 
     @Override
     public void exitFunction_block_declaration(StructuredTextParser.Function_block_declarationContext ctx) {
-        // System.out.println(functionBlock);
-
         scopeStack.pop();
-
         globalTypeScope.addType(functionBlock.getName(), functionBlock);
-
         functionBlock = null;
     }
 
     @Override
     public void exitBoolean_literal(StructuredTextParser.Boolean_literalContext ctx) {
-        // System.out.println(ctx.getText());
-
         initialValue = ctx.getText();
     }
 
     @Override
     public void exitSeconds(StructuredTextParser.SecondsContext ctx) {
-
-        // Fixed_pointContext fixedPointContext = ctx.fixed_point();
-        // if (fixedPointContext != null) {
-        // initialValue = fixedPointContext.getText() + " Seconds";
-        // }
-
-        // IntegerContext integerContext = ctx.integer();
-        // if (integerContext != null) {
-        // initialValue = fixedPointContext.getText() + " Seconds";
-        // }
-
-        // MillisecondsContext millisecondsContext = ctx.milliseconds();
-        // if (millisecondsContext != null) {
-        // initialValue = fixedPointContext.getText() + " Milliseconds";
-        // }
-
         initialValue = "T#" + ctx.getText();
     }
 
@@ -384,7 +335,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        // expressionList.clear();
         clearExpressionList();
 
         variable = null;
@@ -406,6 +356,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         final String variable = ctx.variable().getText();
         // System.out.println(variable);
 
+        // int l = variable.split("\\.").length;
+        // for (int i = 0; i < l; i++) {
+        //     expressionList.remove(0);
+        // }
+
         AssignmentStatement assignmentStatement = new AssignmentStatement();
         scopeStack.peek().addStatement(assignmentStatement);
 
@@ -416,7 +371,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // assignmentStatement.setExpression(comparisonExpression);
         assignmentStatement.getExpressionList().addAll(expressionList);
 
-        // expressionList.clear();
         clearExpressionList();
     }
 
@@ -428,6 +382,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         // expressionList.clear();
 
         // TODO reactivate this
+        // DEACTIVATE FOR FUNCIONs
         clearExpressionList();
     }
 

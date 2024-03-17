@@ -29,9 +29,10 @@ public class ExpressionUtil {
 
                 String[] variableSplit = expression.getVariableNameValue().split("\\.");
 
-                if (variableSplit.length == 1) {
-                    return target;
-                }
+                // // TODO: REQUIRED FOR FUNCTION
+                // if (variableSplit.length == 1) {
+                //     return target;
+                // }
 
                 for (int i = 0; i < variableSplit.length; i++) {
 
