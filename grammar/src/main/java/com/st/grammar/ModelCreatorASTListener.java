@@ -76,6 +76,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     private SubprogramControlStatement subprogramControlStatement;
 
+    private boolean inFunctionCall;
+
     /**
      * ctor
      */
@@ -84,7 +86,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     }
 
     public void addToExpressionList(final Expression expression) {
-        System.out.println(expression);
         expressionList.add(expression);
     }
 
@@ -96,6 +97,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void enterFunction_call(StructuredTextParser.Function_callContext ctx) {
         System.out.println(ctx.getText());
 
+        inFunctionCall = true;
+
         clearExpressionList();
     }
 
@@ -105,14 +108,14 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         System.out.println(ctx.getText());
 
         final String functionName = ctx.function_name().getText();
-        System.out.println(functionName);
+        // System.out.println(functionName);
 
-        for (Param_assignmentContext param_assignment : ctx.param_assignment()) {
-			final String paramAssignmentAsString = param_assignment.getText();
-            System.out.println(paramAssignmentAsString);
-		}
+        // for (Param_assignmentContext param_assignment : ctx.param_assignment()) {
+		// 	final String paramAssignmentAsString = param_assignment.getText();
+        //     System.out.println(paramAssignmentAsString);
+		// }
 
-        System.out.println("");
+        // System.out.println("");
 
         Expression expression = new Expression();
         expression.setExpressionType(ExpressionType.FUNCTION_CALL);
@@ -122,6 +125,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         clearExpressionList();
 
         expressionList.add(expression);
+
+        inFunctionCall = false;
     }
 
     @Override
@@ -170,17 +175,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterStructure_type_declaration(StructuredTextParser.Structure_type_declarationContext ctx) {
-        // System.out.println("");
 
         final String typeName = ctx.structure_type_name().getText();
 
-        // System.out.println("typeName: " + typeName);
-
         structureDataType = new Struct();
         structureDataType.setName(typeName);
-
-        // TypeScope typeScope = typeScopeStack.peek();
-        // typeScope.addType(typeName, structureDataType);
 
         globalTypeScope.addType(typeName, structureDataType);
     }
@@ -198,9 +197,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitSimple_spec_init(StructuredTextParser.Simple_spec_initContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         TypeScope typeScope = globalTypeScope;
 
         String dataTypeAsString = ctx.getStart().getText();
@@ -213,9 +209,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterProgram_declaration(StructuredTextParser.Program_declarationContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         program = new Program();
         scopeStack.push(program);
     }
@@ -227,10 +220,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterProgram_type_name(StructuredTextParser.Program_type_nameContext ctx) {
-
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         // this method is called for configurations and program_declarations!
         if (program != null) {
             program.setName(StringUtils.trim(ctx.getStart().getText()));
@@ -239,9 +228,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterVar1_init_decl(StructuredTextParser.Var1_init_declContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         variable = null;
     }
 
@@ -255,7 +241,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         topScope.getVariables().add(variable);
 
         String variableName = ctx.getStart().getText();
-        // System.out.println(variableName);
         variable.setName(variableName);
 
         variable.setDataType(dataType);
@@ -264,7 +249,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        // expressionList.clear();
         clearExpressionList();
 
         variable = null;
@@ -299,7 +283,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         variable.setInitialValue(initialValue);
         initialValue = null;
 
-        // expressionList.clear();
         clearExpressionList();
 
         variable = null;
@@ -358,7 +341,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // int l = variable.split("\\.").length;
         // for (int i = 0; i < l; i++) {
-        //     expressionList.remove(0);
+
+        //     Expression expression = expressionList.get(0);
+        //     if (expression.getExpressionType() == ExpressionType.VARIABLE_NAME) {
+        //         expressionList.remove(0);
+        //     }
         // }
 
         AssignmentStatement assignmentStatement = new AssignmentStatement();
@@ -383,7 +370,10 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // TODO reactivate this
         // DEACTIVATE FOR FUNCIONs
-        clearExpressionList();
+
+        if (!inFunctionCall) {
+            clearExpressionList();
+        }
     }
 
     @Override
@@ -398,33 +388,24 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
             Expression lhs = new Expression();
             Xor_expressionContext lhsXor_expressionContext = ctx.xor_expression(0);
-            // System.out.println(lhsComparisonContext.getText());
             lhs.setVariableNameValue(lhsXor_expressionContext.getText());
             lhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             orExpression.getExpressionList().add(lhs);
 
             Expression rhs = new Expression();
             Xor_expressionContext rhsXor_expressionContext = ctx.xor_expression(1);
-            // System.out.println(rhsComparisonContext.getText());
             rhs.setVariableNameValue(rhsXor_expressionContext.getText());
             rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             orExpression.getExpressionList().add(rhs);
 
-            // expressionList.clear();
             clearExpressionList();
 
-            // expressionList.add(expression);
-            // expressionList.add(orExpression);
             addToExpressionList(orExpression);
-
         }
     }
 
     @Override
     public void enterRepeat_statement(StructuredTextParser.Repeat_statementContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         repeatStatement = new RepeatStatement();
 
         // repeat statement is the new scope
@@ -433,9 +414,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitRepeat_statement(StructuredTextParser.Repeat_statementContext ctx) {
-
-        // RepeatStatement repeatStatement = (RepeatStatement) scopeStack.pop();
-
         repeatStatement.setTerminationCondition(comparisonExpression);
         comparisonExpression = null;
 
@@ -447,9 +425,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitComparison(StructuredTextParser.ComparisonContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         if ((!equalsDetected) && (!notEqualsDetected)) {
             return;
         }
@@ -463,17 +438,13 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         }
         comparisonExpression.getExpressionList().addAll(expressionList);
 
-        // expressionList.clear();
         clearExpressionList();
     }
 
     @Override
     public void enterInteger(StructuredTextParser.IntegerContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
 
         Expression expression = new Expression();
-        // expressionList.add(expression);
         addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.INTEGER_CONSTANT);
@@ -482,12 +453,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterBoolean_literal(StructuredTextParser.Boolean_literalContext ctx) {
-        // System.out.println("BooleanLiteral: " + ctx.getStart().getText() + " Line: "
-        // + ctx.start.getLine() + " pos: "
-        // + ctx.start.getCharPositionInLine());
-
         Expression expression = new Expression();
-        // expressionList.add(expression);
         addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.BOOLEAN_CONSTANT);
@@ -500,7 +466,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         String varName = ctx.getStart().getText();
 
         Expression expression = new Expression();
-        // expressionList.add(expression);
         addToExpressionList(expression);
 
         expression.setExpressionType(ExpressionType.VARIABLE_NAME);
@@ -509,9 +474,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void exitAdd_expression(StructuredTextParser.Add_expressionContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         if (ctx.add_operator() == null) {
             return;
         }
@@ -531,15 +493,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         arithmeticExpression.getExpressionList().add(expressionList.get(0));
         expressionList.remove(0);
 
-        // expressionList.add(arithmeticExpression);
         addToExpressionList(arithmeticExpression);
     }
 
     @Override
     public void exitTerm(StructuredTextParser.TermContext ctx) {
-
-        // System.out.println("");
-
         if (ctx.multiply_operator() == null) {
             return;
         }
@@ -559,16 +517,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         expression.getExpressionList().add(expressionList.get(0));
         expressionList.remove(0);
 
-        // expressionList.add(expression);
         addToExpressionList(expression);
     }
 
     @Override
     public void exitAnd_expression(StructuredTextParser.And_expressionContext ctx) {
-
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         final String literal = ctx.getStart().getText();
 
         if (StringUtils.equalsIgnoreCase(literal, "and")) {
@@ -578,23 +531,17 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
             Expression lhs = new Expression();
             ComparisonContext lhsComparisonContext = ctx.comparison(0);
-            // System.out.println(lhsComparisonContext.getText());
             lhs.setVariableNameValue(lhsComparisonContext.getText());
             lhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             andExpression.getExpressionList().add(lhs);
 
             Expression rhs = new Expression();
             ComparisonContext rhsComparisonContext = ctx.comparison(1);
-            // System.out.println(rhsComparisonContext.getText());
             rhs.setVariableNameValue(rhsComparisonContext.getText());
             rhs.setExpressionType(ExpressionType.VARIABLE_NAME);
             andExpression.getExpressionList().add(rhs);
 
-            // expressionList.clear();
             clearExpressionList();
-
-            // expressionList.add(expression);
-            // expressionList.add(andExpression);
             addToExpressionList(andExpression);
         }
     }
@@ -610,7 +557,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             if (StringUtils.equalsIgnoreCase(operatorAsString, "not")) {
                 notExpression.getExpressionList().add(expressionList.get(0));
                 expressionList.remove(0);
-                // expressionList.add(notExpression);
                 addToExpressionList(notExpression);
             }
         }
@@ -618,10 +564,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
-
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         String subprogramName = ctx.getStart().getText();
 
         subprogramControlStatement = new SubprogramControlStatement();
@@ -633,8 +575,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitSubprogram_control_statement(StructuredTextParser.Subprogram_control_statementContext ctx) {
         subprogramControlStatement = null;
-
-        // expressionList.clear();
         clearExpressionList();
     }
 
@@ -645,10 +585,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         for (Param_assignmentContext param_assignmentContext : paramAssignments) {
 
             String varName = param_assignmentContext.variable_name().getText();
-            // System.out.println(varName);
-
             String expression = param_assignmentContext.expression().getText();
-            // System.out.println(expression);
 
             subprogramControlStatement.addParameterAssignment(varName, expression);
         }
@@ -666,43 +603,28 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterTask_configuration(StructuredTextParser.Task_configurationContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         Task task = new Task();
 
         configuration.setTask(task);
 
         String taskName = ctx.task_name().getText();
         task.setName(taskName);
-
-        // System.out.println("taskName: " + taskName);
     }
 
     @Override
     public void exitTask_initialization(StructuredTextParser.Task_initializationContext ctx) {
-        // System.out.println(ctx.getClass().getSimpleName() + " " +
-        // ctx.getStart().getText());
-
         IntegerContext priorityIntegerContext = ctx.integer();
-        // System.out.println("Priority: " + priorityIntegerContext.getText());
         configuration.getTask().setPriority(Integer.parseInt(priorityIntegerContext.getText()));
 
         List<Data_sourceContext> data_sourceContextList = (List<Data_sourceContext>) ctx.data_source();
 
         for (Data_sourceContext data_sourceContext : data_sourceContextList) {
-            // System.out.println("INTERVAL: " + data_sourceContext.constant().getText());
             configuration.getTask().setInterval(data_sourceContext.constant().getText());
         }
     }
 
     @Override
     public void exitProgram_configuration(StructuredTextParser.Program_configurationContext ctx) {
-
-        // System.out.println("ProgramName: " + ctx.program_name().getText());
-        // System.out.println("TaskName: " + ctx.task_name().getText());
-        // System.out.println("ProgramType: " + ctx.program_type_name().getText());
-
         ProgramConfiguration programConfiguration = new ProgramConfiguration();
         programConfiguration.setProgramName(ctx.program_name().getText());
         programConfiguration.setTaskName(ctx.task_name().getText());
@@ -718,7 +640,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         step.setInitial(true);
 
         String stepName = ctx.step_name().getText();
-        // System.out.println("stepName: " + stepName + " (INITIAL STEP)");
         step.setName(stepName);
 
         functionBlock.addStep(step.getName(), step);
@@ -727,9 +648,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
-
-            // System.out.println(" actionName: " + actionName);
-            // System.out.println(" actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -745,7 +663,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         Step step = new Step();
 
         String stepName = ctx.step_name().getText();
-        // System.out.println("stepName: " + stepName + " (NORMAL STEP)");
         step.setName(stepName);
 
         functionBlock.addStep(step.getName(), step);
@@ -754,9 +671,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
-
-            // System.out.println(" actionName: " + actionName);
-            // System.out.println(" actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -769,14 +683,11 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitTransition(StructuredTextParser.TransitionContext ctx) {
 
-        // System.out.println("Transition");
-
         Transition transition = new Transition();
         functionBlock.getTempTransitions().add(transition);
 
         if (ctx.transition_name() != null) {
             String transitionName = ctx.transition_name().getText();
-            // System.out.println(" transitionName: " + transitionName);
 
             transition.setName(transitionName);
         }
@@ -788,7 +699,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             for (Step_nameContext Step_nameContext : step_nameContext) {
 
                 String stepName = Step_nameContext.getText();
-                // System.out.println(" stepName: " + stepName);
 
                 if (stepIndex == 0) {
                     transition.setSourceStepName(stepName);
@@ -801,8 +711,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // the transition condition
         Transition_conditionContext transition_conditionContext = ctx.transition_condition();
-        // System.out.println(" transition_conditionContext: " +
-        // transition_conditionContext.getText());
 
         // store transition inte temp list for later insertion into the source action
         transition.getExpressionList().addAll(expressionList);
@@ -815,7 +723,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void enterAction(StructuredTextParser.ActionContext ctx) {
 
         String actionName = ctx.action_name().getText();
-        // System.out.println("actionName: " + actionName);
 
         Action action = new Action();
         functionBlock.getAllActions().add(action);
@@ -840,17 +747,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         functionBlock.setFunctionBlockType(FunctionBlockType.SEQUENTIAL_FUNCTION_CHART);
     }
 
-    // @Override
-    // public void
-    // exitSequential_function_chart(StructuredTextParser.Sequential_function_chartContext
-    // ctx) {
-    // asdf
-    // }
-
     @Override
     public void visitTerminal(TerminalNode node) {
-        // System.out.println("TERMINAL: " + node.getText());
-
         if (StringUtils.equalsIgnoreCase("=", node.getText())) {
             equalsDetected = true;
         }

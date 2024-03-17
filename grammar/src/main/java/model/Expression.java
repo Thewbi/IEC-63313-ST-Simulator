@@ -2,6 +2,8 @@ package model;
 
 import java.util.List;
 
+import org.antlr.v4.runtime.RuntimeMetaData;
+
 import java.util.ArrayList;
 
 public class Expression {
@@ -14,24 +16,31 @@ public class Expression {
 
     private String variableNameValue;
 
+    private List<Expression> expressionList = new ArrayList<>();
+
     @Override
     public String toString() {
 
-        int indent = 1;
+        throw new RuntimeException("");
 
-        StringBuilder stringBuilder = new StringBuilder();
-        toStringSelf(stringBuilder, indent);
+        // int indent = 1;
 
-        for (Expression childExpression : expressionList) {
-            stringBuilder.append(childExpression.toString(indent + 1));
-        }
+        // StringBuilder stringBuilder = new StringBuilder();
+        // toStringSelf(stringBuilder, indent);
 
-        return stringBuilder.toString();
+        // for (Expression childExpression : expressionList) {
+        //     stringBuilder.append(childExpression.toString(indent + 1));
+        // }
+
+        // return stringBuilder.toString();
     }
 
     public String toString(int indent) {
 
         StringBuilder stringBuilder = new StringBuilder();
+
+        DataType.addIndent(stringBuilder, indent);
+
         toStringSelf(stringBuilder, indent);
 
         for (Expression childExpression : expressionList) {
@@ -43,10 +52,6 @@ public class Expression {
 
     private void toStringSelf(StringBuilder stringBuilder, int indent) {
 
-        for (int i = 0; i < indent; i++)
-        {
-            stringBuilder.append("  ");
-        }
         stringBuilder.append("Expression [ ");
         stringBuilder.append(" expressionType=" + expressionType + " ");
 
@@ -62,14 +67,8 @@ public class Expression {
             stringBuilder.append(" variableNameValue=" + variableNameValue + " ");
         }
 
-        // if (subprogramName != null) {
-        //     stringBuilder.append(" subprogramName=" + subprogramName + " ");
-        // }
-
         stringBuilder.append(" ]\n");
     }
-
-    private List<Expression> expressionList = new ArrayList<>();
 
     public List<Expression> getExpressionList() {
         return expressionList;
@@ -106,13 +105,5 @@ public class Expression {
     public void setVariableNameValue(String variableNameValue) {
         this.variableNameValue = variableNameValue;
     }
-
-    // public String getSubprogramName() {
-    //     return subprogramName;
-    // }
-
-    // public void setSubprogramName(String subprogramName) {
-    //     this.subprogramName = subprogramName;
-    // }
 
 }

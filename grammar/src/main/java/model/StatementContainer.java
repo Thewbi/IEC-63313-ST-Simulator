@@ -25,19 +25,37 @@ public interface StatementContainer {
 
                     // find the variable that is assigned a new value
                     String[] variableSplit = variableAsString.split("\\.");
+
                     VariableInstance target = contextVariableInstance;
-                    for (int i = 0; i < variableSplit.length; i++) {
+                    boolean isReturn = false;
 
-                        VariableInstance tempTarget = target.getElement(variableSplit[i]);
+                    // check if a value is assigned to the name of the function
+                    // if a value is assigned to the name of a function, then this is equivalent
+                    // to returning a value from the function
+                    if (contextVariableInstance.getDataType() instanceof Function) {
+                        if (StringUtils.equalsIgnoreCase(variableSplit[0], contextVariableInstance.getName())) {
+                            // System.out.println("Return");
+                            isReturn = true;
+                        }
+                    }
 
-                        if (tempTarget == null) {
-                            String msg = "Cannot find \"" + variableSplit[i] + "\" in \"" + target.getName() + "\"";
-                            System.out.println(msg);
-                            throw new RuntimeException(msg);
+                    if (!isReturn) {
+
+                        for (int i = 0; i < variableSplit.length; i++) {
+
+                            VariableInstance tempTarget = target.getElement(variableSplit[i]);
+
+                            if (tempTarget == null) {
+                                String msg = "Cannot find \"" + variableSplit[i] + "\" in \"" + target.getName() + "\"";
+                                System.out.println(msg);
+                                throw new RuntimeException(msg);
+                            }
+
+                            target = tempTarget;
                         }
 
-                        target = tempTarget;
                     }
+
                     // System.out.println(target);
 
                     if (target == null) {

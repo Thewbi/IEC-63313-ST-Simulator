@@ -117,7 +117,7 @@ public class ExpressionUtil {
             }
 
             case FUNCTION_CALL: {
-                System.out.println(source);
+                // System.out.println(source);
                 // System.out.println(globalTypeScope);
 
                 String varName = expression.getVariableNameValue();

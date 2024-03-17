@@ -113,8 +113,11 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_3.st";
 
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
+
         String pathAsString =
-        "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
+        "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -492,11 +495,11 @@ public class Main {
 
             programInstance.executeStatements(globalTypeScope, programInstance, null, null);
 
-            // DEBUG output all variable values
-            Collection<VariableDescriptor> variables = programInstance.getElements().values();
-            for (VariableDescriptor variableDescriptor : variables) {
-                System.out.println(variableDescriptor);
-            }
+            // // DEBUG output all variable values
+            // Collection<VariableDescriptor> variables = programInstance.getElements().values();
+            // for (VariableDescriptor variableDescriptor : variables) {
+            //     System.out.println(variableDescriptor);
+            // }
 
             // // DEBUG output global status struct
             // VariableInstance stoerung =

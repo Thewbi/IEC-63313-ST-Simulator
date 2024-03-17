@@ -35,8 +35,9 @@ public class AssignmentStatement extends Statement {
         addIndent(stringBuilder, indent + 1);
         stringBuilder.append("expression: \n");
         for (Expression childExpression : expressionList) {
-            addIndent(stringBuilder, indent + 1);
-            stringBuilder.append(childExpression);
+            // addIndent(stringBuilder, indent + 1);
+            // stringBuilder.append(childExpression);
+            stringBuilder.append(childExpression.toString(indent + 2));
         }
 
         return stringBuilder.toString();
