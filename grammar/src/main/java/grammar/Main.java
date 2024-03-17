@@ -475,9 +475,10 @@ public class Main {
         // execution
         //
 
-        for (int step = 0; step < 500; step++) {
+        for (int executionIteration = 0; executionIteration < 500; executionIteration++) {
 
-            System.out.println("step " + step);
+            System.out.println("");
+            System.out.println("executionIteration " + executionIteration);
 
             // // DEBUG - prevent TON timeout
             // if (step == 3) {

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.stringtemplate.v4.ST;
 
 import model.Action;
 import model.DataType;
@@ -59,6 +60,31 @@ public class VariableInstance implements StatementContainer {
         for (final Transition transition : tempTransitions) {
             final String sourceStepName = transition.getSourceStepName();
             steps.get(sourceStepName).getTransistions().add(transition);
+        }
+
+        // DEBUG build transition names
+        for (final Transition transition : tempTransitions) {
+            
+            StringBuilder stringBuilder = new StringBuilder();
+
+            final String sourceStepName = transition.getSourceStepName();
+            stringBuilder.append(sourceStepName);
+
+            stringBuilder.append(" ---> ");
+
+            int idx = 0;
+            for (String targetStepName : transition.getTargetStepNames()) {
+
+                if (idx > 0) {
+                    stringBuilder.append(", ");
+                }
+                stringBuilder.append(targetStepName);
+
+                idx++;
+            }
+
+            transition.setName(stringBuilder.toString());
+
         }
 
         // add the initial steps into the list of currentSteps
@@ -136,8 +162,6 @@ public class VariableInstance implements StatementContainer {
             return;
         }
 
-        // System.out.println("executeStateMachine()");
-
         // 1. All actions of the entire SequentialFunctionChart are set to
         // isExecuted(false);
         for (Action action : allActions) {
@@ -171,19 +195,13 @@ public class VariableInstance implements StatementContainer {
         List<Step> stepsToRemove = new ArrayList<>();
         for (Step step : currentSteps) {
             for (Transition transition : step.getTransistions()) {
-
                 boolean evalResult = transition.evaluate(this);
-
-                // System.out.println("evalResult: " + evalResult);
-
                 if (evalResult) {
 
-                    // System.out.println("TRUE: " + evalResult);
+                    System.out.println("Applying transition \"" + transition.getName() + "\"");
 
-                    // TODO
                     // - the old state is removed from the current step list
                     // - the new state is added to the current step list
-
                     stepsToRemove.add(step);
                     for (String targetStepName : transition.getTargetStepNames()) {
                         stepsToAdd.add(this.getSteps().get(targetStepName));
@@ -192,13 +210,11 @@ public class VariableInstance implements StatementContainer {
             }
         }
 
-        // System.out.println(stepsToRemove);
+        // - the old state is removed from the current step list
         currentSteps.removeAll(stepsToRemove);
 
-        // System.out.println(stepsToAdd);
+        // - the new state is added to the current step list
         currentSteps.addAll(stepsToAdd);
-
-        // System.out.println("");
     }
 
     public String getName() {

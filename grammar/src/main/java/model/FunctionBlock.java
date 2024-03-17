@@ -1,9 +1,8 @@
 package model;
 
-import java.util.List;
 import java.util.ArrayList;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -18,30 +17,13 @@ public class FunctionBlock extends VarScope {
 
     private Map<String, Step> steps = new HashMap<>();
 
-    private List<Step> currentSteps = new ArrayList<>();
+    // private List<Step> currentSteps = new ArrayList<>();
 
     /**
      * first, transitions are inserted into this list, then in a second step
      * inserted into their respective source actions
      */
     private List<Transition> tempTransitions = new ArrayList<>();
-
-    // public void initialize() {
-        
-    //     // take the transitions out of the tempTransitions list and add
-    //     // them into the steps they originate from
-    //     for (final Transition transition : tempTransitions) {
-    //         final String sourceStepName = transition.getSourceStepName();
-    //         steps.get(sourceStepName).getTransistions().add(transition);
-    //     }
-
-    //     // add the initial steps into the list of currentSteps
-    //     for (final Step step : steps.values()) {
-    //         if (step.isInitial()) {
-    //             currentSteps.add(step);
-    //         }
-    //     }
-    // }
 
     @Override
     public String toString() {
@@ -60,7 +42,7 @@ public class FunctionBlock extends VarScope {
         } else {
             for (Action action : getAllActions()) {
                 stringBuilder.append("\n");
-                stringBuilder.append(action.toString(indent+1));
+                stringBuilder.append(action.toString(indent + 1));
             }
         }
         stringBuilder.append("\n");
@@ -72,8 +54,7 @@ public class FunctionBlock extends VarScope {
         } else {
             stringBuilder.append("\n");
             for (Transition transition : tempTransitions) {
-                // stringBuilder.append("\n");
-                stringBuilder.append(transition.toString(indent+1));
+                stringBuilder.append(transition.toString(indent + 1));
             }
         }
         stringBuilder.append("\n");
@@ -85,7 +66,7 @@ public class FunctionBlock extends VarScope {
         } else {
             stringBuilder.append("\n");
             for (Step step : steps.values()) {
-                stringBuilder.append(step.toString(indent+1));
+                stringBuilder.append(step.toString(indent + 1));
             }
         }
         stringBuilder.append("\n");

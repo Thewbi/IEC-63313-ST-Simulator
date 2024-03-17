@@ -24,6 +24,8 @@ public class Action extends VarScope implements StatementContainer {
             return;
         }
 
+        System.out.println("Execution action: \"" + name + "\"");
+
         // execute the statements in the context of the output variableInstance (== FunctionBlock)
         this.executeStatements(parentVariableInstance, this.getStatements());
     }
