@@ -67,7 +67,6 @@ public class FunctionBlock extends VarScope {
                 stringBuilder.append(step.toString(indent + 1));
             }
         }
-        // stringBuilder.append("\n");
 
         return stringBuilder.toString();
     }

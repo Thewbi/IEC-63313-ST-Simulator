@@ -60,8 +60,10 @@ FUNCTION_BLOCK AKT_5_2_MV
     Diag : Diag;
   END_VAR
   VAR
+    _TMP_NOT40_OUT : BOOL;
     _TMP_AND6_OUT : BOOL;
     _TMP_AND9_OUT : BOOL;
+    _TMP_AND39_OUT : BOOL;
     _TMP_NOT17_OUT : BOOL;
     _TMP_AND15_OUT : BOOL;
     _TMP_OR30_OUT : BOOL;
@@ -69,12 +71,15 @@ FUNCTION_BLOCK AKT_5_2_MV
     _TMP_AND19_OUT : BOOL;
     _TMP_AND18_OUT : BOOL;
     _TMP_AND36_OUT : BOOL;
+    _TMP_OR42_OUT : BOOL;
   END_VAR
 
+  _TMP_NOT40_OUT := NOT(status.NotHalt);
   _TMP_AND6_OUT := AND(status.BART_Hand, Hand_P2);
   _TMP_AND9_OUT := AND(status.BART_Hand, Hand_P1);
   SR0(S1 := _TMP_AND6_OUT, R := _TMP_AND9_OUT);
-  s_MV_P2_FF := SR0.Q1;
+  _TMP_AND39_OUT := AND(_TMP_NOT40_OUT, SR0.Q1);
+  s_MV_P2_FF := _TMP_AND39_OUT;
   _TMP_NOT17_OUT := NOT(SEN_P2);
   _TMP_AND15_OUT := AND(_TMP_NOT17_OUT, Hand_P2);
   TON0(IN := _TMP_AND15_OUT, PT := const_T_Laufzeit_P2);
@@ -90,7 +95,8 @@ FUNCTION_BLOCK AKT_5_2_MV
   _TMP_AND18_OUT := AND(status.BART_Hand, Hand_P1);
   _TMP_AND36_OUT := AND(status.BART_Hand, Hand_P2);
   SR1(S1 := _TMP_AND18_OUT, R := _TMP_AND36_OUT);
-  s_MV_P1_FF := SR1.Q1;
+  _TMP_OR42_OUT := OR(status.NotHalt, SR1.Q1);
+  s_MV_P1_FF := _TMP_OR42_OUT;
 END_FUNCTION_BLOCK
 
 FUNCTION_BLOCK SequentialFunctionChart
@@ -142,6 +148,7 @@ FUNCTION_BLOCK SequentialFunctionChart
 
 END_FUNCTION_BLOCK
 
+/*
 FUNCTION FA_SERV : BOOL
   VAR_INPUT
     status : S_FA_STATUS;
@@ -159,6 +166,7 @@ FUNCTION FA_SERV : BOOL
   status.Stoer_Quit := Stoer_Quit;
   status.NotHalt := NotHalt;
 END_FUNCTION
+*/
 
 PROGRAM program0_POU
   VAR
@@ -191,14 +199,17 @@ PROGRAM program0_POU
   END_VAR
 
   global_status.BART_Hand := FA_BART_Hand_T_HMI;
-  _TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI, FA_BART_Auto_T_HMI, FA_Stoerung_T_HMI, FA_Stoer_Quit_T_HMI, FA_NotHalt_T_HMI);
-  DebugBoolean := _TMP_FA_SERV1_OUT;
+  //_TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI, FA_BART_Auto_T_HMI, FA_Stoerung_T_HMI, FA_Stoer_Quit_T_HMI, FA_NotHalt_T_HMI);
+  //DebugBoolean := _TMP_FA_SERV1_OUT;
+  
   AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI, Diag := Diag);
   s_MV_P2_FF := AKT_5_2_MV0.s_MV_P2_FF;
   s_MV_P1_FF := AKT_5_2_MV0.s_MV_P1_FF;
-  SequentialFunctionChart0();
+
+  //SequentialFunctionChart0();
 END_PROGRAM
 
+/*
 FUNCTION_BLOCK FA
   VAR
     Status : S_FA_STATUS;
@@ -206,10 +217,9 @@ FUNCTION_BLOCK FA
 
   Status.Stoerung := TRUE;
 END_FUNCTION_BLOCK
-
+*/
 
 CONFIGURATION Config0
-
   RESOURCE Res0 ON PLC
     VAR_GLOBAL
       global_status : S_FA_STATUS;

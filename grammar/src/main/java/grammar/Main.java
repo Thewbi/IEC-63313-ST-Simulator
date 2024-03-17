@@ -4,19 +4,18 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
-import java.util.Map;
-import java.util.List;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
 import com.st.grammar.ASTListener;
@@ -32,35 +31,25 @@ import com.st.grammar.StructuredTextParser.Function_block_declarationContext;
 import com.st.grammar.StructuredTextParser.Interface_declarationContext;
 import com.st.grammar.StructuredTextParser.Program_declarationContext;
 
-import common.TimeUtils;
 import instance.ConfigurationInstance;
 import instance.ProgramInstance;
 import instance.RSVariableInstance;
 import instance.SRVariableInstance;
 import instance.TONVariableInstance;
-import instance.VariableDescriptor;
 import instance.VariableInstance;
-import model.AssignmentStatement;
 import model.BooleanDataType;
 import model.DataType;
-import model.Expression;
 import model.Field;
 import model.FunctionBlock;
-import model.ParameterAssignment;
 import model.Program;
-import model.Statement;
 import model.Step;
 import model.Struct;
-import model.SubprogramControlStatement;
 import model.TimeDataType;
 import model.TypeScope;
 import model.UIntDataType;
-import model.VarScope;
 import model.Variable;
 import virtual_devices.Cylinder;
 import virtual_devices.CylinderCallback;
-
-import javax.swing.*;
 
 public class Main {
 
@@ -116,8 +105,7 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
-        String pathAsString =
-        "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -133,9 +121,11 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
 
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
@@ -152,7 +142,7 @@ public class Main {
         // Assignment_statementContext root = parser.assignment_statement();
         Compilation_unitContext root = parser.compilation_unit();
 
-        //debugOutputAST(root);
+        // debugOutputAST(root);
         execute(root);
 
         System.out.println("");
@@ -392,16 +382,29 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        cylinder.setHasErrorNeverReachesPosition1(true);
+        //cylinder.setHasErrorNeverReachesPosition1(true);
         // cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
         // GUI
         //
 
-        JFrame mainJFrame = new JFrame();
-        mainJFrame.setTitle("IEC 61131-3 Simulator HMI (Version: 0.0.0)");
         JPanel panel = new JPanel();
+
+        // emergency stop
+        JButton notHaltJButton = new JButton("Nothalt");
+        notHaltJButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                VariableInstance status = programInstance.getElement("global_status");
+                VariableInstance emergencyStop = status.getElement("NotHalt");
+                emergencyStop.setValue("true");
+            }
+
+        });
+        panel.add(notHaltJButton);
 
         // Button to make the cylinder travel towards P1
         JButton buttonP1 = new JButton("P1");
@@ -410,10 +413,10 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // user has requested the cylinder move to P1
-                VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
-                hmi.setValue("true");
+                VariableInstance tasterPosition1 = programInstance.getElement("Zyl1_T_P1_HMI");
+                tasterPosition1.setValue("true");
 
-                cylinder.moveToPosition1();
+                // cylinder.moveToPosition1();
             }
 
         });
@@ -442,7 +445,7 @@ public class Main {
                 VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
                 hmi.setValue("true");
 
-                cylinder.moveToPosition2();
+                // cylinder.moveToPosition2();
             }
 
         });
@@ -466,6 +469,8 @@ public class Main {
 
         panel.add(jLabel);
 
+        JFrame mainJFrame = new JFrame();
+        mainJFrame.setTitle("IEC 61131-3 Simulator HMI (Version: 0.0.0)");
         mainJFrame.add(panel);
 
         // Fenstergröße wird so angepasst, dass
@@ -496,9 +501,10 @@ public class Main {
             programInstance.executeStatements(globalTypeScope, programInstance, null, null);
 
             // // DEBUG output all variable values
-            // Collection<VariableDescriptor> variables = programInstance.getElements().values();
+            // Collection<VariableDescriptor> variables =
+            // programInstance.getElements().values();
             // for (VariableDescriptor variableDescriptor : variables) {
-            //     System.out.println(variableDescriptor);
+            // System.out.println(variableDescriptor);
             // }
 
             // // DEBUG output global status struct
@@ -515,6 +521,18 @@ public class Main {
             if (diag != null) {
                 VariableInstance diagStoerung = diag.getElement("Stoerung");
                 jLabel.setText("Stoerung: " + diagStoerung.getValue());
+            }
+
+            VariableInstance position1Requested = programInstance.getElement("s_MV_P1_FF");
+            // System.out.println(position1Requested);
+            if (StringUtils.equalsIgnoreCase(position1Requested.getValue(), "true")) {
+                cylinder.moveToPosition1();
+            }
+
+            VariableInstance position2Requested = programInstance.getElement("s_MV_P2_FF");
+            // System.out.println(position2Requested);
+            if (StringUtils.equalsIgnoreCase(position2Requested.getValue(), "true")) {
+                cylinder.moveToPosition2();
             }
 
             // DEBUG
@@ -736,7 +754,7 @@ public class Main {
 
         Map<String, Step> newMap = new HashMap<String, Step>();
         newMap.putAll(functionBlock.getSteps());
-        
+
         variableInstance.setSteps(newMap);
 
         variableInstance.initialize();

@@ -290,4 +290,9 @@ public class VariableInstance implements StatementContainer {
         return null;
     }
 
+    @Override
+    public String toString() {
+        return "VariableInstance [name=" + name + ", dataType=" + dataType.toString(0) + ", value=" + value + "]";
+    }
+
 }

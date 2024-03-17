@@ -44,7 +44,7 @@ public class ExpressionUtil {
                     VariableInstance tempTarget = target.getElement(variableSplit[i]);
                     if (tempTarget == null) {
                         String msg = "Cannot find \"" + variableSplit[i] + "\" in " + oldTarget.getName()
-                                + " " + oldTarget.getDataType();
+                                + " " + oldTarget.getDataType().toString(1);
                         System.out.println(msg);
                         throw new RuntimeException(msg);
                     }

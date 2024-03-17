@@ -555,8 +555,9 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         if (ctx.unary_operator() != null) {
             String operatorAsString = ctx.unary_operator().getText();
             if (StringUtils.equalsIgnoreCase(operatorAsString, "not")) {
-                notExpression.getExpressionList().add(expressionList.get(0));
-                expressionList.remove(0);
+
+                notExpression.getExpressionList().addAll(expressionList);
+                clearExpressionList();
                 addToExpressionList(notExpression);
             }
         }
