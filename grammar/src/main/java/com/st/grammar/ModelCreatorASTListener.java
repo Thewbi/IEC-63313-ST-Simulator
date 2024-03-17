@@ -1,7 +1,7 @@
 package com.st.grammar;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -20,6 +20,7 @@ import com.st.grammar.StructuredTextParser.Xor_expressionContext;
 import model.Action;
 import model.ActionAssociation;
 import model.AssignmentStatement;
+import model.Configuration;
 import model.DataType;
 import model.Expression;
 import model.ExpressionType;
@@ -37,7 +38,6 @@ import model.Transition;
 import model.TypeScope;
 import model.VarScope;
 import model.Variable;
-import model.Configuration;
 
 public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
@@ -539,7 +539,6 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             expressionList.clear();
             // expressionList.add(expression);
             expressionList.add(andExpression);
-
         }
     }
 
@@ -659,7 +658,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         step.setInitial(true);
 
         String stepName = ctx.step_name().getText();
-        System.out.println("stepName: " + stepName + " (INITIAL STEP)");
+        // System.out.println("stepName: " + stepName + " (INITIAL STEP)");
         step.setName(stepName);
 
         functionBlock.addStep(step.getName(), step);
@@ -669,8 +668,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
 
-            System.out.println("  actionName: " + actionName);
-            System.out.println("  actionQualifier: " + actionQualifier);
+            // System.out.println("  actionName: " + actionName);
+            // System.out.println("  actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -686,7 +685,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
         Step step = new Step();
 
         String stepName = ctx.step_name().getText();
-        System.out.println("stepName: " + stepName + " (NORMAL STEP)");
+        // System.out.println("stepName: " + stepName + " (NORMAL STEP)");
         step.setName(stepName);
 
         functionBlock.addStep(step.getName(), step);
@@ -696,8 +695,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             String actionName = action_associationContext.action_name().getText();
             String actionQualifier = action_associationContext.action_qualifier().getText();
 
-            System.out.println("  actionName: " + actionName);
-            System.out.println("  actionQualifier: " + actionQualifier);
+            // System.out.println("  actionName: " + actionName);
+            // System.out.println("  actionQualifier: " + actionQualifier);
 
             ActionAssociation actionAssociation = new ActionAssociation();
             actionAssociation.setName(actionName);
@@ -710,14 +709,14 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitTransition(StructuredTextParser.TransitionContext ctx) {
 
-        System.out.println("Transition");
+        // System.out.println("Transition");
 
         Transition transition = new Transition();
         functionBlock.getTempTransitions().add(transition);
 
         if (ctx.transition_name() != null) {
             String transitionName = ctx.transition_name().getText();
-            System.out.println("  transitionName: " + transitionName);
+            // System.out.println("  transitionName: " + transitionName);
 
             transition.setName(transitionName);
         }
@@ -729,7 +728,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
             for (Step_nameContext Step_nameContext : step_nameContext) {
 
                 String stepName = Step_nameContext.getText();
-                System.out.println("  stepName: " + stepName);
+                // System.out.println("  stepName: " + stepName);
 
                 if (stepIndex == 0) {
                     transition.setSourceStepName(stepName);
@@ -742,7 +741,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
         // the transition condition
         Transition_conditionContext transition_conditionContext = ctx.transition_condition();
-        System.out.println("  transition_conditionContext: " + transition_conditionContext.getText());
+        // System.out.println("  transition_conditionContext: " + transition_conditionContext.getText());
 
         // store transition inte temp list for later insertion into the source action
         transition.getExpressionList().addAll(expressionList);
@@ -754,10 +753,10 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void enterAction(StructuredTextParser.ActionContext ctx) {
 
         String actionName = ctx.action_name().getText();
-        System.out.println("actionName: " + actionName);
+        // System.out.println("actionName: " + actionName);
 
         Action action = new Action();
-        functionBlock.getTempActions().add(action);
+        functionBlock.getAllActions().add(action);
         action.setName(actionName);
 
         // action is the new scope

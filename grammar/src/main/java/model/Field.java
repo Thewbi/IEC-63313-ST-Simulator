@@ -14,7 +14,7 @@ public class Field {
     }
 
     public String toString(final int indent) {
-        return "Field [dataType=" + dataType + ", initialValue=" + initialValue + "]";
+        return "Field [dataType=" + dataType.toString(indent) + ", initialValue=" + initialValue + "]";
     }
 
     public DataType getDataType() {

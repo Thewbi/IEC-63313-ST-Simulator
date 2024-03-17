@@ -21,7 +21,7 @@ public class TimeUtils {
 
             substring = substring.substring(0, substring.length() - 2);
 
-            System.out.println(substring);
+            // System.out.println(substring);
 
             long lValue = Long.parseLong(substring);
 
@@ -31,7 +31,7 @@ public class TimeUtils {
 
             substring = substring.substring(0, substring.length() - 1);
 
-            System.out.println(substring);
+            // System.out.println(substring);
 
             long lValue = Long.parseLong(substring);
 
@@ -41,5 +41,5 @@ public class TimeUtils {
 
         return 0L;
     }
-    
+
 }

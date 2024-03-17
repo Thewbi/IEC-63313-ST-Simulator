@@ -2,7 +2,6 @@ package model;
 
 import java.util.List;
 
-import org.antlr.v4.runtime.RuntimeMetaData;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,7 +41,7 @@ public class VarScope extends DataType {
         stringBuilder.append(getClass().getSimpleName() + " [name=" + getName() + " ");
 
         stringBuilder.append("\n");
-        addIndent(stringBuilder, indent+1);
+        addIndent(stringBuilder, indent + 1);
         stringBuilder.append("Variables: ");
         if (CollectionUtils.isEmpty(getVariables())) {
             stringBuilder.append("No Variables");
@@ -53,14 +52,14 @@ public class VarScope extends DataType {
                 if (variable.getDataType() instanceof FunctionBlock) {
 
                     // stringBuilder.append("\n");
-                    addIndent(stringBuilder, indent+2);
+                    addIndent(stringBuilder, indent + 2);
                     stringBuilder.append(variable.toShortString());
 
                 } else {
 
                     // stringBuilder.append("\n");
                     // addIndent(stringBuilder, indent+2);
-                    stringBuilder.append(variable.toString(indent+2));
+                    stringBuilder.append(variable.toString(indent + 2));
                 }
 
                 stringBuilder.append("\n");
@@ -68,15 +67,15 @@ public class VarScope extends DataType {
         }
 
         stringBuilder.append("\n");
-        addIndent(stringBuilder, indent+1);
+        addIndent(stringBuilder, indent + 1);
         stringBuilder.append("Statements: ");
         if (CollectionUtils.isEmpty(getStatements())) {
             stringBuilder.append("No Statements");
         } else {
-            
+
             for (Statement statment : getStatements()) {
                 stringBuilder.append("\n");
-                stringBuilder.append(statment.toString(indent+2));
+                stringBuilder.append(statment.toString(indent + 2));
             }
         }
 
@@ -94,5 +93,5 @@ public class VarScope extends DataType {
     public void addStatement(Statement statement) {
         statements.add(statement);
     }
-    
+
 }

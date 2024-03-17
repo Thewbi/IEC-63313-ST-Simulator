@@ -12,7 +12,7 @@ public class FunctionBlock extends VarScope {
 
     private FunctionBlockType functionBlockType = FunctionBlockType.STRUCTURED_TEXT;
 
-    private List<Action> tempActions = new ArrayList<>();
+    private List<Action> allActions = new ArrayList<>();
 
     private List<Action> globalActions = new ArrayList<>();
 
@@ -26,22 +26,22 @@ public class FunctionBlock extends VarScope {
      */
     private List<Transition> tempTransitions = new ArrayList<>();
 
-    public void initialize() {
+    // public void initialize() {
         
-        // take the transitions out of the tempTransitions list and add
-        // them into the steps they originate from
-        for (final Transition transition : tempTransitions) {
-            final String sourceStepName = transition.getSourceStepName();
-            steps.get(sourceStepName).getTransistions().add(transition);
-        }
+    //     // take the transitions out of the tempTransitions list and add
+    //     // them into the steps they originate from
+    //     for (final Transition transition : tempTransitions) {
+    //         final String sourceStepName = transition.getSourceStepName();
+    //         steps.get(sourceStepName).getTransistions().add(transition);
+    //     }
 
-        // add the initial steps into the list of currentSteps
-        for (final Step step : steps.values()) {
-            if (step.isInitial()) {
-                currentSteps.add(step);
-            }
-        }
-    }
+    //     // add the initial steps into the list of currentSteps
+    //     for (final Step step : steps.values()) {
+    //         if (step.isInitial()) {
+    //             currentSteps.add(step);
+    //         }
+    //     }
+    // }
 
     @Override
     public String toString() {
@@ -55,10 +55,10 @@ public class FunctionBlock extends VarScope {
 
         addIndent(stringBuilder, indent);
         stringBuilder.append("TempActions: ");
-        if (CollectionUtils.isEmpty(getTempActions())) {
+        if (CollectionUtils.isEmpty(getAllActions())) {
             stringBuilder.append("No TempActions");
         } else {
-            for (Action action : getTempActions()) {
+            for (Action action : getAllActions()) {
                 stringBuilder.append("\n");
                 stringBuilder.append(action.toString(indent+1));
             }
@@ -105,12 +105,12 @@ public class FunctionBlock extends VarScope {
         this.functionBlockType = functionBlockType;
     }
 
-    public List<Action> getTempActions() {
-        return tempActions;
+    public List<Action> getAllActions() {
+        return allActions;
     }
 
-    public void setTempActions(List<Action> tempActions) {
-        this.tempActions = tempActions;
+    public void setAllActions(List<Action> allActions) {
+        this.allActions = allActions;
     }
 
     public List<Action> getGlobalActions() {
@@ -129,20 +129,7 @@ public class FunctionBlock extends VarScope {
         this.tempTransitions = tempTransitions;
     }
 
-    /**
-     * <ol>
-     * <li>all steps in the current step list are executed.</li>
-     * <li>if the current step executes an action using the S qualifier, the action is added to the list
-     * of global actions of the SequentialFunctionChart function block unless the action is added already.</li>
-     * <li>the global actions of the SequentialFunctionChart function block are executed.</li>
-     * <li>the local actions of all current steps are executed.</li>
-     * <li>All transitions of the current steps are evaluated. For each transition that is activated
-     * - the source state is removed from the current step list
-     * - the target state is added to the current step list</li>
-     * </ol>
-     */
-    public void executeStateMachine() {
-        System.out.println("executeStateMachine()");
+    public Map<String, Step> getSteps() {
+        return steps;
     }
-
 }

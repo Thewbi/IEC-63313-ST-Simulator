@@ -1,7 +1,5 @@
 package instance;
 
-import org.apache.commons.lang3.StringUtils;
-
 import common.TimeUtils;
 
 import java.util.Timer;
@@ -83,7 +81,4 @@ public class TONVariableInstance extends VariableInstance {
 
         timer = null;
     }
-
-    
-
 }

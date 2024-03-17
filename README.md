@@ -230,12 +230,16 @@ When the SequentialFunctionChart is instantiated
 
 When the SequentialFunctionChart function block is executed for the current cycle:
 
-1. all steps in the current step list are executed.
-2. if the current step executes an action using the S qualifier, the action is added to the list
+1. All actions of the entire SequentialFunctionChart are set to isExecuted(false);
+2. the global actions of the SequentialFunctionChart function block are executed.
+After execution, isExecuted(true) is called.
+3. all steps in the current step list are executed.
+4. if the current step executes an action using the S qualifier, the action is added to the list
 of global actions of the SequentialFunctionChart function block unless the action is added already.
-3. the global actions of the SequentialFunctionChart function block are executed.
-4. the local actions of all current steps are executed.
-5. All transitions are evaluated. For each transition that is activated
+5. the global actions of the SequentialFunctionChart function block are executed unless they have already
+been executed: isExecuted(true).
+6. the local actions of all current steps are executed.
+7. All transitions are evaluated. For each transition that is activated
 * the old state is removed from the current step list
 * the new state is added to the current step list
 

@@ -1,7 +1,9 @@
 package model;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+
+import instance.VariableInstance;
 
 public class Transition {
 
@@ -13,30 +15,38 @@ public class Transition {
 
     public List<Expression> expressionList = new ArrayList<>();
 
+    public boolean evaluate(VariableInstance variableInstance) {
+        VariableInstance source = variableInstance;
+        for (Expression expression : expressionList) {
+            source = ExpressionUtil.evaluateExpression(source, expression);
+        }
+        return Boolean.parseBoolean(source.getValue());
+    }
+
     public String toString(int indent) {
 
         StringBuilder stringBuilder = new StringBuilder();
         DataType.addIndent(stringBuilder, indent);
         stringBuilder.append("Transition").append("\n");
-        
-        DataType.addIndent(stringBuilder, indent+1);
+
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("name = " + name).append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("sourceStepName = " + sourceStepName).append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("targetStepName = ");
         for (String targetStep : targetStepNames) {
             stringBuilder.append(targetStep).append(", ");
         }
         stringBuilder.append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("expression = ");
         stringBuilder.append("\n");
         for (Expression expression : expressionList) {
-            stringBuilder.append(expression.toString(indent+2));
+            stringBuilder.append(expression.toString(indent + 2));
         }
         // stringBuilder.append("\n");
 

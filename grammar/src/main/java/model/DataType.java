@@ -3,7 +3,6 @@ package model;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.antlr.v4.runtime.RuntimeMetaData;
 import org.apache.commons.collections4.MapUtils;
 
 public abstract class DataType {

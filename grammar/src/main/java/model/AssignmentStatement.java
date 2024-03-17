@@ -18,6 +18,11 @@ public class AssignmentStatement extends Statement {
 
     @Override
     public String toString() {
+        throw new RuntimeException();
+    }
+
+    @Override
+    public String toString(final int indent) {
         //return "AssignmentStatement [expressionList=" + expressionList + "]";
 
         StringBuilder stringBuilder = new StringBuilder();

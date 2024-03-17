@@ -1,6 +1,9 @@
 package model;
 
 import java.util.List;
+
+import instance.VariableInstance;
+
 import java.util.ArrayList;
 
 public class Step {
@@ -21,30 +24,69 @@ public class Step {
      */
     private List<Transition> transistions = new ArrayList<>();
 
+    public void execute(VariableInstance functionBlockVariableInstance) {
+
+        // System.out.println("");
+
+        for (ActionAssociation actionAssociation : actionAssociations) {
+
+            // System.out.println(actionAssociation);
+
+            String qualifierAsString = actionAssociation.getQualifier();
+            final ActionQualifier actionQualifier = ActionQualifier.valueOf(qualifierAsString);
+
+            switch (actionQualifier) {
+
+                case N: {
+                    System.out.println("Setting " + actionAssociation.getName());
+
+                    VariableInstance varInstance = functionBlockVariableInstance
+                            .getElement(actionAssociation.getName());
+                    varInstance.setValue("true");
+                }
+                    break;
+
+                case S: {
+
+                    System.out.println("Processing Action: " + actionAssociation.getName());
+
+                    Action action = functionBlockVariableInstance.getActionByName(actionAssociation.getName());
+                    if (!functionBlockVariableInstance.getGlobalActions().contains(action)) {
+                        functionBlockVariableInstance.getGlobalActions().add(action);
+                    }
+                }
+                    break;
+
+                default:
+                    throw new RuntimeException("Not implemented: \"" + qualifierAsString + "\"");
+            }
+        }
+    }
+
     public String toString(int indent) {
 
         StringBuilder stringBuilder = new StringBuilder();
         DataType.addIndent(stringBuilder, indent);
         stringBuilder.append("Step").append("\n");
-        
-        DataType.addIndent(stringBuilder, indent+1);
+
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("name = " + name).append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("initial = " + initial).append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("actionAssociations = ");
         stringBuilder.append("\n");
         for (ActionAssociation actionAssociation : actionAssociations) {
-            stringBuilder.append(actionAssociation.toString(indent+2));
+            stringBuilder.append(actionAssociation.toString(indent + 2));
         }
         // stringBuilder.append("\n");
 
-        DataType.addIndent(stringBuilder, indent+1);
+        DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("actions = ");
         for (Action action : actions) {
-            stringBuilder.append(action.toString(indent+2));
+            stringBuilder.append(action.toString(indent + 2));
         }
         stringBuilder.append("\n");
 
@@ -90,5 +132,5 @@ public class Step {
     public void setTransistions(List<Transition> transistions) {
         this.transistions = transistions;
     }
-    
+
 }
