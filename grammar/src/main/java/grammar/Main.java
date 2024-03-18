@@ -392,16 +392,28 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        cylinder.setHasErrorNeverReachesPosition1(true);
+        //cylinder.setHasErrorNeverReachesPosition1(true);
         //cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
         // GUI
         //
 
+        //
+        // in HasErrorNeverReachesPosition1/2 state the cylinder will only move to
+        // the center location and remain located there, it will not reach the other
+        // position and it will not trigger the lightbar sensor! This will case the
+        // runtime duration check to trigger and cause a system error. The system 
+        // error is persistent/retained and only goes away when error is acknowledged (Quittiert)
+        //
+        // If you remove the HasErrorNeverReachesPosition1/2 state, the cylinder will 
+        // restart movement and eventually arrive at the other location and trigger
+        // the light bar. Potential existing errors remain since their are persistent/retained.
+        // Errors only go away when error is acknowledged (Quittiert)
+        //
+
         JPanel panel = new JPanel();
 
-        // emergency stop
         JButton notHaltJButton = new JButton("NotHalt");
         notHaltJButton.addActionListener(new ActionListener() {
 
@@ -415,6 +427,77 @@ public class Main {
 
         });
         panel.add(notHaltJButton);
+
+        // stoerung quittieren
+        JButton resetErrorStateJButton = new JButton("Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
+        resetErrorStateJButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                // VariableInstance status = programInstance.getElement("global_status");
+                // VariableInstance stoerQuit = status.getElement("Stoer_Quit");
+
+                VariableInstance stoerQuitTasterHMI = programInstance.getElement("FA_Stoer_Quit_T_HMI");
+
+                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(stoerQuitTasterHMI.getValue(), "true");
+                if (valueAsBoolean) {
+                    stoerQuitTasterHMI.setValue("false");
+                } 
+                else {
+                    stoerQuitTasterHMI.setValue("true");
+                }
+
+                resetErrorStateJButton.setText("Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
+            }
+
+        });
+        panel.add(resetErrorStateJButton);
+
+        cylinder.setHasErrorNeverReachesPosition1(false);
+        cylinder.setHasErrorNeverReachesPosition2(false);
+
+        JButton toggleHasErrorNeverReachesPosition1JButton = new JButton("ERR P1 (" + cylinder.isHasErrorNeverReachesPosition1() + ")");
+        toggleHasErrorNeverReachesPosition1JButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (cylinder.isHasErrorNeverReachesPosition1()) {
+                    cylinder.setHasErrorNeverReachesPosition1(false);
+                    
+                } else {
+                    cylinder.setHasErrorNeverReachesPosition1(true);
+                }
+
+                boolean newValue = cylinder.isHasErrorNeverReachesPosition1();
+                toggleHasErrorNeverReachesPosition1JButton.setText("ERR P1 (" + newValue + ")");
+            }
+
+        });
+        panel.add(toggleHasErrorNeverReachesPosition1JButton);
+
+        JButton toggleHasErrorNeverReachesPosition2JButton = new JButton("ERR P2 (" + cylinder.isHasErrorNeverReachesPosition2() + ")");
+        toggleHasErrorNeverReachesPosition2JButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                if (cylinder.isHasErrorNeverReachesPosition2()) {
+                    cylinder.setHasErrorNeverReachesPosition2(false);
+                    
+                } else {
+                    cylinder.setHasErrorNeverReachesPosition2(true);
+                }
+
+                boolean newValue = cylinder.isHasErrorNeverReachesPosition2();
+                toggleHasErrorNeverReachesPosition2JButton.setText("ERR P2 (" + newValue + ")");
+            }
+
+        });
+        panel.add(toggleHasErrorNeverReachesPosition2JButton);
+
+        
 
         // Button to make the cylinder travel towards P1
         JButton buttonP1 = new JButton("P1");

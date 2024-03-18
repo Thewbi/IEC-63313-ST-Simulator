@@ -6,7 +6,11 @@ public class Cylinder {
 
     private static final int POSITION_1 = 0;
 
+    private static final int POSITION_MID = 50;
+
     private static final int POSITION_2 = 100;
+
+    private int startPosition = POSITION_1;
 
     private int position = POSITION_1;
 
@@ -24,13 +28,17 @@ public class Cylinder {
 
     public void moveToPosition1() {
 
+        if (position == POSITION_2) {
+            cylinderCallback.position2Exited();
+            position = POSITION_MID;
+        }
         if (position == POSITION_1) {
             return;
         }
 
-        if (!hasErrorNeverReachesPosition1) {
+        if (hasErrorNeverReachesPosition1) {
 
-            cylinderCallback.position2Exited();
+        } else {
 
             cylinderTimerTask = new CylinderTimerTask();
             cylinderTimerTask.setCylinder(this);
@@ -46,13 +54,17 @@ public class Cylinder {
 
     public void moveToPosition2() {
 
+        if (position == POSITION_1) {
+            cylinderCallback.position1Exited();
+            position = POSITION_MID;
+        }
         if (position == POSITION_2) {
             return;
         }
 
-        if (!hasErrorNeverReachesPosition2) {
+        if (hasErrorNeverReachesPosition2) {
 
-            cylinderCallback.position1Exited();
+        } else {
 
             cylinderTimerTask = new CylinderTimerTask();
             cylinderTimerTask.setCylinder(this);
@@ -63,17 +75,18 @@ public class Cylinder {
                 cylinderTimerTask,
                     millis);
         }
-        
     }
 
     public void timeout() {
-        if (position == POSITION_1) {
+        if (startPosition == POSITION_1) {
             position = POSITION_2;
+            startPosition = POSITION_2;
 
             cylinderCallback.position2Reached();
             
         } else {
             position = POSITION_1;
+            startPosition = POSITION_1;
 
             cylinderCallback.position1Reached();
         }

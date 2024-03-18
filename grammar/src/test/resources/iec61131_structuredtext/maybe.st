@@ -57,12 +57,12 @@ FUNCTION_BLOCK AKT_5_2_MV
   _TMP_NOT17_OUT := NOT(SEN_P1);
   _TMP_AND14_OUT := AND(_TMP_NOT17_OUT, Hand_P1);
   TON0(IN := _TMP_AND14_OUT, PT := const_LaufzeitFehler_T);
-  RS0(S := TON0.Q);
+  RS0(S := TON0.Q, R1 := status.Stoer_Quit);
   F_LZ_P1 := RS0.Q1;
   _TMP_NOT25_OUT := NOT(SEN_P2);
   _TMP_AND23_OUT := AND(_TMP_NOT25_OUT, Hand_P2);
   TON1(IN := _TMP_AND23_OUT, PT := const_LaufzeitFehler_T);
-  RS1(S := TON1.Q);
+  RS1(S := TON1.Q, R1 := status.Stoer_Quit);
   F_LZ_P2 := RS1.Q1;
   _TMP_OR28_OUT := OR(F_LZ_P1, F_LZ_P2);
   F_LZ := _TMP_OR28_OUT;
@@ -74,9 +74,11 @@ FUNCTION FA_SERV : BOOL
   END_VAR
   VAR_INPUT
     BART_Hand : BOOL;
+    Stoer_Quit : BOOL;
   END_VAR
 
   status.BART_Hand := BART_Hand;
+  status.Stoer_Quit := Stoer_Quit;
 END_FUNCTION
 
 PROGRAM program0
@@ -85,6 +87,7 @@ PROGRAM program0
   END_VAR
   VAR
     FA_BART_Hand_T_HMI : BOOL := TRUE;
+    FA_Stoer_Quit_T_HMI : BOOL;
     Zyl1_T_P1_HMI : BOOL := TRUE;
     SEN_P1_T_HMI : BOOL := TRUE;
     Zyl1_T_P2_HMI : BOOL;
@@ -98,7 +101,7 @@ PROGRAM program0
   AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI);
   s_MV_P2 := AKT_5_2_MV0.s_MV_P2;
   Diag.Stoerung := AKT_5_2_MV0.F_LZ;
-  _TMP_FA_SERV1_OUT := FA_SERV(status := global_status, BART_Hand := FA_BART_Hand_T_HMI);
+  _TMP_FA_SERV1_OUT := FA_SERV(status := global_status, BART_Hand := FA_BART_Hand_T_HMI, Stoer_Quit := FA_Stoer_Quit_T_HMI);
 END_PROGRAM
 
 

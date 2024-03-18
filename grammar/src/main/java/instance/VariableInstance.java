@@ -238,6 +238,10 @@ public class VariableInstance implements StatementContainer {
     }
 
     public void setValue(String value) {
+        // DEBUG
+        // if (StringUtils.equalsIgnoreCase(name, "Stoer_Quit") && StringUtils.equalsIgnoreCase(value, "true")) {
+        //     System.out.println(")");
+        // }
         this.value = value;
     }
 

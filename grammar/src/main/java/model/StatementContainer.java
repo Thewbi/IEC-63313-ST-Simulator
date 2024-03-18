@@ -153,7 +153,8 @@ public interface StatementContainer {
                 boolean s1 = Boolean.parseBoolean(variableInstance.getElement("S1").getValue());
                 boolean r = Boolean.parseBoolean(variableInstance.getElement("R").getValue());
 
-                boolean newValue = false;
+                //boolean newValue = false;
+                boolean newValue = Boolean.valueOf(variableInstance.getElement("Q1").getValue());
 
                 // implement reset dominance by putting the reset operation last
                 if (s1) {
@@ -170,7 +171,8 @@ public interface StatementContainer {
                 boolean s = Boolean.parseBoolean(variableInstance.getElement("S").getValue());
                 boolean r1 = Boolean.parseBoolean(variableInstance.getElement("R1").getValue());
 
-                boolean newValue = false;
+                // boolean newValue = false;
+                boolean newValue = Boolean.valueOf(variableInstance.getElement("Q1").getValue());
 
                 // implement set dominance by putting the set operation last
                 if (r1) {
@@ -181,6 +183,9 @@ public interface StatementContainer {
                 }
 
                 variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
+
+                // DEBUG
+                System.out.println(variableInstance.getName() + " S: " + s + " R1: " + r1 + " value: " + newValue);
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "TON")) {
 
@@ -212,8 +217,14 @@ public interface StatementContainer {
 
                     // System.out.println("Starting TON timer!");
 
+                    System.out.println("TON \"" + variableInstance.getName() + "\" goes to true");
+
                     // the TON internally changes state to true
                     currentValueVariableInstance.setValue("true");
+
+                    // // external value goes to true
+                    // VariableInstance outputVariableInstance = variableInstance.getElement("Q");
+                    // outputVariableInstance.setValue("false");
 
                     TONVariableInstance tonVariableInstance = (TONVariableInstance) variableInstance;
                     tonVariableInstance.startTimer();
@@ -222,9 +233,14 @@ public interface StatementContainer {
                 if (fallingEdgeOnInput) {
 
                     // System.out.println("Stopping TON timer!");
+                    System.out.println("TON \"" + variableInstance.getName() + "\" goes to false");
 
                     // the TON internally changes state to false
                     currentValueVariableInstance.setValue("false");
+
+                    // external value goes to false
+                    VariableInstance outputVariableInstance = variableInstance.getElement("Q");
+                    outputVariableInstance.setValue("false");
 
                     TONVariableInstance tonVariableInstance = (TONVariableInstance) variableInstance;
                     tonVariableInstance.stopTimer();

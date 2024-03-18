@@ -12,7 +12,8 @@ import instance.VariableInstance;
 
 public class ExpressionUtil {
 
-    private final static boolean DEBUG_EXPRESSIONS = true;
+    // private final static boolean DEBUG_EXPRESSIONS = true;
+    private final static boolean DEBUG_EXPRESSIONS = false;
 
     /**
      * ctor

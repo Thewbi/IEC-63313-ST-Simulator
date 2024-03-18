@@ -8,7 +8,6 @@ public class CylinderTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        // System.out.println("TON timeout!");
         cylinder.timeout();
     }
 
