@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import instance.ProgramInstance;
 import instance.RSVariableInstance;
 import instance.SRVariableInstance;
 import instance.TONVariableInstance;
+import instance.VariableDescriptor;
 import instance.VariableInstance;
 import model.BooleanDataType;
 import model.DataType;
@@ -105,7 +107,10 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_4.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
+
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_call.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -290,7 +295,10 @@ public class Main {
 
                 boolean retain = false;
                 boolean external = true;
-                programInstance.addElement(configurationInstance.getElement(entry.getName()), retain, external);
+
+                String elementName = entry.getName();
+                VariableInstance elementVariableInstance = configurationInstance.getElement(elementName);
+                programInstance.addElement(elementVariableInstance, retain, external);
 
             } else {
 
@@ -382,7 +390,7 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        //cylinder.setHasErrorNeverReachesPosition1(true);
+        // cylinder.setHasErrorNeverReachesPosition1(true);
         // cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
@@ -491,8 +499,14 @@ public class Main {
             System.out.println("");
             System.out.println("executionIteration " + executionIteration);
 
+            // DEBUG
+            if (executionIteration >= 1) {
+                VariableInstance senP2 = programInstance.getElement("FA_BART_Hand_T_HMI");
+                senP2.setValue("FaLsE_" + executionIteration);
+            }
+
             // // DEBUG - prevent TON timeout
-            // if (step == 3) {
+            // if (executionIteration == 3) {
             // System.out.println("TON turn off");
             // VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
             // senP2.setValue("true");
@@ -500,12 +514,11 @@ public class Main {
 
             programInstance.executeStatements(globalTypeScope, programInstance, null, null);
 
-            // // DEBUG output all variable values
-            // Collection<VariableDescriptor> variables =
-            // programInstance.getElements().values();
-            // for (VariableDescriptor variableDescriptor : variables) {
-            // System.out.println(variableDescriptor);
-            // }
+            // DEBUG output all variable values
+            Collection<VariableDescriptor> variables = programInstance.getElements().values();
+            for (VariableDescriptor variableDescriptor : variables) {
+                System.out.println(variableDescriptor.toString(0));
+            }
 
             // // DEBUG output global status struct
             // VariableInstance stoerung =
@@ -525,14 +538,18 @@ public class Main {
 
             VariableInstance position1Requested = programInstance.getElement("s_MV_P1_FF");
             // System.out.println(position1Requested);
-            if (StringUtils.equalsIgnoreCase(position1Requested.getValue(), "true")) {
-                cylinder.moveToPosition1();
+            if (null != position1Requested) {
+                if (StringUtils.equalsIgnoreCase(position1Requested.getValue(), "true")) {
+                    cylinder.moveToPosition1();
+                }
             }
 
             VariableInstance position2Requested = programInstance.getElement("s_MV_P2_FF");
             // System.out.println(position2Requested);
-            if (StringUtils.equalsIgnoreCase(position2Requested.getValue(), "true")) {
-                cylinder.moveToPosition2();
+            if (null != position2Requested) {
+                if (StringUtils.equalsIgnoreCase(position2Requested.getValue(), "true")) {
+                    cylinder.moveToPosition2();
+                }
             }
 
             // DEBUG

@@ -126,11 +126,6 @@ public class ExpressionUtil {
                 Function function = (Function) globalTypeScope.get(varName);
                 // System.out.println(function);
 
-                // TypeScope globalTypeScope,
-                // VariableInstance variableInstance,
-                // VariableInstance parentVariableInstance,
-                // List<ParameterAssignment> parameterAssignments
-
                 List<Expression> assignments = expression.getExpressionList();
 
                 List<ParameterAssignment> parameterAssignments = new ArrayList<>();

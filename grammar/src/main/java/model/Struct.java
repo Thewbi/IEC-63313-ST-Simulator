@@ -31,8 +31,11 @@ public class Struct extends DataType {
                 DataType.addIndent(stringBuilder, indent + 1);
 
                 stringBuilder.append(entry.getKey()).append(" = ")
-                        .append(entry.getValue().getDataType().getName())
-                        .append(" InitialValue: ").append(entry.getValue().getInitialValue());
+                        .append(entry.getValue().getDataType().getName());
+
+                // stringBuilder.append(" InitialValue: ").append(entry.getValue().getInitialValue());
+
+                stringBuilder.append(" ").append(entry.getValue().toString(indent + 1));
 
             }
         }

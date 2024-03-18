@@ -193,6 +193,8 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     public void exitStructure_element_declaration(StructuredTextParser.Structure_element_declarationContext ctx) {
         String structureElementName = ctx.structure_element_name().getText();
         structureDataType.addField(structureElementName, dataType, initialValue);
+
+        initialValue = null;
     }
 
     @Override

@@ -292,7 +292,29 @@ public class VariableInstance implements StatementContainer {
 
     @Override
     public String toString() {
-        return "VariableInstance [name=" + name + ", dataType=" + dataType.toString(0) + ", value=" + value + "]";
+        throw new RuntimeException();
+    }
+
+    public String toString(int indent) {
+        //return "VariableInstance [name=" + name + ", dataType=" + dataType.toString(indent) + ", value=" + value + "]";
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        DataType.addIndent(stringBuilder, indent);
+
+        stringBuilder.append("VariableInstance [");
+        stringBuilder.append(" name=\"" + name + "\"");
+        stringBuilder.append(" dataType=\"" + dataType.getName() + "\"");
+        stringBuilder.append(" value=\"" + value + "\"");
+
+        for (VariableDescriptor elementVariableDescriptor : elements.values()) {
+            stringBuilder.append("\n");
+            stringBuilder.append(elementVariableDescriptor.toString(indent + 1));
+        }
+
+        stringBuilder.append(" ]");
+
+        return stringBuilder.toString();
     }
 
 }
