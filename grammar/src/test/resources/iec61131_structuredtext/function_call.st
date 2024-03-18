@@ -29,8 +29,8 @@ PROGRAM program0
     _TMP_FA_SERV1_OUT : BOOL;
   END_VAR
 
-  _TMP_FA_SERV1_OUT := FA_SERV(status := global_status, BART_Hand := FA_BART_Hand_T_HMI);
-  //_TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI);
+  //_TMP_FA_SERV1_OUT := FA_SERV(status := global_status, BART_Hand := FA_BART_Hand_T_HMI);
+  _TMP_FA_SERV1_OUT := FA_SERV(global_status, FA_BART_Hand_T_HMI);
 END_PROGRAM
 
 

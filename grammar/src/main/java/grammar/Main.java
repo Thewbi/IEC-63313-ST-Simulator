@@ -110,7 +110,8 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\large_program_5.st";
 
-        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_call.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_call.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\configuration.st";
@@ -126,11 +127,12 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
-        // String pathAsString =
-        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
+        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
+
+        String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\maybe.st";
 
         final CharStream charStream = CharStreams
                 .fromFileName(pathAsString);
@@ -359,9 +361,9 @@ public class Main {
                 VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
                 senP1.setValue("true");
 
-                // turn off the button
-                VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
-                hmi.setValue("false");
+                // // turn off the button
+                // VariableInstance hmi = programInstance.getElement("Zyl1_T_P1_HMI");
+                // hmi.setValue("false");
             }
 
             @Override
@@ -378,9 +380,9 @@ public class Main {
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
                 senP2.setValue("true");
 
-                // turn off the button
-                VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
-                hmi.setValue("false");
+                // // turn off the button
+                // VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
+                // hmi.setValue("false");
             }
 
         };
@@ -390,8 +392,8 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        // cylinder.setHasErrorNeverReachesPosition1(true);
-        // cylinder.setHasErrorNeverReachesPosition2(true);
+        cylinder.setHasErrorNeverReachesPosition1(true);
+        //cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
         // GUI
@@ -400,7 +402,7 @@ public class Main {
         JPanel panel = new JPanel();
 
         // emergency stop
-        JButton notHaltJButton = new JButton("Nothalt");
+        JButton notHaltJButton = new JButton("NotHalt");
         notHaltJButton.addActionListener(new ActionListener() {
 
             @Override
@@ -420,6 +422,10 @@ public class Main {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                VariableInstance tasterPosition2 = programInstance.getElement("Zyl1_T_P2_HMI");
+                tasterPosition2.setValue("false");
+
                 // user has requested the cylinder move to P1
                 VariableInstance tasterPosition1 = programInstance.getElement("Zyl1_T_P1_HMI");
                 tasterPosition1.setValue("true");
@@ -449,9 +455,13 @@ public class Main {
 
             @Override
             public void actionPerformed(ActionEvent e) {
+
+                VariableInstance tasterPosition1 = programInstance.getElement("Zyl1_T_P1_HMI");
+                tasterPosition1.setValue("false");
+
                 // user has requested the cylinder move to P2
-                VariableInstance hmi = programInstance.getElement("Zyl1_T_P2_HMI");
-                hmi.setValue("true");
+                VariableInstance tasterPosition2 = programInstance.getElement("Zyl1_T_P2_HMI");
+                tasterPosition2.setValue("true");
 
                 // cylinder.moveToPosition2();
             }
@@ -499,11 +509,13 @@ public class Main {
             System.out.println("");
             System.out.println("executionIteration " + executionIteration);
 
-            // DEBUG
-            if (executionIteration >= 1) {
-                VariableInstance senP2 = programInstance.getElement("FA_BART_Hand_T_HMI");
-                senP2.setValue("FaLsE_" + executionIteration);
-            }
+            // // DEBUG
+            // if (executionIteration >= 1) {
+            //     VariableInstance senP2 = programInstance.getElement("FA_BART_Hand_T_HMI");
+            //     if (senP2 != null) {
+            //         senP2.setValue("FaLsE_" + executionIteration);
+            //     }
+            // }
 
             // // DEBUG - prevent TON timeout
             // if (executionIteration == 3) {
@@ -514,11 +526,12 @@ public class Main {
 
             programInstance.executeStatements(globalTypeScope, programInstance, null, null);
 
-            // DEBUG output all variable values
-            Collection<VariableDescriptor> variables = programInstance.getElements().values();
-            for (VariableDescriptor variableDescriptor : variables) {
-                System.out.println(variableDescriptor.toString(0));
-            }
+            // // DEBUG output all variable values
+            // Collection<VariableDescriptor> variables =
+            // programInstance.getElements().values();
+            // for (VariableDescriptor variableDescriptor : variables) {
+            // System.out.println(variableDescriptor.toString(0));
+            // }
 
             // // DEBUG output global status struct
             // VariableInstance stoerung =
@@ -549,6 +562,19 @@ public class Main {
             if (null != position2Requested) {
                 if (StringUtils.equalsIgnoreCase(position2Requested.getValue(), "true")) {
                     cylinder.moveToPosition2();
+                }
+            }
+
+            VariableInstance goToPosition2 = programInstance.getElement("s_MV_P2");
+            // System.out.println(position1Requested);
+            if (null != goToPosition2) {
+
+                boolean gotoPos2 = StringUtils.equalsIgnoreCase(goToPosition2.getValue(), "true");
+
+                if (gotoPos2) {
+                    cylinder.moveToPosition2();
+                } else {
+                    cylinder.moveToPosition1();
                 }
             }
 

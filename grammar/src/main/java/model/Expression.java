@@ -1,10 +1,7 @@
 package model;
 
-import java.util.List;
-
-import org.antlr.v4.runtime.RuntimeMetaData;
-
 import java.util.ArrayList;
+import java.util.List;
 
 public class Expression {
 
@@ -18,21 +15,20 @@ public class Expression {
 
     private List<Expression> expressionList = new ArrayList<>();
 
+    private List<ParameterAssignment> parameterAssignments = new ArrayList<>();
+
+    public void addParameterAssignment(String varName, String expression) {
+
+        ParameterAssignment parameterAssignment = new ParameterAssignment();
+        parameterAssignment.setParameterName(varName);
+        parameterAssignment.setValue(expression);
+
+        parameterAssignments.add(parameterAssignment);
+    }
+
     @Override
     public String toString() {
-
         throw new RuntimeException("");
-
-        // int indent = 1;
-
-        // StringBuilder stringBuilder = new StringBuilder();
-        // toStringSelf(stringBuilder, indent);
-
-        // for (Expression childExpression : expressionList) {
-        //     stringBuilder.append(childExpression.toString(indent + 1));
-        // }
-
-        // return stringBuilder.toString();
     }
 
     public String toString(int indent) {
@@ -106,4 +102,7 @@ public class Expression {
         this.variableNameValue = variableNameValue;
     }
 
+    public List<ParameterAssignment> getParameterAssignments() {
+        return parameterAssignments;
+    }
 }

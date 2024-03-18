@@ -10,11 +10,13 @@ import org.apache.commons.lang3.StringUtils;
 import com.st.grammar.StructuredTextParser.Action_associationContext;
 import com.st.grammar.StructuredTextParser.ComparisonContext;
 import com.st.grammar.StructuredTextParser.Data_sourceContext;
+import com.st.grammar.StructuredTextParser.ExpressionContext;
 import com.st.grammar.StructuredTextParser.IntegerContext;
 import com.st.grammar.StructuredTextParser.Param_assignmentContext;
 import com.st.grammar.StructuredTextParser.Step_nameContext;
 import com.st.grammar.StructuredTextParser.StepsContext;
 import com.st.grammar.StructuredTextParser.Transition_conditionContext;
+import com.st.grammar.StructuredTextParser.Variable_nameContext;
 import com.st.grammar.StructuredTextParser.Xor_expressionContext;
 
 import model.Action;
@@ -95,7 +97,7 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
 
     @Override
     public void enterFunction_call(StructuredTextParser.Function_callContext ctx) {
-        System.out.println(ctx.getText());
+        // System.out.println(ctx.getText());
 
         inFunctionCall = true;
 
@@ -105,22 +107,37 @@ public class ModelCreatorASTListener extends StructuredTextBaseListener {
     @Override
     public void exitFunction_call(StructuredTextParser.Function_callContext ctx) {
 
-        System.out.println(ctx.getText());
-
         final String functionName = ctx.function_name().getText();
         // System.out.println(functionName);
 
+        // // DEBUG
         // for (Param_assignmentContext param_assignment : ctx.param_assignment()) {
 		// 	final String paramAssignmentAsString = param_assignment.getText();
         //     System.out.println(paramAssignmentAsString);
 		// }
 
-        // System.out.println("");
-
         Expression expression = new Expression();
         expression.setExpressionType(ExpressionType.FUNCTION_CALL);
         expression.setVariableNameValue(functionName);
         expression.getExpressionList().addAll(expressionList);
+
+        List<Param_assignmentContext> paramAssignments = ctx.param_assignment();
+        for (Param_assignmentContext param_assignmentContext : paramAssignments) {
+
+            Variable_nameContext variable_name = param_assignmentContext.variable_name();
+            if (variable_name == null) {
+                continue;
+            }
+            String varName = variable_name.getText();
+
+            ExpressionContext expression2 = param_assignmentContext.expression();
+            if (expression2 == null) {
+                continue;
+            }
+            String expr = expression2.getText();
+
+            expression.addParameterAssignment(varName, expr);
+        }
 
         clearExpressionList();
 

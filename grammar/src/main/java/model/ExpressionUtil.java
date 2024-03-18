@@ -3,6 +3,7 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import grammar.Main;
@@ -10,6 +11,8 @@ import instance.VariableDescriptor;
 import instance.VariableInstance;
 
 public class ExpressionUtil {
+
+    private final static boolean DEBUG_EXPRESSIONS = true;
 
     /**
      * ctor
@@ -31,7 +34,7 @@ public class ExpressionUtil {
 
                 // // TODO: REQUIRED FOR FUNCTION
                 // if (variableSplit.length == 1) {
-                //     return target;
+                // return target;
                 // }
 
                 for (int i = 0; i < variableSplit.length; i++) {
@@ -60,18 +63,20 @@ public class ExpressionUtil {
                 temp = expression.getExpressionList().get(1);
                 VariableInstance rhsVariableInstance = evaluateExpression(globalTypeScope, source, temp);
 
-                // // DEBUG
-                // System.out.println("AND");
-                // System.out.println(lhsVariableInstance.getName() + " " +
-                // lhsVariableInstance.getValue());
-                // System.out.println(rhsVariableInstance.getName() + " " +
-                // rhsVariableInstance.getValue());
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("AND");
+                    System.out.println("  " + lhsVariableInstance.getName() + " " +
+                            lhsVariableInstance.getValue());
+                    System.out.println("  " + rhsVariableInstance.getName() + " " +
+                            rhsVariableInstance.getValue());
+                }
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
                         & Boolean.parseBoolean(rhsVariableInstance.getValue());
 
-                // // DEBUG
-                // System.out.println("Result: " + result);
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("  " + "Result: " + result);
+                }
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));
@@ -85,16 +90,20 @@ public class ExpressionUtil {
                 temp = expression.getExpressionList().get(1);
                 VariableInstance rhsVariableInstance = evaluateExpression(globalTypeScope, source, temp);
 
-                // System.out.println("OR");
-                // System.out.println(lhsVariableInstance.getName() + " " +
-                // lhsVariableInstance.getValue());
-                // System.out.println(rhsVariableInstance.getName() + " " +
-                // rhsVariableInstance.getValue());
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("OR");
+                    System.out.println("  " + lhsVariableInstance.getName() + " " +
+                            lhsVariableInstance.getValue());
+                    System.out.println("  " + rhsVariableInstance.getName() + " " +
+                            rhsVariableInstance.getValue());
+                }
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue())
                         || Boolean.parseBoolean(rhsVariableInstance.getValue());
 
-                // System.out.println("Result: " + result);
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("  " + "Result: " + result);
+                }
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));
@@ -108,39 +117,49 @@ public class ExpressionUtil {
 
                 boolean result = Boolean.parseBoolean(lhsVariableInstance.getValue());
                 result = !result;
-                // System.out.println(result);
+
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("NOT");
+                    System.out.println("  " + lhsVariableInstance.getName() + " " +
+                            lhsVariableInstance.getValue());
+                }
+                    
 
                 VariableInstance variableInstance = new VariableInstance();
                 variableInstance.setValue(Boolean.toString(result));
+
+                if (DEBUG_EXPRESSIONS) {
+                    System.out.println("  " + "Result: " + result);
+                }
 
                 return variableInstance;
             }
 
             case FUNCTION_CALL: {
-                // System.out.println(source);
-                // System.out.println(globalTypeScope);
 
                 String varName = expression.getVariableNameValue();
-                // System.out.println(varName);
-
                 Function function = (Function) globalTypeScope.get(varName);
-                // System.out.println(function);
-
-                List<Expression> assignments = expression.getExpressionList();
 
                 List<ParameterAssignment> parameterAssignments = new ArrayList<>();
 
-                int i = 0;
-                for (Expression assignmentExpression : assignments) {
+                if (CollectionUtils.isNotEmpty(expression.getParameterAssignments())) {
+                    parameterAssignments = expression.getParameterAssignments();
+                } else {
 
-                    ParameterAssignment parameterAssignment = new ParameterAssignment();
-                    parameterAssignments.add(parameterAssignment);
+                    List<Expression> assignments = expression.getExpressionList();
 
-                    Variable formalParameter = function.getVariables().get(i);
-                    parameterAssignment.setParameterName(formalParameter.getName());
-                    parameterAssignment.setValue(assignmentExpression.getVariableNameValue());
+                    int i = 0;
+                    for (Expression assignmentExpression : assignments) {
 
-                    i++;
+                        ParameterAssignment parameterAssignment = new ParameterAssignment();
+                        parameterAssignments.add(parameterAssignment);
+
+                        Variable formalParameter = function.getVariables().get(i);
+                        parameterAssignment.setParameterName(formalParameter.getName());
+                        parameterAssignment.setValue(assignmentExpression.getVariableNameValue());
+
+                        i++;
+                    }
                 }
 
                 VariableInstance funcVariableInstance = new VariableInstance();
