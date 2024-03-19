@@ -8,7 +8,7 @@ public class TONTimerTask extends TimerTask {
 
     @Override
     public void run() {
-        System.out.println("TON timeout!");
+        System.out.println("TON \"" + tonVariableInstance.getName() + "\" timeout!");
         tonVariableInstance.timeout();
     }
 

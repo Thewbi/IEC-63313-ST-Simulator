@@ -18,6 +18,8 @@ import model.TypeScope;
 
 public class VariableInstance implements StatementContainer {
 
+    private static final boolean EXECUTE_ACTIONS_EACH_CYCLE = true;
+
     private String name;
 
     private DataType dataType;
@@ -162,10 +164,12 @@ public class VariableInstance implements StatementContainer {
             return;
         }
 
-        // 1. All actions of the entire SequentialFunctionChart are set to
-        // isExecuted(false);
-        for (Action action : allActions) {
-            action.setExecuted(false);
+        if (EXECUTE_ACTIONS_EACH_CYCLE) {
+            // 1. All actions of the entire SequentialFunctionChart are set to
+            // isExecuted(false);
+            for (Action action : allActions) {
+                action.setExecuted(false);
+            }
         }
 
         // 2. the global actions of the SequentialFunctionChart function block are
@@ -177,12 +181,16 @@ public class VariableInstance implements StatementContainer {
         // 3. all steps in the current step list are executed.
         for (Step step : currentSteps) {
 
+            // DEBUG: output the current step
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append("Executing step: \"" + step.getName() + "\"");
+            stringBuilder.append("Current step: \"" + step.getName() + "\"");
             if (step.isInitial()) {
                 stringBuilder.append(" (INITIAL STATE)");
             }
+            stringBuilder.append(" willExecute: ").append(!step.isExecuted());
             System.out.println(stringBuilder.toString());
+
+            // execute all actionassociations (N, R, S, ...)
             step.execute(this);
         }
 
@@ -197,7 +205,9 @@ public class VariableInstance implements StatementContainer {
         // - the new state is added to the current step list
         List<Step> stepsToAdd = new ArrayList<>();
         List<Step> stepsToRemove = new ArrayList<>();
+
         for (Step step : currentSteps) {
+
             for (Transition transition : step.getTransistions()) {
                 boolean evalResult = transition.evaluate(globalTypeScope, this);
                 if (evalResult) {
@@ -208,7 +218,11 @@ public class VariableInstance implements StatementContainer {
                     // - the new state is added to the current step list
                     stepsToRemove.add(step);
                     for (String targetStepName : transition.getTargetStepNames()) {
-                        stepsToAdd.add(this.getSteps().get(targetStepName));
+
+                        Step executeStep = getSteps().get(targetStepName);
+                        executeStep.setExecuted(false);
+
+                        stepsToAdd.add(executeStep);
                     }
                 }
             }

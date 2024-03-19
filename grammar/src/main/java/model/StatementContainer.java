@@ -166,6 +166,9 @@ public interface StatementContainer {
 
                 variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
 
+                // DEBUG output the flip flop state
+                System.out.println(variableInstance.getName() + " [S1: " + s1 + "] [R: " + r + "] [value: " + newValue + "]");
+
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "RS")) {
 
                 boolean s = Boolean.parseBoolean(variableInstance.getElement("S").getValue());
@@ -184,8 +187,8 @@ public interface StatementContainer {
 
                 variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
 
-                // DEBUG
-                System.out.println(variableInstance.getName() + " S: " + s + " R1: " + r1 + " value: " + newValue);
+                // DEBUG output the flip flop state
+                // System.out.println(variableInstance.getName() + " S: " + s + " R1: " + r1 + " value: " + newValue);
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "TON")) {
 
@@ -217,7 +220,8 @@ public interface StatementContainer {
 
                     // System.out.println("Starting TON timer!");
 
-                    System.out.println("TON \"" + variableInstance.getName() + "\" goes to true");
+                    // DEBUG output the TON state
+                    // System.out.println("TON \"" + variableInstance.getName() + "\" goes to true");
 
                     // the TON internally changes state to true
                     currentValueVariableInstance.setValue("true");
@@ -233,7 +237,9 @@ public interface StatementContainer {
                 if (fallingEdgeOnInput) {
 
                     // System.out.println("Stopping TON timer!");
-                    System.out.println("TON \"" + variableInstance.getName() + "\" goes to false");
+
+                    // DEBUG output the TON state
+                    // System.out.println("TON \"" + variableInstance.getName() + "\" goes to false");
 
                     // the TON internally changes state to false
                     currentValueVariableInstance.setValue("false");

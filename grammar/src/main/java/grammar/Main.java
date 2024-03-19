@@ -127,7 +127,8 @@ public class Main {
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function_block_inout_var.st";
 
-        //String pathAsString = "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
+        // String pathAsString =
+        // "grammar\\src\\test\\resources\\iec61131_structuredtext\\traffic_light.st";
 
         // String pathAsString =
         // "grammar\\src\\test\\resources\\iec61131_structuredtext\\function.st";
@@ -150,12 +151,15 @@ public class Main {
         Compilation_unitContext root = parser.compilation_unit();
 
         // debugOutputAST(root);
-        execute(root);
+
+        // configuration
+        ConfigurationInstance configurationInstance = new ConfigurationInstance();
+        execute(root, configurationInstance);
 
         System.out.println("");
     }
 
-    private static void debugOutputAST(Compilation_unitContext root) {
+    private static void debugOutputAST(Compilation_unitContext root, ConfigurationInstance configurationInstance) {
         ASTListener listener = new ASTListener();
 
         // DefaultStructuredTextListener listener = new DefaultStructuredTextListener();
@@ -166,7 +170,7 @@ public class Main {
         walker.walk(listener, root);
     }
 
-    private static void execute(Compilation_unitContext root) {
+    private static void execute(Compilation_unitContext root, ConfigurationInstance configurationInstance) {
 
         TypeScope globalTypeScope = new TypeScope();
 
@@ -213,7 +217,7 @@ public class Main {
 
         outputItems(listener);
 
-        executeParsedObjects(globalTypeScope, listener);
+        executeParsedObjects(globalTypeScope, configurationInstance, listener);
     }
 
     private static void outputItems(ModelCreatorASTListener listener) {
@@ -230,14 +234,12 @@ public class Main {
         System.out.println(listener.configuration.toString(indent + 1));
     }
 
-    private static void executeParsedObjects(TypeScope globalTypeScope, ModelCreatorASTListener listener) {
+    private static void executeParsedObjects(TypeScope globalTypeScope, ConfigurationInstance configurationInstance,
+            ModelCreatorASTListener listener) {
 
         //
         // Instantiation
         //
-
-        // configuration
-        ConfigurationInstance configurationInstance = new ConfigurationInstance();
 
         TypeScope types = listener.globalTypeScope;
 
@@ -294,6 +296,8 @@ public class Main {
         for (Variable entry : program.getVariables()) {
 
             if (entry.isExternal()) {
+
+                // take external variables from the configuration
 
                 boolean retain = false;
                 boolean external = true;
@@ -392,8 +396,8 @@ public class Main {
 
         // here you can simulate the cylinder never reaching some position
         //
-        //cylinder.setHasErrorNeverReachesPosition1(true);
-        //cylinder.setHasErrorNeverReachesPosition2(true);
+        // cylinder.setHasErrorNeverReachesPosition1(true);
+        // cylinder.setHasErrorNeverReachesPosition2(true);
 
         //
         // GUI
@@ -403,34 +407,46 @@ public class Main {
         // in HasErrorNeverReachesPosition1/2 state the cylinder will only move to
         // the center location and remain located there, it will not reach the other
         // position and it will not trigger the lightbar sensor! This will case the
-        // runtime duration check to trigger and cause a system error. The system 
-        // error is persistent/retained and only goes away when error is acknowledged (Quittiert)
+        // runtime duration check to trigger and cause a system error. The system
+        // error is persistent/retained and only goes away when error is acknowledged
+        // (Quittiert)
         //
-        // If you remove the HasErrorNeverReachesPosition1/2 state, the cylinder will 
+        // If you remove the HasErrorNeverReachesPosition1/2 state, the cylinder will
         // restart movement and eventually arrive at the other location and trigger
-        // the light bar. Potential existing errors remain since their are persistent/retained.
+        // the light bar. Potential existing errors remain since their are
+        // persistent/retained.
         // Errors only go away when error is acknowledged (Quittiert)
         //
 
         JPanel panel = new JPanel();
 
-        JButton automatikBetriebJButton = new JButton("Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
+        JButton automatikBetriebJButton = new JButton(
+                "Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
         automatikBetriebJButton.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                VariableInstance stoerQuitTasterHMI = programInstance.getElement("FA_BART_Auto_S_HMI");
-
-                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(stoerQuitTasterHMI.getValue(), "true");
+                // toggle automatic operation
+                VariableInstance variableInstance = programInstance.getElement("FA_BART_Auto_S_HMI");
+                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(variableInstance.getValue(), "true");
                 if (valueAsBoolean) {
-                    stoerQuitTasterHMI.setValue("false");
-                } 
-                else {
-                    stoerQuitTasterHMI.setValue("true");
+                    variableInstance.setValue("false");
+                } else {
+                    variableInstance.setValue("true");
                 }
 
-                automatikBetriebJButton.setText("Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
+                automatikBetriebJButton.setText(
+                        "Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
+
+                // toggle manual operation off
+                variableInstance = programInstance.getElement("FA_BART_Hand_T_HMI");
+                valueAsBoolean = StringUtils.equalsIgnoreCase(variableInstance.getValue(), "true");
+                if (valueAsBoolean) {
+                    variableInstance.setValue("false");
+                } else {
+                    variableInstance.setValue("true");
+                }
             }
 
         });
@@ -451,7 +467,8 @@ public class Main {
         panel.add(notHaltJButton);
 
         // stoerung quittieren
-        JButton resetErrorStateJButton = new JButton("Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
+        JButton resetErrorStateJButton = new JButton(
+                "Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
         resetErrorStateJButton.addActionListener(new ActionListener() {
 
             @Override
@@ -462,12 +479,12 @@ public class Main {
                 boolean valueAsBoolean = StringUtils.equalsIgnoreCase(stoerQuitTasterHMI.getValue(), "true");
                 if (valueAsBoolean) {
                     stoerQuitTasterHMI.setValue("false");
-                } 
-                else {
+                } else {
                     stoerQuitTasterHMI.setValue("true");
                 }
 
-                resetErrorStateJButton.setText("Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
+                resetErrorStateJButton
+                        .setText("Quittieren (" + programInstance.getElement("FA_Stoer_Quit_T_HMI").getValue() + ")");
             }
 
         });
@@ -476,7 +493,8 @@ public class Main {
         cylinder.setHasErrorNeverReachesPosition1(false);
         cylinder.setHasErrorNeverReachesPosition2(false);
 
-        JButton toggleHasErrorNeverReachesPosition1JButton = new JButton("ERR P1 (" + cylinder.isHasErrorNeverReachesPosition1() + ")");
+        JButton toggleHasErrorNeverReachesPosition1JButton = new JButton(
+                "ERR P1 (" + cylinder.isHasErrorNeverReachesPosition1() + ")");
         toggleHasErrorNeverReachesPosition1JButton.addActionListener(new ActionListener() {
 
             @Override
@@ -484,7 +502,7 @@ public class Main {
 
                 if (cylinder.isHasErrorNeverReachesPosition1()) {
                     cylinder.setHasErrorNeverReachesPosition1(false);
-                    
+
                 } else {
                     cylinder.setHasErrorNeverReachesPosition1(true);
                 }
@@ -496,7 +514,8 @@ public class Main {
         });
         panel.add(toggleHasErrorNeverReachesPosition1JButton);
 
-        JButton toggleHasErrorNeverReachesPosition2JButton = new JButton("ERR P2 (" + cylinder.isHasErrorNeverReachesPosition2() + ")");
+        JButton toggleHasErrorNeverReachesPosition2JButton = new JButton(
+                "ERR P2 (" + cylinder.isHasErrorNeverReachesPosition2() + ")");
         toggleHasErrorNeverReachesPosition2JButton.addActionListener(new ActionListener() {
 
             @Override
@@ -504,7 +523,7 @@ public class Main {
 
                 if (cylinder.isHasErrorNeverReachesPosition2()) {
                     cylinder.setHasErrorNeverReachesPosition2(false);
-                    
+
                 } else {
                     cylinder.setHasErrorNeverReachesPosition2(true);
                 }
@@ -536,7 +555,8 @@ public class Main {
         });
         panel.add(buttonP1);
 
-        JButton buttonSensorP1 = new JButton("Sensor P1 (" + programInstance.getElement("SEN_P1_T_HMI").getValue() + ")");
+        JButton buttonSensorP1 = new JButton(
+                "Sensor P1 (" + programInstance.getElement("SEN_P1_T_HMI").getValue() + ")");
         buttonSensorP1.addActionListener(new ActionListener() {
 
             @Override
@@ -550,8 +570,7 @@ public class Main {
                 boolean valueAsBoolean = StringUtils.equalsIgnoreCase(senP1.getValue(), "true");
                 if (valueAsBoolean) {
                     senP1.setValue("false");
-                } 
-                else {
+                } else {
                     senP1.setValue("true");
                 }
 
@@ -581,7 +600,8 @@ public class Main {
         });
         panel.add(buttonP2);
 
-        JButton buttonSensorP2 = new JButton("Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
+        JButton buttonSensorP2 = new JButton(
+                "Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
         buttonSensorP2.addActionListener(new ActionListener() {
 
             @Override
@@ -590,17 +610,15 @@ public class Main {
                 // VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
                 // senP2.setValue("true");
 
-                // buttonSensorP2.setText("Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
-
-
+                // buttonSensorP2.setText("Sensor P2 (" +
+                // programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
 
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
 
                 boolean valueAsBoolean = StringUtils.equalsIgnoreCase(senP2.getValue(), "true");
                 if (valueAsBoolean) {
                     senP2.setValue("false");
-                } 
-                else {
+                } else {
                     senP2.setValue("true");
                 }
 
@@ -635,14 +653,14 @@ public class Main {
         for (int executionIteration = 0; executionIteration < 500; executionIteration++) {
 
             System.out.println("");
-            System.out.println("executionIteration " + executionIteration);
+            // System.out.println("executionIteration " + executionIteration);
 
             // // DEBUG
             // if (executionIteration >= 1) {
-            //     VariableInstance senP2 = programInstance.getElement("FA_BART_Hand_T_HMI");
-            //     if (senP2 != null) {
-            //         senP2.setValue("FaLsE_" + executionIteration);
-            //     }
+            // VariableInstance senP2 = programInstance.getElement("FA_BART_Hand_T_HMI");
+            // if (senP2 != null) {
+            // senP2.setValue("FaLsE_" + executionIteration);
+            // }
             // }
 
             // // DEBUG - prevent TON timeout
@@ -661,10 +679,24 @@ public class Main {
             // System.out.println(variableDescriptor.toString(0));
             // }
 
-            // // DEBUG output global status struct
-            // VariableInstance stoerung =
-            // globalStatusVariableInstance.getElement("Stoerung");
-            // System.out.println(stoerung.getName() + " " + stoerung.getValue());
+            // DEBUG
+            VariableInstance variableInstance = programInstance.getElement("Zyl1_AUTO_P2_HMI");
+            System.out.println(variableInstance.getName() + " " + variableInstance.getValue());
+
+            // DEBUG output global status struct
+            VariableInstance globalStatusVariableInstance = configurationInstance.getElement("global_status");
+            //VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
+            //System.out.println(stoerung.getName() + " " + stoerung.getValue());
+            VariableInstance bArtAuto = globalStatusVariableInstance.getElement("BART_Auto");
+            System.out.println(bArtAuto.getName() + " " + bArtAuto.getValue());
+
+            VariableInstance akt52MV0 = programInstance.getElement("AKT_5_2_MV0");
+            //System.out.println(akt52MV0.toString(0));
+            VariableInstance autoP2 = akt52MV0.getElement("Auto_P2");
+            System.out.println(autoP2.getName() + " " + autoP2.getValue());
+
+            VariableInstance s_MV_P2 = akt52MV0.getElement("s_MV_P2");
+            System.out.println(s_MV_P2.getName() + " " + s_MV_P2.getValue());
 
             //
             // GUI (update the gui for example for errors)
@@ -918,7 +950,8 @@ public class Main {
         }
 
         //
-        // Instantiate objects belonging to a 'sequential function chart' language FunctionBlock
+        // Instantiate objects belonging to a 'sequential function chart' language
+        // FunctionBlock
         //
 
         // copy actions into the instance
@@ -932,7 +965,8 @@ public class Main {
         newMap.putAll(functionBlock.getSteps());
         variableInstance.setSteps(newMap);
 
-        // initialize the instance (establish connections between steps, actions, transitions)
+        // initialize the instance (establish connections between steps, actions,
+        // transitions)
         variableInstance.initialize();
 
         return variableInstance;

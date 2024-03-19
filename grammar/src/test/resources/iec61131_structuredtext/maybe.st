@@ -51,6 +51,7 @@ FUNCTION_BLOCK AKT_5_2_MV
     _TMP_OR44_OUT : BOOL;
     _TMP_OR10_OUT : BOOL;
     _TMP_NOT17_OUT : BOOL;
+    _TMP_NOT47_OUT : BOOL;
     _TMP_AND14_OUT : BOOL;
     _TMP_NOT25_OUT : BOOL;
     _TMP_AND23_OUT : BOOL;
@@ -69,12 +70,13 @@ FUNCTION_BLOCK AKT_5_2_MV
   s_MV_P2_FF(S1 := _TMP_OR39_OUT, R := _TMP_OR10_OUT);
   s_MV_P2 := s_MV_P2_FF.Q1;
   _TMP_NOT17_OUT := NOT(SEN_P1);
-  _TMP_AND14_OUT := AND(_TMP_NOT17_OUT, Hand_P1);
+  _TMP_NOT47_OUT := NOT(s_MV_P2);
+  _TMP_AND14_OUT := AND(_TMP_NOT17_OUT, _TMP_NOT47_OUT);
   TON0(IN := _TMP_AND14_OUT, PT := const_LaufzeitFehler_T);
   RS0(S := TON0.Q, R1 := status.Stoer_Quit);
   F_LZ_P1 := RS0.Q1;
   _TMP_NOT25_OUT := NOT(SEN_P2);
-  _TMP_AND23_OUT := AND(_TMP_NOT25_OUT, Hand_P2);
+  _TMP_AND23_OUT := AND(_TMP_NOT25_OUT, s_MV_P2);
   TON1(IN := _TMP_AND23_OUT, PT := const_LaufzeitFehler_T);
   RS1(S := TON1.Q, R1 := status.Stoer_Quit);
   F_LZ_P2 := RS1.Q1;
@@ -93,6 +95,7 @@ FUNCTION_BLOCK FB_Automatik
   VAR_INPUT
     S_FA_Status : S_FA_STATUS;
     Zylinder_1_SEN_P1 : BOOL;
+    Zylinder_1_SEN_P2 : BOOL;
   END_VAR
   VAR
     _TMP_NOT9_OUT : BOOL;
@@ -130,6 +133,25 @@ FUNCTION_BLOCK FB_Automatik
   STEP Step2:
     Zylinder_1_Auto_P1(N);
   END_STEP
+
+  TRANSITION FROM Step2 TO Step3
+    := Zylinder_1_SEN_P1;
+  END_TRANSITION
+
+  STEP Step3:
+    Zylinder_1_Auto_P2(N);
+  END_STEP
+
+  TRANSITION FROM Step3 TO Step4
+    := Zylinder_1_SEN_P2;
+  END_TRANSITION
+
+  STEP Step4:
+  END_STEP
+
+  TRANSITION FROM Step1 TO Step3
+    := Zylinder_1_SEN_P1;
+  END_TRANSITION
 
 END_FUNCTION_BLOCK
 
@@ -172,7 +194,7 @@ PROGRAM program0
   AKT_5_2_MV0(status := global_status, Hand_P1 := Zyl1_T_P1_HMI, Hand_P2 := Zyl1_T_P2_HMI, Auto_P1 := Zyl1_AUTO_P1_HMI, Auto_P2 := Zyl1_AUTO_P2_HMI, SEN_P1 := SEN_P1_T_HMI, SEN_P2 := SEN_P2_T_HMI);
   s_MV_P2 := AKT_5_2_MV0.s_MV_P2;
   Diag.Stoerung := AKT_5_2_MV0.F_LZ;
-  FB_Automatik0(S_FA_Status := global_status, Zylinder_1_SEN_P1 := SEN_P1_T_HMI);
+  FB_Automatik0(S_FA_Status := global_status, Zylinder_1_SEN_P1 := SEN_P1_T_HMI, Zylinder_1_SEN_P2 := SEN_P2_T_HMI);
   Zyl1_AUTO_P1_HMI := FB_Automatik0.Zylinder_1_Auto_P1;
   Zyl1_AUTO_P2_HMI := FB_Automatik0.Zylinder_1_Auto_P2;
   _TMP_FA_SERV1_OUT := FA_SERV(status := global_status, BART_Hand := FA_BART_Hand_T_HMI, BART_Auto := FA_BART_Auto_S_HMI, Stoer_Quit := FA_Stoer_Quit_T_HMI);

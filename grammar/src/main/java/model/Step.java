@@ -14,6 +14,8 @@ public class Step {
 
     private List<ActionAssociation> actionAssociations = new ArrayList<>();
 
+    private boolean executed;
+
     /**
      * local actions
      */
@@ -26,11 +28,14 @@ public class Step {
 
     public void execute(VariableInstance functionBlockVariableInstance) {
 
-        // System.out.println("");
+        if (executed) {
+            System.out.println("State: \"" + name + "\" already executed!");
+            return;
+        }
+
+        executed = true;
 
         for (ActionAssociation actionAssociation : actionAssociations) {
-
-            // System.out.println(actionAssociation);
 
             String qualifierAsString = actionAssociation.getQualifier();
             final ActionQualifier actionQualifier = ActionQualifier.valueOf(qualifierAsString);
@@ -38,7 +43,9 @@ public class Step {
             switch (actionQualifier) {
 
                 case N: {
-                    System.out.println("Setting " + actionAssociation.getName());
+                    // DEBUG output the operation
+                    //System.out.println("Setting " + actionAssociation.getName());
+
                     VariableInstance varInstance = functionBlockVariableInstance
                             .getElement(actionAssociation.getName());
                     varInstance.setValue("true");
@@ -46,7 +53,9 @@ public class Step {
                     break;
 
                 case R: {
-                    System.out.println("Resetting " + actionAssociation.getName());
+                    // DEBUG output the operation
+                    //System.out.println("Resetting " + actionAssociation.getName());
+
                     VariableInstance varInstance = functionBlockVariableInstance
                             .getElement(actionAssociation.getName());
                     varInstance.setValue("false");
@@ -81,14 +90,15 @@ public class Step {
         DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("initial = " + initial).append("\n");
 
+        // action associations
         DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("actionAssociations = ");
         stringBuilder.append("\n");
         for (ActionAssociation actionAssociation : actionAssociations) {
             stringBuilder.append(actionAssociation.toString(indent + 2));
         }
-        // stringBuilder.append("\n");
 
+        // actions
         DataType.addIndent(stringBuilder, indent + 1);
         stringBuilder.append("actions = ");
         for (Action action : actions) {
@@ -137,6 +147,14 @@ public class Step {
 
     public void setTransistions(List<Transition> transistions) {
         this.transistions = transistions;
+    }
+
+    public boolean isExecuted() {
+        return executed;
+    }
+
+    public void setExecuted(boolean executed) {
+        this.executed = executed;
     }
 
 }

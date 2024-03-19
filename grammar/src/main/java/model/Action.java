@@ -24,10 +24,10 @@ public class Action extends VarScope implements StatementContainer {
             return;
         }
 
-        System.out.println("Execution action: \"" + name + "\"");
+        System.out.println("Executing action: \"" + name + "\"");
 
         // execute the statements in the context of the output variableInstance (== FunctionBlock)
-        this.executeStatements(globalTypeScope, parentVariableInstance, this.getStatements());
+        executeStatements(globalTypeScope, parentVariableInstance, getStatements());
     }
 
     @Override
