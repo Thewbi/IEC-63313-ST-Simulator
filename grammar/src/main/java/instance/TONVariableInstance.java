@@ -48,7 +48,7 @@ public class TONVariableInstance extends VariableInstance {
             return;
         }
 
-        System.out.println("stopTimer() stopTimer() stopTimer()");
+        System.out.println("stopTimer() stopTimer() stopTimer() " + getName());
 
         // set the TON output to false
         VariableInstance variableInstance = getElement("Q");

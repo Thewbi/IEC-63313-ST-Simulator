@@ -167,7 +167,7 @@ public interface StatementContainer {
                 variableInstance.getElement("Q1").setValue(Boolean.toString(newValue));
 
                 // DEBUG output the flip flop state
-                System.out.println(variableInstance.getName() + " [S1: " + s1 + "] [R: " + r + "] [value: " + newValue + "]");
+                //System.out.println(variableInstance.getName() + " [S1: " + s1 + "] [R: " + r + "] [value: " + newValue + "]");
 
             } else if (StringUtils.equalsIgnoreCase(dataTypeAsString, "RS")) {
 

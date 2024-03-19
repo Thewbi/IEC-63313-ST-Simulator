@@ -9,5 +9,7 @@ public interface CylinderCallback {
     void position2Exited();
 
     void position2Reached();
+
+    void setCylinder(Cylinder cylinder);
     
 }

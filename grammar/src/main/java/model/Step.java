@@ -29,7 +29,7 @@ public class Step {
     public void execute(VariableInstance functionBlockVariableInstance) {
 
         if (executed) {
-            System.out.println("State: \"" + name + "\" already executed!");
+            //System.out.println("State: \"" + name + "\" already executed!");
             return;
         }
 

@@ -140,6 +140,7 @@ FUNCTION_BLOCK FB_Automatik
 
   STEP Step3:
     Zylinder_1_Auto_P2(N);
+    Zylinder_1_Auto_P1(R);
   END_STEP
 
   TRANSITION FROM Step3 TO Step4
@@ -147,7 +148,13 @@ FUNCTION_BLOCK FB_Automatik
   END_TRANSITION
 
   STEP Step4:
+    Zylinder_1_Auto_P1(N);
+    Zylinder_1_Auto_P2(R);
   END_STEP
+
+  TRANSITION FROM Step4 TO Step3
+    := Zylinder_1_SEN_P1;
+  END_TRANSITION
 
   TRANSITION FROM Step1 TO Step3
     := Zylinder_1_SEN_P1;

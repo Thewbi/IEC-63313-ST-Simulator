@@ -349,10 +349,12 @@ public class Main {
 
         CylinderCallback cylinderCallback = new CylinderCallback() {
 
+            private Cylinder cylinder;
+
             @Override
             public void position1Exited() {
 
-                System.out.println("position 1 Exited()");
+                System.out.println("Zylinder: \"" + cylinder.getName() + "\": Position 1 exited");
 
                 VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
                 senP1.setValue("false");
@@ -360,7 +362,7 @@ public class Main {
 
             @Override
             public void position1Reached() {
-                System.out.println("position 1 Reached()");
+                System.out.println("Zylinder: \"" + cylinder.getName() + "\": Position 1 reached");
 
                 VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
                 senP1.setValue("true");
@@ -372,14 +374,14 @@ public class Main {
 
             @Override
             public void position2Exited() {
-                System.out.println("position 2 Exited()");
+                System.out.println("Zylinder: \"" + cylinder.getName() + "\": Position 2 exited()");
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
                 senP2.setValue("false");
             }
 
             @Override
             public void position2Reached() {
-                System.out.println("position 2 Reached()");
+                System.out.println("Zylinder: \"" + cylinder.getName() + "\": Position 2 reached()");
 
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
                 senP2.setValue("true");
@@ -389,10 +391,20 @@ public class Main {
                 // hmi.setValue("false");
             }
 
+            public Cylinder getCylinder() {
+                return cylinder;
+            }
+
+            public void setCylinder(Cylinder cylinder) {
+                this.cylinder = cylinder;
+            }
+
         };
 
         Cylinder cylinder = new Cylinder();
+        cylinder.setName("Zylinder 1");
         cylinder.setCylinderCallback(cylinderCallback);
+        cylinderCallback.setCylinder(cylinder);
 
         // here you can simulate the cylinder never reaching some position
         //
@@ -679,24 +691,30 @@ public class Main {
             // System.out.println(variableDescriptor.toString(0));
             // }
 
-            // DEBUG
-            VariableInstance variableInstance = programInstance.getElement("Zyl1_AUTO_P2_HMI");
-            System.out.println(variableInstance.getName() + " " + variableInstance.getValue());
+            // // DEBUG
+            // VariableInstance variableInstance = programInstance.getElement("Zyl1_AUTO_P2_HMI");
+            // System.out.println(variableInstance.getName() + " " + variableInstance.getValue());
 
-            // DEBUG output global status struct
-            VariableInstance globalStatusVariableInstance = configurationInstance.getElement("global_status");
-            //VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
-            //System.out.println(stoerung.getName() + " " + stoerung.getValue());
-            VariableInstance bArtAuto = globalStatusVariableInstance.getElement("BART_Auto");
-            System.out.println(bArtAuto.getName() + " " + bArtAuto.getValue());
+            // // DEBUG output global status struct
+            // VariableInstance globalStatusVariableInstance = configurationInstance.getElement("global_status");
+            // //VariableInstance stoerung = globalStatusVariableInstance.getElement("Stoerung");
+            // //System.out.println(stoerung.getName() + " " + stoerung.getValue());
+            // VariableInstance bArtAuto = globalStatusVariableInstance.getElement("BART_Auto");
+            // System.out.println(bArtAuto.getName() + " " + bArtAuto.getValue());
 
-            VariableInstance akt52MV0 = programInstance.getElement("AKT_5_2_MV0");
-            //System.out.println(akt52MV0.toString(0));
-            VariableInstance autoP2 = akt52MV0.getElement("Auto_P2");
-            System.out.println(autoP2.getName() + " " + autoP2.getValue());
+            // VariableInstance akt52MV0 = programInstance.getElement("AKT_5_2_MV0");
+            // //System.out.println(akt52MV0.toString(0));
+            // VariableInstance autoP2 = akt52MV0.getElement("Auto_P2");
+            // System.out.println(autoP2.getName() + " " + autoP2.getValue());
 
-            VariableInstance s_MV_P2 = akt52MV0.getElement("s_MV_P2");
-            System.out.println(s_MV_P2.getName() + " " + s_MV_P2.getValue());
+            // VariableInstance s_MV_P2 = akt52MV0.getElement("s_MV_P2");
+            // System.out.println(s_MV_P2.getName() + " " + s_MV_P2.getValue());
+
+            // VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
+            // System.out.println("Sensor P1 (" + senP1.getValue() + ")");
+
+            // VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+            // System.out.println("Sensor P2 (" + senP2.getValue() + ")");
 
             //
             // GUI (update the gui for example for errors)

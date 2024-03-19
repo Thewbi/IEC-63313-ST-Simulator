@@ -209,6 +209,7 @@ public class VariableInstance implements StatementContainer {
         for (Step step : currentSteps) {
 
             for (Transition transition : step.getTransistions()) {
+
                 boolean evalResult = transition.evaluate(globalTypeScope, this);
                 if (evalResult) {
 
@@ -220,8 +221,6 @@ public class VariableInstance implements StatementContainer {
                     for (String targetStepName : transition.getTargetStepNames()) {
 
                         Step executeStep = getSteps().get(targetStepName);
-                        executeStep.setExecuted(false);
-
                         stepsToAdd.add(executeStep);
                     }
                 }
@@ -230,9 +229,15 @@ public class VariableInstance implements StatementContainer {
 
         // - the old state is removed from the current step list
         currentSteps.removeAll(stepsToRemove);
+        for (Step step : stepsToRemove) {
+            step.setExecuted(false);
+        }
 
         // - the new state is added to the current step list
         currentSteps.addAll(stepsToAdd);
+        for (Step step : stepsToAdd) {
+            step.setExecuted(false);
+        }
     }
 
     public String getName() {

@@ -10,6 +10,8 @@ public class Cylinder {
 
     private static final int POSITION_2 = 100;
 
+    private String name;
+
     private int startPosition = POSITION_1;
 
     private int position = POSITION_1;
@@ -121,6 +123,14 @@ public class Cylinder {
 
     public void setHasErrorNeverReachesPosition2(boolean hasErrorNeverReachesPosition2) {
         this.hasErrorNeverReachesPosition2 = hasErrorNeverReachesPosition2;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
     
 }
