@@ -243,8 +243,19 @@ been executed: isExecuted(true).
 * the old state is removed from the current step list
 * the new state is added to the current step list
 
+## Instantiation 
+
+Instantiating a SFC function block is done in the instantiation section of main.java
+
+## Running the Function Block
+
+The SFC function block is called in the program. The program is executed in main.java.
+
 
 # Next Steps
+
+Add Paarüberwachung (Error when both sensors are on!)
+Enable Diagnose enable: (Only run runtime error detection and paarüberwachung, when Diag.enabled == TRUE)
 
 1. Move code out of main into TONVariableInstance as much as possible.
 2. In OpenPLC editor, add Laufzeitüberwachung to P1

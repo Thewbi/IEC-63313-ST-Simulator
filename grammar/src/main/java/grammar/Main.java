@@ -414,6 +414,28 @@ public class Main {
 
         JPanel panel = new JPanel();
 
+        JButton automatikBetriebJButton = new JButton("Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
+        automatikBetriebJButton.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                VariableInstance stoerQuitTasterHMI = programInstance.getElement("FA_BART_Auto_S_HMI");
+
+                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(stoerQuitTasterHMI.getValue(), "true");
+                if (valueAsBoolean) {
+                    stoerQuitTasterHMI.setValue("false");
+                } 
+                else {
+                    stoerQuitTasterHMI.setValue("true");
+                }
+
+                automatikBetriebJButton.setText("Automatikbetrieb (" + programInstance.getElement("FA_BART_Auto_S_HMI").getValue() + ")");
+            }
+
+        });
+        panel.add(automatikBetriebJButton);
+
         JButton notHaltJButton = new JButton("NotHalt");
         notHaltJButton.addActionListener(new ActionListener() {
 
@@ -434,9 +456,6 @@ public class Main {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                // VariableInstance status = programInstance.getElement("global_status");
-                // VariableInstance stoerQuit = status.getElement("Stoer_Quit");
 
                 VariableInstance stoerQuitTasterHMI = programInstance.getElement("FA_Stoer_Quit_T_HMI");
 
@@ -497,8 +516,6 @@ public class Main {
         });
         panel.add(toggleHasErrorNeverReachesPosition2JButton);
 
-        
-
         // Button to make the cylinder travel towards P1
         JButton buttonP1 = new JButton("P1");
         buttonP1.addActionListener(new ActionListener() {
@@ -519,14 +536,26 @@ public class Main {
         });
         panel.add(buttonP1);
 
-        JButton buttonSensorP1 = new JButton("Sensor P1");
+        JButton buttonSensorP1 = new JButton("Sensor P1 (" + programInstance.getElement("SEN_P1_T_HMI").getValue() + ")");
         buttonSensorP1.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // pneumatic cylinder arrived at P1 and sensor P1 sends high signal
+                // // pneumatic cylinder arrived at P1 and sensor P1 sends high signal
+                // VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
+                // senP1.setValue("true");
+
                 VariableInstance senP1 = programInstance.getElement("SEN_P1_T_HMI");
-                senP1.setValue("true");
+
+                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(senP1.getValue(), "true");
+                if (valueAsBoolean) {
+                    senP1.setValue("false");
+                } 
+                else {
+                    senP1.setValue("true");
+                }
+
+                buttonSensorP1.setText("Sensor P1 (" + programInstance.getElement("SEN_P1_T_HMI").getValue() + ")");
             }
 
         });
@@ -552,14 +581,30 @@ public class Main {
         });
         panel.add(buttonP2);
 
-        JButton buttonSensorP2 = new JButton("Sensor P2");
+        JButton buttonSensorP2 = new JButton("Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
         buttonSensorP2.addActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                // pneumatic cylinder arrived at P2 and sensor P2 sends high signal
+                // // pneumatic cylinder arrived at P2 and sensor P2 sends high signal
+                // VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
+                // senP2.setValue("true");
+
+                // buttonSensorP2.setText("Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
+
+
+
                 VariableInstance senP2 = programInstance.getElement("SEN_P2_T_HMI");
-                senP2.setValue("true");
+
+                boolean valueAsBoolean = StringUtils.equalsIgnoreCase(senP2.getValue(), "true");
+                if (valueAsBoolean) {
+                    senP2.setValue("false");
+                } 
+                else {
+                    senP2.setValue("true");
+                }
+
+                buttonSensorP2.setText("Sensor P2 (" + programInstance.getElement("SEN_P2_T_HMI").getValue() + ")");
             }
 
         });
@@ -872,17 +917,22 @@ public class Main {
             }
         }
 
-        // copy actions
+        //
+        // Instantiate objects belonging to a 'sequential function chart' language FunctionBlock
+        //
 
+        // copy actions into the instance
         variableInstance.getAllActions().addAll(functionBlock.getAllActions());
 
+        // copy transitions into the instance
         variableInstance.getTempTransitions().addAll(functionBlock.getTempTransitions());
 
+        // copy steps into the instance
         Map<String, Step> newMap = new HashMap<String, Step>();
         newMap.putAll(functionBlock.getSteps());
-
         variableInstance.setSteps(newMap);
 
+        // initialize the instance (establish connections between steps, actions, transitions)
         variableInstance.initialize();
 
         return variableInstance;

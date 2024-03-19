@@ -255,7 +255,7 @@ public interface StatementContainer {
         variableInstance.executeStatements(globalTypeScope, variableInstance, variableInstance.getStatements());
 
         //
-        // execute sequential function chart
+        // execute sequential function chart (SFC) state machine if the function block contains one
         //
 
         if (variableInstance.getDataType() instanceof FunctionBlock) {

@@ -169,21 +169,25 @@ public class VariableInstance implements StatementContainer {
         }
 
         // 2. the global actions of the SequentialFunctionChart function block are
-        // executed.
-        // After execution, isExecuted(true) is called.
+        // executed. After execution, isExecuted(true) is called.
         for (Action action : globalActions) {
             action.execute(globalTypeScope);
         }
 
         // 3. all steps in the current step list are executed.
         for (Step step : currentSteps) {
-            System.out.println("Executing step: \"" + step.getName() + "\"");
+
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("Executing step: \"" + step.getName() + "\"");
+            if (step.isInitial()) {
+                stringBuilder.append(" (INITIAL STATE)");
+            }
+            System.out.println(stringBuilder.toString());
             step.execute(this);
         }
 
         // 5. the global actions of the SequentialFunctionChart function block are
-        // executed unless they have already
-        // been executed: isExecuted(true).
+        // executed unless they have already been executed: isExecuted(true).
         for (Action action : globalActions) {
             action.execute(globalTypeScope);
         }
@@ -239,8 +243,9 @@ public class VariableInstance implements StatementContainer {
 
     public void setValue(String value) {
         // DEBUG
-        // if (StringUtils.equalsIgnoreCase(name, "Stoer_Quit") && StringUtils.equalsIgnoreCase(value, "true")) {
-        //     System.out.println(")");
+        // if (StringUtils.equalsIgnoreCase(name, "Stoer_Quit") &&
+        // StringUtils.equalsIgnoreCase(value, "true")) {
+        // System.out.println(")");
         // }
         this.value = value;
     }
@@ -300,7 +305,8 @@ public class VariableInstance implements StatementContainer {
     }
 
     public String toString(int indent) {
-        //return "VariableInstance [name=" + name + ", dataType=" + dataType.toString(indent) + ", value=" + value + "]";
+        // return "VariableInstance [name=" + name + ", dataType=" +
+        // dataType.toString(indent) + ", value=" + value + "]";
 
         StringBuilder stringBuilder = new StringBuilder();
 

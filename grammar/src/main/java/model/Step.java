@@ -45,10 +45,19 @@ public class Step {
                 }
                     break;
 
+                case R: {
+                    System.out.println("Resetting " + actionAssociation.getName());
+                    VariableInstance varInstance = functionBlockVariableInstance
+                            .getElement(actionAssociation.getName());
+                    varInstance.setValue("false");
+                }
+                    break;
+
                 case S: {
                     Action action = functionBlockVariableInstance.getActionByName(actionAssociation.getName());
                     if (!functionBlockVariableInstance.getGlobalActions().contains(action)) {
-                        System.out.println("Adding S-Type Action \"" + actionAssociation.getName() + "\" to global action list");
+                        System.out.println(
+                                "Adding S-Type Action \"" + actionAssociation.getName() + "\" to global action list");
                         functionBlockVariableInstance.getGlobalActions().add(action);
                     }
                 }
